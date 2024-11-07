@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Lab 0：networking warmup 0.介绍 本次热身任务中，你需要在自己的计算机上安装 Linux 系统，学习如何手动通过互联网执行一些任务，用 C++ 编写一个小程序从互联网上获取网页，并在内存中实现网络的一个关键抽象概念：在写入者和读取者之间的可靠字节流。\n">
+<title>CS144 Lab 0</title>
+
+<link rel='canonical' href='https://SilentThink.github.io/p/cs144-lab-0/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="CS144 Lab 0">
+<meta property='og:description' content="Lab 0：networking warmup 0.介绍 本次热身任务中，你需要在自己的计算机上安装 Linux 系统，学习如何手动通过互联网执行一些任务，用 C++ 编写一个小程序从互联网上获取网页，并在内存中实现网络的一个关键抽象概念：在写入者和读取者之间的可靠字节流。\n">
+<meta property='og:url' content='https://SilentThink.github.io/p/cs144-lab-0/'>
+<meta property='og:site_name' content='SilentThink 博客'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2024-11-07T13:59:07&#43;08:00'/><meta property='article:modified_time' content='2024-11-07T13:59:07&#43;08:00'/>
+<meta name="twitter:title" content="CS144 Lab 0">
+<meta name="twitter:description" content="Lab 0：networking warmup 0.介绍 本次热身任务中，你需要在自己的计算机上安装 Linux 系统，学习如何手动通过互联网执行一些任务，用 C++ 编写一个小程序从互联网上获取网页，并在内存中实现网络的一个关键抽象概念：在写入者和读取者之间的可靠字节流。\n">
+    <link rel="shortcut icon" href="/favicon2.ico" />
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/%E5%8A%A0%E8%97%A4%E6%83%A0_hu8574714599784400491.png" width="300"
+                            height="301" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">😋</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">SilentThink 博客</a></h1>
+            <h2 class="site-description">欢迎</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/SilentThink'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E9%93%BE%E6%8E%A5/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>链接</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+                    
+                        <li id="i18n-switch">  
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M4 5h7" />
+  <path d="M9 3v2c0 4.418 -2.239 8 -5 8" />
+  <path d="M5 9c-.003 2.144 2.952 3.908 6.7 4" />
+  <path d="M12 20l4 -9l4 9" />
+  <path d="M19.1 18h-6.2" />
+</svg>
+
+
+
+                            <select name="language" title="language" onchange="window.location.href = this.selectedOptions[0].value">
+                                
+                                    <option value="https://SilentThink.github.io/en/" >English</option>
+                                
+                                    <option value="https://SilentThink.github.io/" selected>简体中文</option>
+                                
+                            </select>
+                        </li>
+                    
+                
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#lab-0networking-warmup">Lab 0：networking warmup</a>
+      <ol>
+        <li><a href="#0介绍">0.介绍</a></li>
+        <li><a href="#1-gnulinux环境配置">1. <strong>GNU/Linux</strong>环境配置</a>
+          <ol>
+            <li><a href="#windows">windows:</a></li>
+            <li><a href="#mac-os">Mac OS:</a></li>
+          </ol>
+        </li>
+        <li><a href="#2-手动完成网络任务">2. 手动完成网络任务</a>
+          <ol>
+            <li><a href="#21-获取一个网页">2.1 获取一个网页</a></li>
+            <li><a href="#22-给自己发邮件">2.2 给自己发邮件</a></li>
+            <li><a href="#23-监听与连接">2.3 监听与连接</a></li>
+          </ol>
+        </li>
+        <li><a href="#3-使用操作系统流套接字编写网络程序">3. 使用操作系统流套接字编写网络程序</a>
+          <ol>
+            <li><a href="#31-获取并部署原始代码">3.1 获取并部署原始代码</a></li>
+            <li><a href="#32-现代c编码规范">3.2 现代C++编码规范</a></li>
+            <li><a href="#33-阅读-minnow-提供的源代码框架">3.3 阅读 Minnow 提供的源代码框架</a></li>
+            <li><a href="#34-编写-webget">3.4 编写 webget</a></li>
+            <li><a href="#35-实现内存中的可靠字节流bytestream">3.5 实现内存中的可靠字节流（ByteStream）</a></li>
+          </ol>
+        </li>
+        <li><a href="#check0-over-">Check0 Over !!</a></li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/cs144-lab-0/">CS144 Lab 0</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">2024-11-07</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 10 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h2 id="lab-0networking-warmup">Lab 0：networking warmup
+</h2><h3 id="0介绍">0.介绍
+</h3><p>本次热身任务中，你需要在自己的计算机上安装 Linux 系统，学习如何手动通过互联网执行一些任务，用 C++ 编写一个小程序从互联网上获取网页，并在内存中实现网络的一个关键抽象概念：在写入者和读取者之间的可靠字节流。</p>
+<h3 id="1-gnulinux环境配置">1. <strong>GNU/Linux</strong>环境配置
+</h3><h4 id="windows">windows:
+</h4><p>我使用的环境为<code>Ubuntu 22.04 @ WSL2</code></p>
+<p>运行以下命令安装需要的包</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">sudo apt update &amp;&amp; sudo apt install git cmake gdb build-essential clang \
+</span></span><span class="line"><span class="cl">clang-tidy clang-format gcc-doc pkg-config glibc-doc tcpdump tshark
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>项目编译运行及调试需要的g++ 版本:13及以上</p>
+<h4 id="mac-os">Mac OS:
+</h4><p>官方文档中的建议：</p>
+<p>If you have a 2020–24 MacBook (with the ARM64 M1/M2/M3 chips), VirtualBox will</p>
+<p>not successfully run. Instead, please install the UTM virtual machine software and our</p>
+<p>ARM64 virtual machine image from <a class="link" href="https://stanford.edu/class/cs144/vm_howto/"  target="_blank" rel="noopener"
+    >https://stanford.edu/class/cs144/vm_howto/</a> .</p>
+<p>我的配置方法——docker:</p>
+<p><strong>dockerfile:</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="cl"><span class="k">FROM</span><span class="s"> ubuntu:latest</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">WORKDIR</span><span class="s"> /usr/src/app</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">RUN</span> apt-get update <span class="o">&amp;&amp;</span> apt-get install -y <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    build-essential <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    g++-13 <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    clang-15<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">RUN</span> update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 <span class="m">100</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    <span class="o">&amp;&amp;</span> update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 <span class="m">100</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    <span class="o">&amp;&amp;</span> update-alternatives --install /usr/bin/clang clang /usr/bin/clang-15 <span class="m">100</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">ENV</span> <span class="nv">CC</span><span class="o">=</span>gcc
+</span></span><span class="line"><span class="cl"><span class="k">ENV</span> <span class="nv">CXX</span><span class="o">=</span>g++<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">RUN</span> apt-get clean <span class="o">&amp;&amp;</span> rm -rf /var/lib/apt/lists/*<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">CMD</span> <span class="p">[</span> <span class="s2">&#34;/bin/bash&#34;</span><span class="p">]</span><span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="2-手动完成网络任务">2. 手动完成网络任务
+</h3><p>在 “Networking by hand” 部分，你需要手动完成两项任务：检索网页（就像网络浏览器一样）和发送电子邮件消息（就像电子邮件客户端一样）。这两项任务都依赖于一种称为可靠双向字节流的网络抽象概念。你将在终端中输入一系列字节，相同顺序的字节序列最终将被传递到另一台计算机（服务器）上运行的程序。服务器用它自己的字节序列进行响应，并将其传递回你的终端。</p>
+<h4 id="21-获取一个网页">2.1 获取一个网页
+</h4><ol>
+<li>打开浏览器访问 <a class="link" href="http://cs144.keithw.org/hello"  target="_blank" rel="noopener"
+    >http://cs144.keithw.org/hello</a> 并观察结果</li>
+</ol>
+<img src="img/image-20241107164735897-173098075839223.png" alt="image-20241107164735897" style="zoom: 80%;" />
+<ol start="2">
+<li>在linux终端中执行和浏览器一样的工作</li>
+</ol>
+<p>​	(a) 运行 <code>telnet cs144.keithw.org http</code></p>
+<img src="img/image-20241107165749670-173098075839224.png" alt="image-20241107165749670" style="zoom:80%;" />
+<p>这会告诉 telnet 程序在你的计算机和另一台名为 “<a class="link" href="https://cs144.keithw.org/"  target="_blank" rel="noopener"
+    >cs144.keithw.org</a>” 的计算机之间打开一个可靠的字节流，并且在那台计算机上运行特定的服务：用于万维网的超文本传输协议（“http” 服务）。如果你的计算机已正确设置并连接到互联网，你将看到如上图相应的输出。</p>
+<p>如果你想要退出这个连接，按住键盘的 <code>ctrl</code> 键然后按 <code>]</code>，之后敲下回车键 <code>Enter</code> 即可
+(b)  输入 <code>GET /hello HTTP/1.1</code>，这告诉服务器 URL 的路径部分（从第三个斜杠开始的部分）。</p>
+<p>​	(c) 输入 <code>Host: cs144.keithw.org</code>，这告诉服务器 URL 的主机部分（在 “http://” 和第三个斜杠之间的部分）。</p>
+<p>​	(d) 输入 <code>Connection: close</code>，这告诉服务器你已完成请求，并且它应在回复完成后尽快关闭连接。</p>
+<p>​	(e) 再按一次回车键，这发送一个空行并告诉服务器你已完成 HTTP 请求。</p>
+<p>​	(f) 如果一切顺利，你将看到与浏览器看到的相同响应，前面是 HTTP 头，它告诉浏览器如何解释响应。</p>
+<p><img src="/p/cs144-lab-0/img/image-20241107171403116-173098075839225.png"
+	width="1028"
+	height="760"
+	srcset="/p/cs144-lab-0/img/image-20241107171403116-173098075839225_hu10781897983281865416.png 480w, /p/cs144-lab-0/img/image-20241107171403116-173098075839225_hu6414918317582455258.png 1024w"
+	loading="lazy"
+	
+		alt="image-20241107171403116"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="135"
+		data-flex-basis="324px"
+	
+></p>
+<h4 id="22-给自己发邮件">2.2 给自己发邮件
+</h4><p>略：没有斯坦福的邮箱，无法完成这个任务</p>
+<h4 id="23-监听与连接">2.3 监听与连接
+</h4><p>你已经看到了用 telnet 能做什么：它是一个客户端程序，可以与其他计算机上运行的程序建立外出连接。现在是时候尝试运行一个简单的服务器了：即等待客户端连接它的程序。</p>
+<ol>
+<li>
+<p>在一个终端窗口中，在你的虚拟机上运行 <code>netcat -v -l -p 9090</code>。</p>
+</li>
+<li>
+<p>让 netcat 保持运行状态。在另一个终端窗口中，运行 <code>telnet localhost 9090</code>。</p>
+</li>
+<li>
+<p>如果一切顺利，netcat 将会打印出类似 “Connection from localhost 53500 received! ” 的内容。</p>
+</li>
+<li>
+<p>现在尝试在任意一个终端窗口中输入内容 —— 无论是 netcat（服务器）窗口还是 telnet（客户端）窗口。注意，你在一个窗口中输入的任何内容都会出现在另一个窗口中，反之亦然。你必须按回车键才能传输字节。</p>
+</li>
+<li>
+<p>在 <strong>netcat</strong> 窗口中，通过输入 <code>ctrl-C</code>  退出程序。注意，telnet 程序也会立即退出。</p>
+</li>
+</ol>
+<p><img src="/p/cs144-lab-0/img/image-20241107172314171-173098075839226.png"
+	width="1755"
+	height="760"
+	srcset="/p/cs144-lab-0/img/image-20241107172314171-173098075839226_hu18156668215240137384.png 480w, /p/cs144-lab-0/img/image-20241107172314171-173098075839226_hu16084933704800575242.png 1024w"
+	loading="lazy"
+	
+		alt="image-20241107172314171"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="230"
+		data-flex-basis="554px"
+	
+></p>
+<h3 id="3-使用操作系统流套接字编写网络程序">3. 使用操作系统流套接字编写网络程序
+</h3><p>在本次热身实验的下一部分，你要编写一个简短程序从互联网获取网页。这会利用 Linux 内核及大多数其他操作系统提供的功能，即在两个程序间创建可靠双向字节流，比如一个程序在你的计算机上运行，另一个在互联网上的其他计算机（如 Web 服务器或 netcat 程序）上运行。此功能称为流套接字，对于程序和 Web 服务器来说，它就像普通文件描述符。</p>
+<p>但实际上，互联网并不直接提供可靠字节流服务，只是尽最大努力传送数据报，而数据报可能丢失、乱序、内容改变甚至被复制多次。连接两端的操作系统通常负责将 “尽力而为的数据报” 转换为 “可靠字节流”，这是通过 1981 年的传输控制协议（TCP）实现的。</p>
+<p>在本次实验中，你将借助操作系统对 TCP 的支持编写 “webget” 程序，创建 TCP 流套接字连接 Web 服务器获取页面。未来的实验中，你将自己实现传输控制协议，从不太可靠的数据报中创建可靠字节流。</p>
+<h4 id="31-获取并部署原始代码">3.1 获取并部署原始代码
+</h4><ol>
+<li>运行 <code>git clone https://github.com/cs144/minnow</code> 拉取代码</li>
+<li>将项目部署到自己的github仓库</li>
+<li>进入 Lab 0 的目录：<code>cd minnow</code></li>
+<li>创建build目录来编译程序： <code>cmake -S . -B build</code></li>
+<li>编译源代码：<code>cmake --build build</code></li>
+</ol>
+<p>查看是否安装g++13版本，对应的路径在哪：</p>
+<p><img src="/p/cs144-lab-0/img/image-20241107181108561-173098075839227.png"
+	width="632"
+	height="181"
+	srcset="/p/cs144-lab-0/img/image-20241107181108561-173098075839227_hu6262721510504163645.png 480w, /p/cs144-lab-0/img/image-20241107181108561-173098075839227_hu12421196636774949627.png 1024w"
+	loading="lazy"
+	
+		alt="image-20241107181108561"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="349"
+		data-flex-basis="838px"
+	
+></p>
+<p>配置默认编译器：<code>nano ~/.bashrc</code>，在文件末尾添加以下两行代码：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">CC</span><span class="o">=</span>gcc-13
+</span></span><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">CXX</span><span class="o">=</span>clang++-14
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>ctrl+x</code>,<code>Enter</code> 进行保存</p>
+<p>运行<code>source ~/.bashrc</code>进行更新</p>
+<p>创建build目录</p>
+<p><img src="/p/cs144-lab-0/img/image-20241107181612888-173098075839228.png"
+	width="723"
+	height="268"
+	srcset="/p/cs144-lab-0/img/image-20241107181612888-173098075839228_hu12021905086290291651.png 480w, /p/cs144-lab-0/img/image-20241107181612888-173098075839228_hu3376914329669964262.png 1024w"
+	loading="lazy"
+	
+		alt="image-20241107181612888"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="269"
+		data-flex-basis="647px"
+	
+></p>
+<p>编译</p>
+<p><img src="/p/cs144-lab-0/img/image-20241107181653367-173098075839229.png"
+	width="831"
+	height="201"
+	srcset="/p/cs144-lab-0/img/image-20241107181653367-173098075839229_hu10889311905787848746.png 480w, /p/cs144-lab-0/img/image-20241107181653367-173098075839229_hu6943445466437202101.png 1024w"
+	loading="lazy"
+	
+		alt="image-20241107181653367"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="413"
+		data-flex-basis="992px"
+	
+></p>
+<h4 id="32-现代c编码规范">3.2 现代C++编码规范
+</h4><p>参考：</p>
+<p><a class="link" href="http://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines"  target="_blank" rel="noopener"
+    >http://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines</a></p>
+<p><a class="link" href="https://en.cppreference.com"  target="_blank" rel="noopener"
+    >https://en.cppreference.com</a></p>
+<p>具体请看源文档：check0.pdf</p>
+<p>在push到github之前，运行  <code>cmake --build build --target tidy</code> 以获取有关如何改进与 C++ 编程实践相关的代码的建议，并运行 <code>cmake --build build --target format</code>  以一致地格式化代码。</p>
+<p>使用git:</p>
+<p><strong>Please make frequent small commits as you work, and use commit messages that identify what changed and why</strong></p>
+<p>参考：</p>
+<p><a class="link" href="https://guides.github.com/introduction/git-handbook"  target="_blank" rel="noopener"
+    >https://guides.github.com/introduction/git-handbook</a></p>
+<h4 id="33-阅读-minnow-提供的源代码框架">3.3 阅读 Minnow 提供的源代码框架
+</h4><p>请仔细阅读公共接口（在文件 <code>util/socket.hh</code> 和 <code>util/file_descriptor.hh</code> 中 “<code>public:</code>” 之后的部分。请注意，<code>Socket</code> 是一种 <code>FileDescriptor</code> 类型，而 <code>TCPSocket</code> 是一种 <code>Socket</code> 类型）。</p>
+<h4 id="34-编写-webget">3.4 编写 webget
+</h4><p>现在是时候实现 “webget” 了，这是一个使用操作系统的 TCP 支持和流套接字抽象从互联网上获取网页的程序 —— 就像你在本次实验的早些时候手动所做的那样。</p>
+<ol>
+<li>从构建目录中，在文本编辑器或集成开发环境（IDE）中打开 “../apps/webget.cc” 文件。</li>
+<li>在 “get_URL” 函数中实现简单的 Web 客户端。</li>
+</ol>
+<ul>
+<li>按照文件中的描述，使用之前用过的 HTTP（Web）请求格式。同时要使用 “TCPSocket” 和 “Address” 类。</li>
+<li>明确了实现的具体位置和所需的类。</li>
+</ul>
+<ol start="3">
+<li>提示：</li>
+</ol>
+<ul>
+<li>在 HTTP 中，每行必须以 “\r\n” 结尾，不能仅用 “\n” 或 “endl”。强调了 HTTP 协议的格式要求。</li>
+<li>客户端请求中要包含 “Connection: close”，告知服务器在本次请求后不再等待更多请求，服务器发送一个回复后就结束传出字节流。当套接字到达 “EOF” 时，表明传入字节流结束，客户端由此知道服务器已完成回复。详细说明了与服务器交互的关键设置。</li>
+<li>确保读取并打印服务器的所有输出直到套接字到达 “EOF”，单次调用 “read” 是不够的。强调了要完整处理服务器的响应。</li>
+<li>预计需要写大约十行代码，给出了代码量的大致预期。</li>
+</ul>
+<ol start="4">
+<li>
+<p>通过运行 <code>make</code> 编译程序。</p>
+</li>
+<li>
+<p>测试程序。</p>
+</li>
+</ol>
+<ul>
+<li>运行 <code>./apps/webget cs144.keithw.org /hello</code> 进行测试。</li>
+<li>比较与在浏览器中访问 “http://cs144.keithw.org/hello” 的结果以及与 2.1 节结果的差异。鼓励用任何 http URL 进行实验。</li>
+</ul>
+<ol start="6">
+<li>自动化测试：</li>
+</ol>
+<ul>
+<li>当程序看似正常工作时，运行 “<code>cmake --build build --target check webget</code>” 进行自动化测试。</li>
+<li>在实现 “get_URL” 函数之前，会看到特定的测试结果，包括编译检查通过但功能测试失败，并给出警告和错误信息。完成作业后，测试应全部通过。</li>
+</ul>
+<p>webget.cc:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-C++" data-lang="C++"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;socket.hh&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;tcp_minnow_socket.hh&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;cstdlib&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;span&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;string&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">get_URL</span><span class="p">(</span> <span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">host</span><span class="p">,</span> <span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">path</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">CS144TCPSocket</span> <span class="n">sock</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl">  <span class="n">sock</span><span class="p">.</span><span class="n">connect</span><span class="p">(</span> <span class="n">Address</span><span class="p">(</span> <span class="n">host</span><span class="p">,</span> <span class="s">&#34;http&#34;</span> <span class="p">)</span> <span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">sock</span><span class="p">.</span><span class="n">write</span><span class="p">(</span> <span class="s">&#34;GET &#34;</span> <span class="o">+</span> <span class="n">path</span> <span class="o">+</span> <span class="s">&#34; HTTP/1.1</span><span class="se">\r\n</span><span class="s">Host: &#34;</span> <span class="o">+</span> <span class="n">host</span> <span class="o">+</span> <span class="s">&#34;</span><span class="se">\r\n</span><span class="s">Connection: close</span><span class="se">\r\n\r\n</span><span class="s">&#34;</span> <span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">sock</span><span class="p">.</span><span class="n">shutdown</span><span class="p">(</span> <span class="n">SHUT_WR</span> <span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">while</span> <span class="p">(</span> <span class="o">!</span><span class="n">sock</span><span class="p">.</span><span class="n">eof</span><span class="p">()</span> <span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">string</span> <span class="n">recvd</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">sock</span><span class="p">.</span><span class="n">read</span><span class="p">(</span> <span class="n">recvd</span> <span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">recvd</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="n">sock</span><span class="p">.</span><span class="n">close</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">return</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span> <span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[]</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">try</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span> <span class="n">argc</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="n">abort</span><span class="p">();</span> <span class="c1">// For sticklers: don&#39;t try to access argv[0] if argc &lt;= 0.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">auto</span> <span class="n">args</span> <span class="o">=</span> <span class="n">span</span><span class="p">(</span> <span class="n">argv</span><span class="p">,</span> <span class="n">argc</span> <span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// The program takes two command-line arguments: the hostname and &#34;path&#34; part of the URL.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// Print the usage message unless there are these two arguments (plus the program name
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// itself, so arg count = 3 in total).
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span> <span class="n">argc</span> <span class="o">!=</span> <span class="mi">3</span> <span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Usage: &#34;</span> <span class="o">&lt;&lt;</span> <span class="n">args</span><span class="p">.</span><span class="n">front</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&#34; HOST PATH</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;</span><span class="se">\t</span><span class="s">Example: &#34;</span> <span class="o">&lt;&lt;</span> <span class="n">args</span><span class="p">.</span><span class="n">front</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&#34; stanford.edu /class/cs144</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="k">return</span> <span class="n">EXIT_FAILURE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// Get the command-line arguments.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">const</span> <span class="n">string</span> <span class="n">host</span> <span class="p">{</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl">    <span class="k">const</span> <span class="n">string</span> <span class="n">path</span> <span class="p">{</span> <span class="n">args</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// Call the student-written function.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">get_URL</span><span class="p">(</span> <span class="n">host</span><span class="p">,</span> <span class="n">path</span> <span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span> <span class="k">const</span> <span class="n">exception</span><span class="o">&amp;</span> <span class="n">e</span> <span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="n">e</span><span class="p">.</span><span class="n">what</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">EXIT_FAILURE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="n">EXIT_SUCCESS</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>进入build目录执行<code>make</code></p>
+<p><img src="/p/cs144-lab-0/img/image-20241107181935392-173098075839230.png"
+	width="776"
+	height="261"
+	srcset="/p/cs144-lab-0/img/image-20241107181935392-173098075839230_hu16142148294353037179.png 480w, /p/cs144-lab-0/img/image-20241107181935392-173098075839230_hu2964938728901714077.png 1024w"
+	loading="lazy"
+	
+		alt="image-20241107181935392"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="297"
+		data-flex-basis="713px"
+	
+></p>
+<p>运行<code>./apps/webget cs144.keithw.org /hello</code>：</p>
+<p><img src="/p/cs144-lab-0/img/image-20241107191044341-173098075839331.png"
+	width="906"
+	height="263"
+	srcset="/p/cs144-lab-0/img/image-20241107191044341-173098075839331_hu15086207240489262806.png 480w, /p/cs144-lab-0/img/image-20241107191044341-173098075839331_hu10821072074628342531.png 1024w"
+	loading="lazy"
+	
+		alt="image-20241107191044341"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="344"
+		data-flex-basis="826px"
+	
+></p>
+<p>回到minnow目录运行 <code>cmake --build build --target check webget</code>：</p>
+<p><img src="/p/cs144-lab-0/img/image-20241107191609118-173098075839332.png"
+	width="874"
+	height="242"
+	srcset="/p/cs144-lab-0/img/image-20241107191609118-173098075839332_hu11754118453692460345.png 480w, /p/cs144-lab-0/img/image-20241107191609118-173098075839332_hu9857370640882304925.png 1024w"
+	loading="lazy"
+	
+		alt="image-20241107191609118"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="361"
+		data-flex-basis="866px"
+	
+></p>
+<h4 id="35-实现内存中的可靠字节流bytestream">3.5 实现内存中的可靠字节流（ByteStream）
+</h4><p>你将在一台计算机的内存中实现一个提供这种抽象的对象。字节在 “输入” 侧被写入，并可以从 “输出” 侧以相同的顺序被读取。这个字节流是有限的：写入者可以结束输入，之后就不能再写入更多字节。当读取者读到流的末尾时，它将到达 “EOF”（文件结束），并且不能再读取更多字节。</p>
+<p>你的字节流也将进行流量控制，以在任何给定时间限制其内存消耗。该对象在初始化时带有特定的 “容量”：即在任何给定时刻它愿意在自己的内存中存储的最大字节数。字节流将限制写入者在任何给定时刻可以写入的量，以确保流不会超过其存储容量。当读取者读取字节并从流中排出它们时，写入者被允许写入更多。你的字节流用于单个线程中 —— 你不必担心并发的写入者 / 读取者、锁定或竞争条件。</p>
+<p>需要明确的是：字节流是有限的，但在写入者结束输入并完成流之前，它可以几乎是任意长的。你的实现必须能够处理比容量长得多的流。容量限制了在给定时刻内存中（已写入但尚未读取）的字节数，但不限制流的长度。一个容量只有一个字节的对象仍然可以承载一个长达数 TB 的流，只要写入者一次写入一个字节，并且在写入者被允许写入下一个字节之前，读取者读取每个字节。</p>
+<p>writer的接口如下:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-C++" data-lang="C++"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">push</span><span class="p">(</span> <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">data</span> <span class="p">);</span> <span class="c1">// Push data to stream, but only as much as available capacity allows.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="nf">close</span><span class="p">();</span> <span class="c1">// Signal that the stream has reached its ending. Nothing more will be written.*
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="kt">bool</span> <span class="nf">is_closed</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span> <span class="c1">// Has the stream been closed?
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="kt">uint64_t</span> <span class="nf">available_capacity</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span> <span class="c1">// How many bytes can be pushed to the stream right now?
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">uint64_t</span> <span class="nf">bytes_pushed</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>  <span class="c1">// Total number of bytes cumulatively pushed to the stream
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>reader的接口如下:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-C++" data-lang="C++"><span class="line"><span class="cl"><span class="n">std</span><span class="o">::</span><span class="n">string_view</span> <span class="n">peek</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span> <span class="c1">// Peek at the next bytes in the buffer
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="nf">pop</span><span class="p">(</span> <span class="kt">uint64_t</span> <span class="n">len</span> <span class="p">);</span> <span class="c1">// Remove `len` bytes from the buffer
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">bool</span> <span class="nf">is_finished</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span> <span class="c1">// Is the stream finished (closed and fully popped)?
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">bool</span> <span class="nf">has_error</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span> <span class="c1">// Has the stream had an error?
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">uint64_t</span> <span class="nf">bytes_buffered</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span> <span class="c1">// Number of bytes currently buffered (pushed and not popped)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">uint64_t</span> <span class="nf">bytes_popped</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span> <span class="c1">// Total number of bytes cumulatively popped from stream
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>请打开 “<code>src/byte_stream.hh</code>” 和 “<code>src/byte_stream.cc</code>” 文件，并实现一个提供此接口的对象。在开发字节流实现的过程中，你可以使用 “<code>cmake --build build --target check0</code>” 运行自动化测试。如果所有测试通过，check0 测试将运行你的实现的速度基准测试。对于本课程而言，任何速度快于 0.1 Gbit/s（换句话说，每秒 1 亿比特）的都是可以接受的。（一个实现有可能执行速度快于 10 Gbit/s，但这取决于你的计算机速度，不是必需的。）</p>
+<p>byte_stream.hh:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-C++" data-lang="C++"><span class="line"><span class="cl"><span class="cp">#pragma once
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;cstdint&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;deque&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;string&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;string_view&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Reader</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Writer</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">ByteStream</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">  <span class="k">explicit</span> <span class="n">ByteStream</span><span class="p">(</span> <span class="kt">uint64_t</span> <span class="n">capacity</span> <span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// Helper functions (provided) to access the ByteStream&#39;s Reader and Writer interfaces
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">Reader</span><span class="o">&amp;</span> <span class="n">reader</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="k">const</span> <span class="n">Reader</span><span class="o">&amp;</span> <span class="n">reader</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">Writer</span><span class="o">&amp;</span> <span class="n">writer</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="k">const</span> <span class="n">Writer</span><span class="o">&amp;</span> <span class="n">writer</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="kt">void</span> <span class="nf">set_error</span><span class="p">()</span> <span class="p">{</span> <span class="n">error_</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span> <span class="p">};</span>       <span class="c1">// Signal that the stream suffered an error.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">bool</span> <span class="nf">has_error</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span> <span class="k">return</span> <span class="n">error_</span><span class="p">;</span> <span class="p">};</span> <span class="c1">// Has the stream had an error?
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="k">protected</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// Please add any additional state to the ByteStream here, and not to the Writer and Reader interfaces.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">uint64_t</span> <span class="n">capacity_</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">bool</span> <span class="n">error_</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl">  <span class="n">std</span><span class="o">::</span><span class="n">deque</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span> <span class="n">buffer_</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">bool</span> <span class="n">is_closed_</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">uint64_t</span> <span class="n">pushcnt_</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">uint64_t</span> <span class="n">popcnt_</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">uint64_t</span> <span class="n">buffer_bytes_size_</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Writer</span> <span class="o">:</span> <span class="k">public</span> <span class="n">ByteStream</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">void</span> <span class="n">push</span><span class="p">(</span> <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">data</span> <span class="p">);</span> <span class="c1">// Push data to stream, but only as much as available capacity allows.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">void</span> <span class="nf">close</span><span class="p">();</span>                  <span class="c1">// Signal that the stream has reached its ending. Nothing more will be written.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">  <span class="kt">bool</span> <span class="nf">is_closed</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>              <span class="c1">// Has the stream been closed?
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">uint64_t</span> <span class="nf">available_capacity</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span> <span class="c1">// How many bytes can be pushed to the stream right now?
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">uint64_t</span> <span class="nf">bytes_pushed</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>       <span class="c1">// Total number of bytes cumulatively pushed to the stream
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Reader</span> <span class="o">:</span> <span class="k">public</span> <span class="n">ByteStream</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">  <span class="n">std</span><span class="o">::</span><span class="n">string_view</span> <span class="n">peek</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span> <span class="c1">// Peek at the next bytes in the buffer
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">void</span> <span class="nf">pop</span><span class="p">(</span> <span class="kt">uint64_t</span> <span class="n">len</span> <span class="p">);</span>      <span class="c1">// Remove `len` bytes from the buffer
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">  <span class="kt">bool</span> <span class="nf">is_finished</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>        <span class="c1">// Is the stream finished (closed and fully popped)?
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">uint64_t</span> <span class="nf">bytes_buffered</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span> <span class="c1">// Number of bytes currently buffered (pushed and not popped)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">uint64_t</span> <span class="nf">bytes_popped</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>   <span class="c1">// Total number of bytes cumulatively popped from stream
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="cm">/*
+</span></span></span><span class="line"><span class="cl"><span class="cm"> * read: A (provided) helper function thats peeks and pops up to `len` bytes
+</span></span></span><span class="line"><span class="cl"><span class="cm"> * from a ByteStream Reader into a string;
+</span></span></span><span class="line"><span class="cl"><span class="cm"> */</span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">read</span><span class="p">(</span> <span class="n">Reader</span><span class="o">&amp;</span> <span class="n">reader</span><span class="p">,</span> <span class="kt">uint64_t</span> <span class="n">len</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span> <span class="n">out</span> <span class="p">);</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>byte_stream.cc:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span><span class="lnt">79
+</span><span class="lnt">80
+</span><span class="lnt">81
+</span><span class="lnt">82
+</span><span class="lnt">83
+</span><span class="lnt">84
+</span><span class="lnt">85
+</span><span class="lnt">86
+</span><span class="lnt">87
+</span><span class="lnt">88
+</span><span class="lnt">89
+</span><span class="lnt">90
+</span><span class="lnt">91
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-C++" data-lang="C++"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;byte_stream.hh&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">ByteStream</span><span class="o">::</span><span class="n">ByteStream</span><span class="p">(</span> <span class="kt">uint64_t</span> <span class="n">capacity</span> <span class="p">)</span> <span class="o">:</span> <span class="n">capacity_</span><span class="p">(</span> <span class="n">capacity</span> <span class="p">)</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">bool</span> <span class="n">Writer</span><span class="o">::</span><span class="n">is_closed</span><span class="p">()</span> <span class="k">const</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// Your code here.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">return</span> <span class="n">is_closed_</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">Writer</span><span class="o">::</span><span class="n">push</span><span class="p">(</span> <span class="n">string</span> <span class="n">data</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// Your code here.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">if</span> <span class="p">(</span> <span class="n">is_closed_</span> <span class="o">||</span> <span class="n">available_capacity</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">data</span><span class="p">.</span><span class="n">empty</span><span class="p">()</span> <span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">uint64_t</span> <span class="k">const</span> <span class="n">push_size</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">min</span><span class="p">(</span> <span class="n">data</span><span class="p">.</span><span class="n">size</span><span class="p">(),</span> <span class="n">available_capacity</span><span class="p">()</span> <span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span> <span class="n">push_size</span> <span class="o">&lt;</span> <span class="n">data</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">.</span><span class="n">substr</span><span class="p">(</span> <span class="mi">0</span><span class="p">,</span> <span class="n">push_size</span> <span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="n">buffer_</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span> <span class="n">data</span> <span class="p">)</span> <span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">buffer_bytes_size_</span> <span class="o">+=</span> <span class="n">push_size</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">pushcnt_</span> <span class="o">+=</span> <span class="n">push_size</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">Writer</span><span class="o">::</span><span class="n">close</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// Your code here.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">is_closed_</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">uint64_t</span> <span class="n">Writer</span><span class="o">::</span><span class="n">available_capacity</span><span class="p">()</span> <span class="k">const</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// Your code here.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">return</span> <span class="p">(</span> <span class="n">capacity_</span> <span class="o">-</span> <span class="n">buffer_bytes_size_</span> <span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">uint64_t</span> <span class="n">Writer</span><span class="o">::</span><span class="n">bytes_pushed</span><span class="p">()</span> <span class="k">const</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// Your code here.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">return</span> <span class="n">pushcnt_</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">bool</span> <span class="n">Reader</span><span class="o">::</span><span class="n">is_finished</span><span class="p">()</span> <span class="k">const</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// Your code here.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">return</span> <span class="p">(</span> <span class="n">is_closed_</span> <span class="o">&amp;&amp;</span> <span class="n">pushcnt_</span> <span class="o">==</span> <span class="n">popcnt_</span> <span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">uint64_t</span> <span class="n">Reader</span><span class="o">::</span><span class="n">bytes_popped</span><span class="p">()</span> <span class="k">const</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// Your code here.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">return</span> <span class="n">popcnt_</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">string_view</span> <span class="n">Reader</span><span class="o">::</span><span class="n">peek</span><span class="p">()</span> <span class="k">const</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// Your code here.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">if</span> <span class="p">(</span> <span class="n">buffer_</span><span class="p">.</span><span class="n">empty</span><span class="p">()</span> <span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">string_view</span><span class="p">(</span> <span class="n">buffer_</span><span class="p">.</span><span class="n">front</span><span class="p">()</span> <span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">Reader</span><span class="o">::</span><span class="n">pop</span><span class="p">(</span> <span class="kt">uint64_t</span> <span class="n">len</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// Your code here.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">uint64_t</span> <span class="n">pop_size</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">min</span><span class="p">(</span> <span class="n">len</span><span class="p">,</span> <span class="n">buffer_bytes_size_</span> <span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">buffer_bytes_size_</span> <span class="o">-=</span> <span class="n">pop_size</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">popcnt_</span> <span class="o">+=</span> <span class="n">pop_size</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">while</span> <span class="p">(</span> <span class="n">pop_size</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">uint64_t</span> <span class="k">const</span> <span class="n">to_pop_size</span> <span class="o">=</span> <span class="n">buffer_</span><span class="p">.</span><span class="n">front</span><span class="p">().</span><span class="n">size</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span> <span class="n">to_pop_size</span> <span class="o">&lt;=</span> <span class="n">pop_size</span> <span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="n">buffer_</span><span class="p">.</span><span class="n">pop_front</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">      <span class="n">pop_size</span> <span class="o">-=</span> <span class="n">to_pop_size</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="n">buffer_</span><span class="p">.</span><span class="n">front</span><span class="p">().</span><span class="n">erase</span><span class="p">(</span> <span class="mi">0</span><span class="p">,</span> <span class="n">pop_size</span> <span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="n">pop_size</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">uint64_t</span> <span class="n">Reader</span><span class="o">::</span><span class="n">bytes_buffered</span><span class="p">()</span> <span class="k">const</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// Your code here.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">return</span> <span class="n">pushcnt_</span> <span class="o">-</span> <span class="n">popcnt_</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>执行自动化测试<code>cmake --build build --target check0</code>：</p>
+<p><img src="/p/cs144-lab-0/img/image-20241107193120654-173098075839333.png"
+	width="860"
+	height="616"
+	srcset="/p/cs144-lab-0/img/image-20241107193120654-173098075839333_hu13255474232117984469.png 480w, /p/cs144-lab-0/img/image-20241107193120654-173098075839333_hu18333582788604531294.png 1024w"
+	loading="lazy"
+	
+		alt="image-20241107193120654"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="139"
+		data-flex-basis="335px"
+	
+></p>
+<h3 id="check0-over-">Check0 Over !!
+</h3>
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2024 SilentThink
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.29.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
