@@ -794,6 +794,97 @@
         document.head.appendChild(customFont);
     }());
 </script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css">
+<div id="aplayer"></div>
+<script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script>
+
+<script>
+    const musicDir = "https://SilentThink.github.io/" + 'music/';
+    const songs = [
+        'Amani-BEYOND',
+        'Shall we talk-陈奕迅',
+        '暧昧-王菲',
+        '暗号-周杰伦',
+        '不浪漫罪名-王杰',
+        '超跑女神-周杰伦',
+        '城府-许嵩',
+        '大笨钟-周杰伦',
+        '单车-陈奕迅',
+        '东京不太热-洛天依',
+        '断桥残雪-许嵩',
+        '发如雪-周杰伦',
+        '枫-周杰伦',
+        '富士山下-陈奕迅',
+        '给我一首歌的时间-周杰伦',
+        '勾指起誓-洛天依Official;ilem',
+        '红玫瑰-陈奕迅',
+        '就是现在-王力宏',
+        '菊花台-周杰伦',
+        '庐州月-许嵩',
+        '你若成风-许嵩',
+        '陪你度过漫长岁月-陈奕迅',
+        '清明雨上-许嵩',
+        '晴天-周杰伦',
+        '如果当时-许嵩',
+        '谁明浪子心-王杰',
+        '霜雪千年-洛天依;乐正绫',
+        '素颜-许嵩',
+        '特别的人-方大同',
+        '听妈妈的话-周杰伦',
+        '烟花易冷-周杰伦',
+        '一场游戏一场梦-王杰',
+        '有何不可-许嵩',
+        '月光-胡彦斌',
+        '最伟大的作品-周杰伦',
+        '奏（かなで） (想唱的叙事诗)-高橋李依',
+        '言わないけどね。 (虽然不会说出口。)-高橋李依',
+        '小小虫-方大同',
+        '小さな恋のうた (小小恋歌)-高橋李依',
+        '小さなてのひら (小手手掌)-安野希世乃',
+        '麦恩莉-方大同',
+        '君色シグナル-春奈るな',
+        '季節を抱きしめて (拥抱季节)-安野希世乃',
+        '勾指起誓-洛天依Official;ilem',
+        '粉雪-高橋李依',
+        '春风吹-方大同',
+        '暗号-周杰伦',
+        '愛唄-高橋李依',
+        '爱爱爱-方大同',
+        'ダ・カーポ ～第2ボタンの誓い～ (达·卡波～第2颗扣子的誓言～)-安野希世乃',
+        'サインはB-高橋李依',
+        'キセキ (奇迹)-高橋李依',
+        'カラフル。 (色彩缤纷。)-沢井美空',
+        'ありがとう (谢谢)-高橋李依',
+        'ULTIMATE-安野希世乃',
+        'M♭-安野希世乃',
+        'Love Song-方大同',
+        'GLISTENING♭-安野希世乃',
+        'ETERNAL♭-安野希世乃',
+        'Cherish you-矢作紗友里'
+    ];
+    let audios = [];
+    songs.forEach((item) => {
+        const songInfo = item.split('-');
+        audios.push({
+            name: songInfo[0],
+            artist: songInfo[1],
+            url: musicDir + item + '/song.mp3',
+            cover: musicDir + item + '/cover.jpg',   
+            lrc: musicDir + item + '/lyric.lrc'       
+        });
+    });
+    
+    const ap = new APlayer({ 
+        container: document.getElementById('aplayer'),
+        lrcType: 3,
+        audio: audios,
+        
+        fixed: true,
+        listMaxHeight: '300px',
+    });
+</script>
+
+
 
     </body>
 </html>
