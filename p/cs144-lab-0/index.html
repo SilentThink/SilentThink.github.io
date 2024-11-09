@@ -469,20 +469,7 @@
 <p>​	(d) 输入 <code>Connection: close</code>，这告诉服务器你已完成请求，并且它应在回复完成后尽快关闭连接。</p>
 <p>​	(e) 再按一次回车键，这发送一个空行并告诉服务器你已完成 HTTP 请求。</p>
 <p>​	(f) 如果一切顺利，你将看到与浏览器看到的相同响应，前面是 HTTP 头，它告诉浏览器如何解释响应。</p>
-<p><img src="/p/cs144-lab-0/img/image-20241107171403116-173098075839225.png"
-	width="1028"
-	height="760"
-	srcset="/p/cs144-lab-0/img/image-20241107171403116-173098075839225_hu10781897983281865416.png 480w, /p/cs144-lab-0/img/image-20241107171403116-173098075839225_hu6414918317582455258.png 1024w"
-	loading="lazy"
-	
-		alt="image-20241107171403116"
-	
-	
-		class="gallery-image" 
-		data-flex-grow="135"
-		data-flex-basis="324px"
-	
-></p>
+<img src="img/image-20241107171403116-173098075839225.png" alt="image-20241107171403116" style="zoom:80%;" />
 <h4 id="22-给自己发邮件">2.2 给自己发邮件
 </h4><p>略：没有斯坦福的邮箱，无法完成这个任务</p>
 <h4 id="23-监听与连接">2.3 监听与连接
@@ -504,20 +491,7 @@
 <p>在 <strong>netcat</strong> 窗口中，通过输入 <code>ctrl-C</code>  退出程序。注意，telnet 程序也会立即退出。</p>
 </li>
 </ol>
-<p><img src="/p/cs144-lab-0/img/image-20241107172314171-173098075839226.png"
-	width="1755"
-	height="760"
-	srcset="/p/cs144-lab-0/img/image-20241107172314171-173098075839226_hu18156668215240137384.png 480w, /p/cs144-lab-0/img/image-20241107172314171-173098075839226_hu16084933704800575242.png 1024w"
-	loading="lazy"
-	
-		alt="image-20241107172314171"
-	
-	
-		class="gallery-image" 
-		data-flex-grow="230"
-		data-flex-basis="554px"
-	
-></p>
+<img src="img/image-20241107172314171-173098075839226.png" alt="image-20241107172314171" style="zoom:80%;" />
 <h3 id="3-使用操作系统流套接字编写网络程序">3. 使用操作系统流套接字编写网络程序
 </h3><p>在本次热身实验的下一部分，你要编写一个简短程序从互联网获取网页。这会利用 Linux 内核及大多数其他操作系统提供的功能，即在两个程序间创建可靠双向字节流，比如一个程序在你的计算机上运行，另一个在互联网上的其他计算机（如 Web 服务器或 netcat 程序）上运行。此功能称为流套接字，对于程序和 Web 服务器来说，它就像普通文件描述符。</p>
 <p>但实际上，互联网并不直接提供可靠字节流服务，只是尽最大努力传送数据报，而数据报可能丢失、乱序、内容改变甚至被复制多次。连接两端的操作系统通常负责将 “尽力而为的数据报” 转换为 “可靠字节流”，这是通过 1981 年的传输控制协议（TCP）实现的。</p>
@@ -553,7 +527,7 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">CC</span><span class="o">=</span>gcc-13
-</span></span><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">CXX</span><span class="o">=</span>clang++-14
+</span></span><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">CXX</span><span class="o">=</span>g++-13
 </span></span></code></pre></td></tr></table>
 </div>
 </div><p><code>ctrl+x</code>,<code>Enter</code> 进行保存</p>
