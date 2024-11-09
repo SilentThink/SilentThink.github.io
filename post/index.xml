@@ -7,7 +7,320 @@
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
         <copyright>SilentThink</copyright>
-        <lastBuildDate>Fri, 08 Nov 2024 00:14:19 +0800</lastBuildDate><atom:link href="https://SilentThink.github.io/post/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Sat, 09 Nov 2024 14:11:41 +0800</lastBuildDate><atom:link href="https://SilentThink.github.io/post/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Graph Compression Tech</title>
+        <link>https://SilentThink.github.io/p/graph-compression-tech/</link>
+        <pubDate>Sat, 09 Nov 2024 14:11:41 +0800</pubDate>
+        
+        <guid>https://SilentThink.github.io/p/graph-compression-tech/</guid>
+        <description>&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109141743105.png&#34;
+	width=&#34;1220&#34;
+	height=&#34;587&#34;
+	srcset=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109141743105_hu1302417917710764173.png 480w, https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109141743105_hu7815822504371464812.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241109141743105&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;207&#34;
+		data-flex-basis=&#34;498px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;论文链接：http://joces.nudt.edu.cn/CN/Y2020/V42/I01/89&lt;/p&gt;
+&lt;h1 id=&#34;图数据压缩技术综述&#34;&gt;图数据压缩技术综述
+&lt;/h1&gt;&lt;h2 id=&#34;1-引言&#34;&gt;1 引言
+&lt;/h2&gt;&lt;p&gt;随着大数据时代的到来，数据规模以前所未有的方式不断增长，数据结构也呈现出复杂性和多样性。图，作为一种特殊的数据结构在众多领域有重要的研究价值。&lt;/p&gt;
+&lt;p&gt;随着图在各个领域的广泛应用，传统的图存储结构已经不能支持超大规模图数据的管理和分析。中国互联网络中心 2018 年发布的《第 41 次中国互联网络发展状况报告》 中提到， 网页的数量约为2600亿。若采用图模型存储上述网页节点及节点关系， 至少需要 42TB 的存储空间，并且随着因特网的不断发展，需要的存储开销也越来越大。如何存储和操作上亿万个节点的图数据的问题受国内外研究人员广泛研究。&lt;/p&gt;
+&lt;p&gt;图数据压缩技术：主要思想是消除图数据中的冗余信息，将图数据以压缩的形式存储到内存中。&lt;/p&gt;
+&lt;p&gt;本文主要从3个方面讨论图数据压缩技术：&lt;/p&gt;
+&lt;p&gt;（1）基于邻接矩阵的压缩技术：主要思想是尽可能地压缩邻接矩阵中的“0” 元素。&lt;/p&gt;
+&lt;p&gt;（2）基于形式化方法的压缩技术： 主要思想是对所给的图进行编码&amp;quot; 使其转化为布尔代数&amp;quot; 再利用决策图对布尔代数进行表示和化简。&lt;/p&gt;
+&lt;p&gt;（3）基于邻接表的压缩技术： 主要思想是利用节点的邻居节点集的相似性和局部引用性来进行压缩。&lt;/p&gt;
+&lt;h2 id=&#34;2-基于邻接矩阵的压缩技术&#34;&gt;2 基于邻接矩阵的压缩技术
+&lt;/h2&gt;&lt;h3 id=&#34;1k-tree-压缩技术&#34;&gt;（1）k²-tree 压缩技术
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;构造过程&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;步骤 1：对于给定的邻接矩阵，判断是否为的幂。若是，进入步骤 2；若不是，增加行和列使（为正整数），新增元素用 “0” 填充，再进入步骤 2 递归划分。&lt;/li&gt;
+&lt;li&gt;步骤 2：依据 MXQuntree 规则把矩阵划分为个大小一致的子矩阵。若子矩阵至少有一个 “1” 元素，标记为 1，否则标记为 0，自上而下、自左而右排列这些值作为根节点的 4 个儿子节点，完成树的第 1 层节点构造。对标记为 1 的矩阵递归处理，其值作为树的第 2 层节点，重复直至划分后的矩阵全为 0 或已划分到原始矩阵元素，递归停止。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;示例及优势&lt;/strong&gt;：以图1中 4 个节点的网页图和 图2中11 个节点的网页图为例，11 个节点网页图用邻接矩阵存储需 121bit，用k²-tree 存储需 72bit，可见k²-tree 空间利用率更高，且节点数增加时节省空间更多，还支持常数时间内查询节点直接邻居和反向邻居。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109145737643.png&#34;
+	width=&#34;507&#34;
+	height=&#34;337&#34;
+	srcset=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109145737643_hu5468181000944773502.png 480w, https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109145737643_hu12259586588007654240.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241109145737643&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;150&#34;
+		data-flex-basis=&#34;361px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109145843806.png&#34;
+	width=&#34;556&#34;
+	height=&#34;737&#34;
+	srcset=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109145843806_hu4812718135395188991.png 480w, https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109145843806_hu5766822673250830149.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241109145843806&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;75&#34;
+		data-flex-basis=&#34;181px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;存在问题&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;网页图中节点和链接分布依赖 URL 排序，传统k²-tree 机械划分会使稠密和稀疏区域在同子矩阵，降低空间利用率。&lt;/li&gt;
+&lt;li&gt;k²-tree 邻居查询时间与树高度成正比，处理上亿节点图数据时，若不处理，邻居查询时间大幅增加。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;2k-partition-技术&#34;&gt;（2）k²-partition 技术
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;改进思路&lt;/strong&gt;：Claude 等人利用网页图中域的规律，提出k²-partition，沿对角线划分图为不同域，对不同域用传统-tree 表示，实现较好时间 / 空间均衡。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;效果对比&lt;/strong&gt;：如对图 2 中的矩阵，传统k²-tree 表示需 72bit 存储空间，k²-partition 表示只需 64bit，且随图节点增加效果更明显，同时能获得更好查询时间。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109145943577.png&#34;
+	width=&#34;489&#34;
+	height=&#34;358&#34;
+	srcset=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109145943577_hu5010207668050535099.png 480w, https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109145943577_hu11357765550976966176.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241109145943577&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;136&#34;
+		data-flex-basis=&#34;327px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109150021518.png&#34;
+	width=&#34;970&#34;
+	height=&#34;723&#34;
+	srcset=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109150021518_hu4601760404461213331.png 480w, https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109150021518_hu10362979661923429665.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241109150021518&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;134&#34;
+		data-flex-basis=&#34;321px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;3kᵈ-tree-技术&#34;&gt;（3）kᵈ-tree 技术
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;提出背景及构造&lt;/strong&gt;：Caro 等人针对多维数据紧凑表示需求，利用 $k^2$-tree 构造思想提出 $k^d$-tree。它是 $k^2$-tree 的一般化形式，用于表示 $d$ 维二元矩阵，将规模为 $n_1 \times n_2 \times \cdots \times n_d$ 的 $d$ 维矩阵递归划分为 $k^d$ 个子矩阵。假设 $n_i = n$（$1 \leq i \leq d$），每个树节点有 $k^d$ 个儿子节点表示子矩阵，按从高维到低维次序确定 $k^d$-tree 各层值。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;示例说明&lt;/strong&gt;：图 5 展示了不同维度下 $k^d$-tree（$k = 2$）的表示方法。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109151517769.png&#34;
+	width=&#34;885&#34;
+	height=&#34;318&#34;
+	srcset=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109151517769_hu18030989117608907124.png 480w, https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109151517769_hu7765763705472588375.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241109151517769&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;278&#34;
+		data-flex-basis=&#34;667px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;3-基于形式化方法的压缩技术&#34;&gt;3 基于形式化方法的压缩技术
+&lt;/h2&gt;&lt;h3 id=&#34;1二叉决策图bdd与有序二叉决策图obdd&#34;&gt;（1）二叉决策图（BDD）与有序二叉决策图（OBDD）
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;核心思想&lt;/strong&gt;：杨志飞等人将符号计算运用到大规模图数据压缩表示中，把图中节点二进制编码，链接关系转布尔代数，再用 OBDD 求解。利用布尔代数节点取值冗余，通过 OBDD 化简和删除规则共享子图以提高存储效率。在这种表示下，图的多种操作可转化为 OBDD 的相关操作。例如，查询节点度数可转化为 OBDD 的可满足性问题等。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;示例&lt;/strong&gt;：对于有 $n$ 个节点的有向图，用布尔变量编码节点和边转化为布尔表达式。例如，对于 4 个节点有向图（设为图 $G$），需要 2 个布尔变量（设为 $x_1, x_2$ 和 $y_1, y_2$）分别表示有向边的起点和终点。若节点 0（编码为 $x_1&amp;rsquo;x_2&amp;rsquo;$，即 $x_1 = 1, x_2 = 1$）到节点 1（编码为 $y_1&amp;rsquo;y_2&amp;rsquo;$，即 $y_1 = 1, y_2 = 1$）有一条有向边，则表示为 $x_1&amp;rsquo;x_2&amp;rsquo;y_1&amp;rsquo;y_2&amp;rsquo;$。编码每条边即可得到图 $G$ 对应的 OBDD（如图 6b）。但 OBDD 终节点只能为 0 或 1，因此只能表示无权图。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109152228969.png&#34;
+	width=&#34;783&#34;
+	height=&#34;598&#34;
+	srcset=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109152228969_hu14334409717977972375.png 480w, https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109152228969_hu2338441746854892337.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241109152228969&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;130&#34;
+		data-flex-basis=&#34;314px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;2代数决策图add&#34;&gt;（2）代数决策图（ADD）
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;拓展内容&lt;/strong&gt;：Bahar 等人提出 ADD，将布尔代数拓展到伪布尔代数，将无权图拓展到带权图，丰富了图的布尔代数表示方法。其将图转化为 ADD 的思想与 OBDD 类似，但 ADD 的终节点是图中边的权重值。例如，4 个节点带权有向图（设为图 $H$）对应的邻接矩阵 $M_G$ 及代数决策图（如图 7）所示。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109152254944.png&#34;
+	width=&#34;784&#34;
+	height=&#34;738&#34;
+	srcset=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109152254944_hu11550239566068396951.png 480w, https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109152254944_hu7571442442170511511.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241109152254944&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;106&#34;
+		data-flex-basis=&#34;254px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;3k-mdd-技术&#34;&gt;（3）k²-MDD 技术
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;提出背景及构造&lt;/strong&gt;：针对 $k^2$-tree 存在同构子树、只能压缩稀疏图和表示静态图等问题，董荣胜等人将多值决策图（MDD）与 $k^2$-tree 结合，提出了 $k^2$-MDD。构造过程分三步：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;步骤 1&lt;/strong&gt;：将邻接矩阵用传统 $k^2$-tree 表示。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;步骤 2&lt;/strong&gt;：删除 $k^2$-tree 中所有 0 节点，合并叶子节点中为 1 的节点。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;步骤 3&lt;/strong&gt;：对 $k^2$-tree 每个分支进行二进制编码（$k = 2$），合并节点值相等且儿子节点相同的节点（共享子图）。&lt;/p&gt;
+&lt;p&gt;例如，11 个顶点邻接矩阵的 $k^2$-tree 表示（如图 8）、传统 $k^2$-tree 的同构子树分布（如图 9）及 $k^2$-tree 的 MDD 表示（如图 10）展示了其构造过程及效果。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109152358715.png&#34;
+	width=&#34;883&#34;
+	height=&#34;954&#34;
+	srcset=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109152358715_hu8484991723977186367.png 480w, https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109152358715_hu11369012216425933232.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241109152358715&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;92&#34;
+		data-flex-basis=&#34;222px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109152418583.png&#34;
+	width=&#34;855&#34;
+	height=&#34;499&#34;
+	srcset=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109152418583_hu12605624156883740085.png 480w, https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109152418583_hu7013264210014297743.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241109152418583&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;171&#34;
+		data-flex-basis=&#34;411px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109152438744.png&#34;
+	width=&#34;709&#34;
+	height=&#34;763&#34;
+	srcset=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109152438744_hu18316473331553620671.png 480w, https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109152438744_hu289061197503840619.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241109152438744&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;92&#34;
+		data-flex-basis=&#34;223px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;4技术优势总结&#34;&gt;（4）技术优势总结
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;实验对比（如用真实网页图和社交网络数据集）表明，在 $k^2$-tree、$k^2$-MDD 和 OBDD 中，用位串 $T$ 记录除最后一层节点的 0 值和 1 值，位串 $L$ 记录最后一层节点的 0 值和 1 值，$T$ 和 $L$ 的总和为存储空间。以网页图数据集（如 $cnr, in, uk, indochina$）和社交网络数据集（如 $enron, dblp-1, dblp-2, dewiki$）为例，采用 OBDD 压缩网页图，$T$ 和 $L$ 的总和约为 $k^2$-tree 的 21%；采用 $k^2$-MDD 压缩网页图，$T$ 和 $L$ 的总和约为 $k^2$-tree 的 3%。在社交网络数据集上也有类似结果，显著改善了存储空间需求，体现了形式化方法在大规模图数据压缩处理上的优势。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;4-基于邻接表的压缩技术&#34;&gt;4 基于邻接表的压缩技术
+&lt;/h2&gt;&lt;h3 id=&#34;1空隙编码&#34;&gt;（1）空隙编码
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;编码依据及思想&lt;/strong&gt;：研究表明多数网页图具有局部性，即页面直接邻居集合挨得很近。Boldi 等人据此提出空隙编码，其思想是用连续节点标签值替代原始值以压缩节点标签，减少存储空间。设 $A(x)=(a_1, a_2, a_3, \cdots, a_n)$ 为第 $x$ 个节点的直接邻居标签值序列，$x$ 对应的空隙编码 $B(x)=(c(a_1 - x), a_2 - a_1 - 1, a_3 - a_2 - 1, \cdots, a_n - a_{n - 1} - 1)$，其中
+&lt;/p&gt;
+$$
+  c(x)=\begin{cases}2x, &amp; x \geq 0 \\ 2|x| - 1, &amp; x &lt; 0\end{cases}
+  $$&lt;p&gt;
+例如，对于网页图邻接表（如表 1），可得到对应的空隙编码（如表 2）。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109152957033.png&#34;
+	width=&#34;723&#34;
+	height=&#34;1027&#34;
+	srcset=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109152957033_hu9159345574902275234.png 480w, https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109152957033_hu12680410699856896633.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241109152957033&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;70&#34;
+		data-flex-basis=&#34;168px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;2参考压缩&#34;&gt;（2）参考压缩
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;压缩原理&lt;/strong&gt;：利用网页的相似性，即位置较近的网页的后继集较为相似。Suel 等人提出参考压缩，用一个节点的邻接表表示其余邻接表。设 $s(x)$ 为参考表，$s(y)$ 为复制表，$y - x$ 为参考系数 $r$。若 $s(x)$ 的后继在 $s(y)$ 中存在，复制表的对应位置为 $1$，否则为 $0$，$s(y)$ 中不在 $s(x)$ 中的后继为额外节点。例如，网页图邻接表的参考压缩如表 3 所示。但上述两种技术要求节点直接邻居集合有序，若需保存原始链接顺序则不适用。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109153044044.png&#34;
+	width=&#34;921&#34;
+	height=&#34;579&#34;
+	srcset=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109153044044_hu7968697724391349137.png 480w, https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109153044044_hu13358933604241574138.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241109153044044&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;159&#34;
+		data-flex-basis=&#34;381px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;3repair-算法&#34;&gt;（3）Repair 算法
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;算法思想及操作&lt;/strong&gt;：Adler 和 Faust 等人发现邻接表节点后继存在相似信息，提出了 Repair 算法。该算法将所有节点后继看成序列 $T$，每次用未在 $T$ 中出现的符号 $s$ 替换 $T$ 中最频繁的符号对，直到 $T$ 中无频繁模式为止。设图 $G=(V, E)$，则 $T(G)=v_1v_{1,1}v_{1,2}v_{1,3}\cdots v_{1,n}v_2v_{2,1}v_{2,2}v_{2,3}\cdots v_{2,n}\cdots v_nv_{n,1}v_{n,2}v_{n,3}\cdots v_{n,n}$，$Ptrs[m]$ 记录节点在 $T$ 中的起始位置。例如，给定图邻接表的 Repair 压缩如图 11 所示。该算法将邻接表压缩成字典规则集合 $R$、指针数组 $Ptrs$ 和序列 $T$。查询节点信息时，仅需部分解压缩即可。但对于大规模图，由于每次添加新规则导致字典规则集合增大，Bille 等人改进了该算法，取得了较好的时间和空间平衡。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109153109352.png&#34;
+	width=&#34;956&#34;
+	height=&#34;683&#34;
+	srcset=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109153109352_hu17665443857374671002.png 480w, https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109153109352_hu7914380863332275378.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241109153109352&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;139&#34;
+		data-flex-basis=&#34;335px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;4lz78-算法&#34;&gt;（4）LZ78 算法
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;算法流程及特点&lt;/strong&gt;：另一种基于邻接表的压缩算法 LZ78 由 Ziv 和 Lempel 提出，思想是建立字典表，读入字符时判断是否在表中。若不在，保存字符并建立索引；若在，保存索引并添加新字符形成字符串表示。具体流程如下：先建立空字典表，依次读取新字符 $c$，查找当前前缀 $P$ 与 $c$ 的组合 $P + c$。若 $P + c$ 在字典表中，更新前缀 $P$ 为 $P + c$；若不在，输出当前前缀索引及 $c$，将 $P + c$ 保存至字典表，并将前缀 $P$ 设为空，重复直到所有字符串编码完成。例如，图 11 邻接表的 LZ78 压缩结果如表 4 所示。LZ78 算法和 Repair 算法的区别在于压缩时，LZ78 算法的字典表以结果形式输出，查询节点信息的速度比 Repair 算法快，但每次解压需要从结果开始构造字典 $R$，只能压缩邻接表边表，限制了性能。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109153141282.png&#34;
+	width=&#34;658&#34;
+	height=&#34;764&#34;
+	srcset=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109153141282_hu7505122720141397655.png 480w, https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109153141282_hu15865306040073812203.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241109153141282&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;86&#34;
+		data-flex-basis=&#34;206px&#34;
+	
+&gt;&lt;/p&gt;
+</description>
+        </item>
+        <item>
         <title>CS144 Lab 4</title>
         <link>https://SilentThink.github.io/p/cs144-lab-4/</link>
         <pubDate>Fri, 08 Nov 2024 00:14:19 +0800</pubDate>
