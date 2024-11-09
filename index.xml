@@ -321,6 +321,161 @@ $$
 </description>
         </item>
         <item>
+        <title>非独立同分布图上的联邦图分类</title>
+        <link>https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/</link>
+        <pubDate>Sat, 09 Nov 2024 14:11:41 +0800</pubDate>
+        
+        <guid>https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/</guid>
+        <description>&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/img/image-20241109165208229.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241109165208229&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;论文链接：https://arxiv.org/abs/2106.13423&lt;/p&gt;
+&lt;p&gt;github仓库：https://github.com/Oxfordblue7/GCFL&lt;/p&gt;
+&lt;h1 id=&#34;federated-graph-classification-over-non-iid-graphs&#34;&gt;Federated Graph Classification over Non-IID Graphs
+&lt;/h1&gt;&lt;h2 id=&#34;摘要&#34;&gt;摘要
+&lt;/h2&gt;&lt;p&gt;联邦学习（Federated Learning, FL）在不同领域训练机器学习模型方面已成为重要范式，对于图分类等图级任务，图可视为特殊数据样本，可分布于不同本地系统。本文通过分析发现真实世界的图具有共同属性，但不同来源的图在结构和节点特征上呈现非独立同分布（Non-IID）。为此提出图聚类联邦学习（Graph Clustered Federated Learning, GCFL）框架，根据图神经网络（Graph Neural Network, GNN）的梯度动态聚类本地系统，以减少图的结构和特征异质性。同时观察到GCFL中GNN梯度波动影响聚类，进而设计基于动态时间规整（Dynamic Time Warping, DTW）的梯度序列聚类机制（GCFL+），实验验证了框架有效性。&lt;/p&gt;
+&lt;h2 id=&#34;1-引言&#34;&gt;1. 引言
+&lt;/h2&gt;&lt;p&gt;联邦学习允许本地系统在保护数据隐私的同时受益于其他系统的数据，但面临数据分布异质性问题。图学习中的图分类任务具有广泛应用场景，如分子属性预测、蛋白质分类、社交网络分析等。本文研究发现不同来源的真实世界图存在共同属性，但也存在结构和特征异质性，因此提出GCFL框架，根据GNN梯度聚类客户端以降低异质性，并进一步改进为GCFL+以应对梯度波动问题。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/img/image-20241109165639474.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241109165639474&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;2-相关工作&#34;&gt;2. 相关工作
+&lt;/h2&gt;&lt;h3 id=&#34;21联邦学习&#34;&gt;2.1联邦学习
+&lt;/h3&gt;&lt;p&gt;联邦学习在数据分布于远程设备且模型由中央服务器协调训练的场景下受到关注。FedAvg是首个基本FL算法，但在处理非IID数据时存在收敛慢、精度下降等问题。已有研究从数据共享、优化收敛、个性化学习、聚类学习等方面进行改进，但仍面临挑战。&lt;/p&gt;
+&lt;h3 id=&#34;22联邦学习在图数据上的应用&#34;&gt;2.2联邦学习在图数据上的应用
+&lt;/h3&gt;&lt;p&gt;已有研究将FL应用于图数据，但多数研究集中于节点分类和链接预测，无法直接应用于图分类任务。本文研究跨数据集/跨域的联邦图分类，具有创新性。&lt;/p&gt;
+&lt;h2 id=&#34;3-预备知识&#34;&gt;3. 预备知识
+&lt;/h2&gt;&lt;h3 id=&#34;31图神经网络&#34;&gt;3.1图神经网络
+&lt;/h3&gt;&lt;p&gt;GNN通过消息传递和邻域聚合学习图表示，如节点嵌入或图嵌入，可用于图分类等任务。&lt;/p&gt;
+&lt;h3 id=&#34;32-fedavg算法&#34;&gt;3.2 FedAvg算法
+&lt;/h3&gt;&lt;p&gt;FedAvg是基本的FL算法，通过聚合本地客户端更新的模型参数并重新分发平均参数来训练模型，但在处理非IID数据时存在不足。&lt;/p&gt;
+&lt;h2 id=&#34;4-gcfl框架&#34;&gt;4. GCFL框架
+&lt;/h2&gt;&lt;h3 id=&#34;41跨客户端的非iid结构和特征&#34;&gt;4.1跨客户端的非IID结构和特征
+&lt;/h3&gt;&lt;p&gt;真实世界图在结构和特征上存在不同程度的异质性，这种异质性使得传统FL算法如FedAvg在处理非IID图数据时可能无效甚至产生负面影响。&lt;/p&gt;
+&lt;h3 id=&#34;42问题表述&#34;&gt;4.2问题表述
+&lt;/h3&gt;&lt;p&gt;GCFL旨在联合找到具有相似结构和特征图的客户端集群，并在同一集群内使用FedAvg训练图挖掘模型。目标是最小化损失函数，同时动态维护集群分配。&lt;/p&gt;
+&lt;h3 id=&#34;43技术设计&#34;&gt;4.3技术设计
+&lt;/h3&gt;&lt;p&gt;GCFL利用GNN的强大表示能力，根据客户端传输的梯度动态聚类。通过引入超参数$\varepsilon_1$和$\varepsilon_2$作为聚类准则，当满足条件时，服务器基于余弦相似度矩阵和Stoer-Wagner最小割算法对集群进行二分。客户端在本地训练后传输梯度，服务器聚合梯度更新模型参数。&lt;/p&gt;
+&lt;h3 id=&#34;44理论分析&#34;&gt;4.4理论分析
+&lt;/h3&gt;&lt;p&gt;利用梯度范数波动和动态时间规整技术，GCFL+通过维护多变量时间序列矩阵$Q$，根据梯度序列的距离矩阵进行聚类，能够更好地捕捉客户端长期行为，形成更同质的集群。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;梯度反映信息&lt;/strong&gt;：通过Bourgain定理证明GNN梯度能够反映图的结构、特征和任务信息，从而理论上支持基于梯度的聚类框架GCFL可捕获结构和特征信息。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;结构与特征差异捕获&lt;/strong&gt;：针对结构和特征差异的两个命题，证明了不同结构或特征的图在训练SGC时，权重差异与结构/特征差异有界，即梯度会随结构和特征变化。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;任务异质性捕获&lt;/strong&gt;：命题表明不同任务训练下，SGC权重有界，意味着GCFL框架有潜力扩展到跨任务图级联邦学习。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/img/image-20241109165734375.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241109165734375&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;5-gcfl基于梯度观测序列改进的gcfl&#34;&gt;5. GCFL+：基于梯度观测序列改进的GCFL
+&lt;/h2&gt;&lt;h3 id=&#34;51梯度范数波动&#34;&gt;5.1梯度范数波动
+&lt;/h3&gt;&lt;p&gt;GCFL训练中梯度范数波动大，不同客户端梯度尺度不同，反映结构和特征异质性。原始GCFL基于最后一轮梯度聚类可能忽略重要信息，受噪声误导。&lt;/p&gt;
+&lt;h3 id=&#34;52技术设计&#34;&gt;5.2技术设计
+&lt;/h3&gt;&lt;p&gt;GCFL+通过维护矩阵$Q$记录梯度范数序列，使用DTW计算距离矩阵$\beta$进行聚类，能更好捕捉客户端长期行为，形成更同质集群。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/img/image-20241109165828948.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241109165828948&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;6-实验&#34;&gt;6. 实验
+&lt;/h2&gt;&lt;h3 id=&#34;61实验设置&#34;&gt;6.1实验设置
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;数据集&lt;/strong&gt;：使用13个来自三个领域的图分类数据集，设计单数据集和多数据集两种数据划分机制，每个客户端持有一定数量图，部分用于测试。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;基线方法&lt;/strong&gt;：使用self-train、FedAvg和FedProx作为基线方法，图分类模型采用GIN，固定架构和超参数以控制实验。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;参数设置&lt;/strong&gt;：详细说明GIN网络参数、优化器、学习率、权重衰减等设置，以及FL方法的本地轮数，通过离线训练确定聚类准则超参数。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;62实验结果&#34;&gt;6.2实验结果
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;单数据集内联邦图分类&lt;/strong&gt;：GCFL和GCFL+在该设置下显著提升图分类性能，相比self-train有明显性能增益，帮助更多客户端提升性能，而FedAvg仅能帮助约一半客户端，表明传统FL算法在单数据集图数据上因非IID性存在局限。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;跨多数据集联邦图分类&lt;/strong&gt;：该设置下客户端异质性更强，GCFL和GCFL+仍能有效提升性能，GCFL+相比FedAvg能使更多客户端受益，且在多数据集设置中，两者均能显著降低集群内结构和特征异质性，不同领域数据集也能相互受益，体现了框架的有效性。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;超参数影响&lt;/strong&gt;：$\varepsilon_1$和$\varepsilon_2$分别为停止准则和聚类控制参数，在合理范围内变化对GCFL和GCFL+性能影响较小。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/img/image-20241109165920858.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241109165920858&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/img/image-20241109170053080.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241109170053080&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;63集群内结构和特征分析&#34;&gt;6.3集群内结构和特征分析
+&lt;/h3&gt;&lt;p&gt;GCFL和GCFL+聚类后显著降低集群内图的结构和特征异质性，尤其在多数据集设置中。同一数据集内特征异质性降低较少，结构异质性显著降低；多数据集设置中两者均显著降低。聚类结果显示来自同一领域的数据集更易聚在一起，但不同领域数据集也能相互受益，表明框架能根据性能动态聚类的必要性。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/img/image-20241109170128856.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241109170128856&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/img/image-20241109170205306.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241109170205306&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/img/image-20241109170229862.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241109170229862&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;64收敛性分析&#34;&gt;6.4收敛性分析
+&lt;/h3&gt;&lt;p&gt;可视化测试损失与通信轮数关系表明，GCFL和GCFL+收敛速度与处理非IID欧几里得数据的FedProx相似，且比FedAvg收敛到更低损失，验证了框架对非IID问题的处理能力。&lt;/p&gt;
+&lt;h3 id=&#34;65附录中的更多结果&#34;&gt;6.5附录中的更多结果
+&lt;/h3&gt;&lt;p&gt;提供详细的客户端性能分布小提琴图，包括重叠与非重叠数据划分、原始与合成节点特征、GCFL+中标准化与非标准化梯度序列矩阵等不同设置下的结果。总体上，框架在多种设置下均表现出较好性能提升效果。&lt;/p&gt;
+&lt;h2 id=&#34;7-结论&#34;&gt;7. 结论
+&lt;/h2&gt;&lt;p&gt;本文提出跨数据集和跨域联邦图分类设置及GCFL和GCFL+技术，允许数据所有者协同训练图分类神经网络，虽未深入研究数据隐私等问题，但为未来研究奠定基础。&lt;/p&gt;
+</description>
+        </item>
+        <item>
         <title>CS144 Lab 4</title>
         <link>https://SilentThink.github.io/p/cs144-lab-4/</link>
         <pubDate>Fri, 08 Nov 2024 00:14:19 +0800</pubDate>

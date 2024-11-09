@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="\n论文链接：https://arxiv.org/abs/2106.13423\ngithub仓库：https://github.com/Oxfordblue7/GCFL\n">
+<title>非独立同分布图上的联邦图分类</title>
+
+<link rel='canonical' href='https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="非独立同分布图上的联邦图分类">
+<meta property='og:description' content="\n论文链接：https://arxiv.org/abs/2106.13423\ngithub仓库：https://github.com/Oxfordblue7/GCFL\n">
+<meta property='og:url' content='https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/'>
+<meta property='og:site_name' content='SilentThink 博客'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2024-11-09T14:11:41&#43;08:00'/><meta property='article:modified_time' content='2024-11-09T14:11:41&#43;08:00'/>
+<meta name="twitter:title" content="非独立同分布图上的联邦图分类">
+<meta name="twitter:description" content="\n论文链接：https://arxiv.org/abs/2106.13423\ngithub仓库：https://github.com/Oxfordblue7/GCFL\n">
+    <link rel="shortcut icon" href="/favicon2.ico" />
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/%E5%8A%A0%E8%97%A4%E6%83%A0_hu8574714599784400491.png" width="300"
+                            height="301" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">😋</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">SilentThink 博客</a></h1>
+            <h2 class="site-description">欢迎</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/SilentThink'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E9%93%BE%E6%8E%A5/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>链接</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+                    
+                        <li id="i18n-switch">  
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M4 5h7" />
+  <path d="M9 3v2c0 4.418 -2.239 8 -5 8" />
+  <path d="M5 9c-.003 2.144 2.952 3.908 6.7 4" />
+  <path d="M12 20l4 -9l4 9" />
+  <path d="M19.1 18h-6.2" />
+</svg>
+
+
+
+                            <select name="language" title="language" onchange="window.location.href = this.selectedOptions[0].value">
+                                
+                                    <option value="https://SilentThink.github.io/en/" >English</option>
+                                
+                                    <option value="https://SilentThink.github.io/" selected>简体中文</option>
+                                
+                            </select>
+                        </li>
+                    
+                
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#摘要">摘要</a></li>
+    <li><a href="#1-引言">1. 引言</a></li>
+    <li><a href="#2-相关工作">2. 相关工作</a>
+      <ol>
+        <li><a href="#21联邦学习">2.1联邦学习</a></li>
+        <li><a href="#22联邦学习在图数据上的应用">2.2联邦学习在图数据上的应用</a></li>
+      </ol>
+    </li>
+    <li><a href="#3-预备知识">3. 预备知识</a>
+      <ol>
+        <li><a href="#31图神经网络">3.1图神经网络</a></li>
+        <li><a href="#32-fedavg算法">3.2 FedAvg算法</a></li>
+      </ol>
+    </li>
+    <li><a href="#4-gcfl框架">4. GCFL框架</a>
+      <ol>
+        <li><a href="#41跨客户端的非iid结构和特征">4.1跨客户端的非IID结构和特征</a></li>
+        <li><a href="#42问题表述">4.2问题表述</a></li>
+        <li><a href="#43技术设计">4.3技术设计</a></li>
+        <li><a href="#44理论分析">4.4理论分析</a></li>
+      </ol>
+    </li>
+    <li><a href="#5-gcfl基于梯度观测序列改进的gcfl">5. GCFL+：基于梯度观测序列改进的GCFL</a>
+      <ol>
+        <li><a href="#51梯度范数波动">5.1梯度范数波动</a></li>
+        <li><a href="#52技术设计">5.2技术设计</a></li>
+      </ol>
+    </li>
+    <li><a href="#6-实验">6. 实验</a>
+      <ol>
+        <li><a href="#61实验设置">6.1实验设置</a></li>
+        <li><a href="#62实验结果">6.2实验结果</a></li>
+        <li><a href="#63集群内结构和特征分析">6.3集群内结构和特征分析</a></li>
+        <li><a href="#64收敛性分析">6.4收敛性分析</a></li>
+        <li><a href="#65附录中的更多结果">6.5附录中的更多结果</a></li>
+      </ol>
+    </li>
+    <li><a href="#7-结论">7. 结论</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/">非独立同分布图上的联邦图分类</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">2024-11-09</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 6 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <p><img src="/img/image-20241109165208229.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20241109165208229"
+	
+	
+></p>
+<p>论文链接：https://arxiv.org/abs/2106.13423</p>
+<p>github仓库：https://github.com/Oxfordblue7/GCFL</p>
+<h1 id="federated-graph-classification-over-non-iid-graphs">Federated Graph Classification over Non-IID Graphs
+</h1><h2 id="摘要">摘要
+</h2><p>联邦学习（Federated Learning, FL）在不同领域训练机器学习模型方面已成为重要范式，对于图分类等图级任务，图可视为特殊数据样本，可分布于不同本地系统。本文通过分析发现真实世界的图具有共同属性，但不同来源的图在结构和节点特征上呈现非独立同分布（Non-IID）。为此提出图聚类联邦学习（Graph Clustered Federated Learning, GCFL）框架，根据图神经网络（Graph Neural Network, GNN）的梯度动态聚类本地系统，以减少图的结构和特征异质性。同时观察到GCFL中GNN梯度波动影响聚类，进而设计基于动态时间规整（Dynamic Time Warping, DTW）的梯度序列聚类机制（GCFL+），实验验证了框架有效性。</p>
+<h2 id="1-引言">1. 引言
+</h2><p>联邦学习允许本地系统在保护数据隐私的同时受益于其他系统的数据，但面临数据分布异质性问题。图学习中的图分类任务具有广泛应用场景，如分子属性预测、蛋白质分类、社交网络分析等。本文研究发现不同来源的真实世界图存在共同属性，但也存在结构和特征异质性，因此提出GCFL框架，根据GNN梯度聚类客户端以降低异质性，并进一步改进为GCFL+以应对梯度波动问题。</p>
+<p><img src="/img/image-20241109165639474.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20241109165639474"
+	
+	
+></p>
+<h2 id="2-相关工作">2. 相关工作
+</h2><h3 id="21联邦学习">2.1联邦学习
+</h3><p>联邦学习在数据分布于远程设备且模型由中央服务器协调训练的场景下受到关注。FedAvg是首个基本FL算法，但在处理非IID数据时存在收敛慢、精度下降等问题。已有研究从数据共享、优化收敛、个性化学习、聚类学习等方面进行改进，但仍面临挑战。</p>
+<h3 id="22联邦学习在图数据上的应用">2.2联邦学习在图数据上的应用
+</h3><p>已有研究将FL应用于图数据，但多数研究集中于节点分类和链接预测，无法直接应用于图分类任务。本文研究跨数据集/跨域的联邦图分类，具有创新性。</p>
+<h2 id="3-预备知识">3. 预备知识
+</h2><h3 id="31图神经网络">3.1图神经网络
+</h3><p>GNN通过消息传递和邻域聚合学习图表示，如节点嵌入或图嵌入，可用于图分类等任务。</p>
+<h3 id="32-fedavg算法">3.2 FedAvg算法
+</h3><p>FedAvg是基本的FL算法，通过聚合本地客户端更新的模型参数并重新分发平均参数来训练模型，但在处理非IID数据时存在不足。</p>
+<h2 id="4-gcfl框架">4. GCFL框架
+</h2><h3 id="41跨客户端的非iid结构和特征">4.1跨客户端的非IID结构和特征
+</h3><p>真实世界图在结构和特征上存在不同程度的异质性，这种异质性使得传统FL算法如FedAvg在处理非IID图数据时可能无效甚至产生负面影响。</p>
+<h3 id="42问题表述">4.2问题表述
+</h3><p>GCFL旨在联合找到具有相似结构和特征图的客户端集群，并在同一集群内使用FedAvg训练图挖掘模型。目标是最小化损失函数，同时动态维护集群分配。</p>
+<h3 id="43技术设计">4.3技术设计
+</h3><p>GCFL利用GNN的强大表示能力，根据客户端传输的梯度动态聚类。通过引入超参数$\varepsilon_1$和$\varepsilon_2$作为聚类准则，当满足条件时，服务器基于余弦相似度矩阵和Stoer-Wagner最小割算法对集群进行二分。客户端在本地训练后传输梯度，服务器聚合梯度更新模型参数。</p>
+<h3 id="44理论分析">4.4理论分析
+</h3><p>利用梯度范数波动和动态时间规整技术，GCFL+通过维护多变量时间序列矩阵$Q$，根据梯度序列的距离矩阵进行聚类，能够更好地捕捉客户端长期行为，形成更同质的集群。</p>
+<ol>
+<li><strong>梯度反映信息</strong>：通过Bourgain定理证明GNN梯度能够反映图的结构、特征和任务信息，从而理论上支持基于梯度的聚类框架GCFL可捕获结构和特征信息。</li>
+<li><strong>结构与特征差异捕获</strong>：针对结构和特征差异的两个命题，证明了不同结构或特征的图在训练SGC时，权重差异与结构/特征差异有界，即梯度会随结构和特征变化。</li>
+<li><strong>任务异质性捕获</strong>：命题表明不同任务训练下，SGC权重有界，意味着GCFL框架有潜力扩展到跨任务图级联邦学习。</li>
+</ol>
+<p><img src="/img/image-20241109165734375.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20241109165734375"
+	
+	
+></p>
+<h2 id="5-gcfl基于梯度观测序列改进的gcfl">5. GCFL+：基于梯度观测序列改进的GCFL
+</h2><h3 id="51梯度范数波动">5.1梯度范数波动
+</h3><p>GCFL训练中梯度范数波动大，不同客户端梯度尺度不同，反映结构和特征异质性。原始GCFL基于最后一轮梯度聚类可能忽略重要信息，受噪声误导。</p>
+<h3 id="52技术设计">5.2技术设计
+</h3><p>GCFL+通过维护矩阵$Q$记录梯度范数序列，使用DTW计算距离矩阵$\beta$进行聚类，能更好捕捉客户端长期行为，形成更同质集群。</p>
+<p><img src="/img/image-20241109165828948.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20241109165828948"
+	
+	
+></p>
+<h2 id="6-实验">6. 实验
+</h2><h3 id="61实验设置">6.1实验设置
+</h3><ol>
+<li><strong>数据集</strong>：使用13个来自三个领域的图分类数据集，设计单数据集和多数据集两种数据划分机制，每个客户端持有一定数量图，部分用于测试。</li>
+<li><strong>基线方法</strong>：使用self-train、FedAvg和FedProx作为基线方法，图分类模型采用GIN，固定架构和超参数以控制实验。</li>
+<li><strong>参数设置</strong>：详细说明GIN网络参数、优化器、学习率、权重衰减等设置，以及FL方法的本地轮数，通过离线训练确定聚类准则超参数。</li>
+</ol>
+<h3 id="62实验结果">6.2实验结果
+</h3><ol>
+<li><strong>单数据集内联邦图分类</strong>：GCFL和GCFL+在该设置下显著提升图分类性能，相比self-train有明显性能增益，帮助更多客户端提升性能，而FedAvg仅能帮助约一半客户端，表明传统FL算法在单数据集图数据上因非IID性存在局限。</li>
+<li><strong>跨多数据集联邦图分类</strong>：该设置下客户端异质性更强，GCFL和GCFL+仍能有效提升性能，GCFL+相比FedAvg能使更多客户端受益，且在多数据集设置中，两者均能显著降低集群内结构和特征异质性，不同领域数据集也能相互受益，体现了框架的有效性。</li>
+<li><strong>超参数影响</strong>：$\varepsilon_1$和$\varepsilon_2$分别为停止准则和聚类控制参数，在合理范围内变化对GCFL和GCFL+性能影响较小。</li>
+</ol>
+<p><img src="/img/image-20241109165920858.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20241109165920858"
+	
+	
+></p>
+<p><img src="/img/image-20241109170053080.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20241109170053080"
+	
+	
+></p>
+<h3 id="63集群内结构和特征分析">6.3集群内结构和特征分析
+</h3><p>GCFL和GCFL+聚类后显著降低集群内图的结构和特征异质性，尤其在多数据集设置中。同一数据集内特征异质性降低较少，结构异质性显著降低；多数据集设置中两者均显著降低。聚类结果显示来自同一领域的数据集更易聚在一起，但不同领域数据集也能相互受益，表明框架能根据性能动态聚类的必要性。</p>
+<p><img src="/img/image-20241109170128856.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20241109170128856"
+	
+	
+></p>
+<p><img src="/img/image-20241109170205306.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20241109170205306"
+	
+	
+></p>
+<p><img src="/img/image-20241109170229862.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20241109170229862"
+	
+	
+></p>
+<h3 id="64收敛性分析">6.4收敛性分析
+</h3><p>可视化测试损失与通信轮数关系表明，GCFL和GCFL+收敛速度与处理非IID欧几里得数据的FedProx相似，且比FedAvg收敛到更低损失，验证了框架对非IID问题的处理能力。</p>
+<h3 id="65附录中的更多结果">6.5附录中的更多结果
+</h3><p>提供详细的客户端性能分布小提琴图，包括重叠与非重叠数据划分、原始与合成节点特征、GCFL+中标准化与非标准化梯度序列矩阵等不同设置下的结果。总体上，框架在多种设置下均表现出较好性能提升效果。</p>
+<h2 id="7-结论">7. 结论
+</h2><p>本文提出跨数据集和跨域联邦图分类设置及GCFL和GCFL+技术，允许数据所有者协同训练图分类神经网络，虽未深入研究数据隐私等问题，但为未来研究奠定基础。</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    </footer>
+
+
+    
+        <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI&#43;WdtXRGWt2kTvGFasHpSy3SV"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG&#43;vnGctmUb0ZY0l8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"integrity="sha384-&#43;VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4&#43;/RRE05"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+        renderMathInElement(document.body, {
+            delimiters: [
+                { left: "$$", right: "$$", display: true },
+                { left: "$", right: "$", display: false },
+                { left: "\\(", right: "\\)", display: false },
+                { left: "\\[", right: "\\]", display: true }
+            ],
+            ignoredClasses: ["gist"]
+        });})
+</script>
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2024 SilentThink
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.29.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.99ce1801c4bad426a42fc436add4721e149159dbb598636e9578fd59cf778c83.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css">
+<div id="aplayer"></div>
+<script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script>
+
+<script>
+    const musicDir = "https://SilentThink.github.io/" + 'music/';
+    const songs = [
+        'Amani-BEYOND',
+        'Shall we talk-陈奕迅',
+        '暧昧-王菲',
+        '暗号-周杰伦',
+        '不浪漫罪名-王杰',
+        '超跑女神-周杰伦',
+        '城府-许嵩',
+        '大笨钟-周杰伦',
+        '单车-陈奕迅',
+        '东京不太热-洛天依',
+        '断桥残雪-许嵩',
+        '发如雪-周杰伦',
+        '枫-周杰伦',
+        '富士山下-陈奕迅',
+        '给我一首歌的时间-周杰伦',
+        '勾指起誓-洛天依Official;ilem',
+        '红玫瑰-陈奕迅',
+        '就是现在-王力宏',
+        '菊花台-周杰伦',
+        '庐州月-许嵩',
+        '你若成风-许嵩',
+        '陪你度过漫长岁月-陈奕迅',
+        '清明雨上-许嵩',
+        '晴天-周杰伦',
+        '如果当时-许嵩',
+        '谁明浪子心-王杰',
+        '霜雪千年-洛天依;乐正绫',
+        '素颜-许嵩',
+        '特别的人-方大同',
+        '听妈妈的话-周杰伦',
+        '烟花易冷-周杰伦',
+        '一场游戏一场梦-王杰',
+        '有何不可-许嵩',
+        '月光-胡彦斌',
+        '最伟大的作品-周杰伦',
+        '奏（かなで） (想唱的叙事诗)-高橋李依',
+        '言わないけどね。 (虽然不会说出口。)-高橋李依',
+        '小小虫-方大同',
+        '小さな恋のうた (小小恋歌)-高橋李依',
+        '小さなてのひら (小手手掌)-安野希世乃',
+        '麦恩莉-方大同',
+        '君色シグナル-春奈るな',
+        '季節を抱きしめて (拥抱季节)-安野希世乃',
+        '勾指起誓-洛天依Official;ilem',
+        '粉雪-高橋李依',
+        '春风吹-方大同',
+        '暗号-周杰伦',
+        '愛唄-高橋李依',
+        '爱爱爱-方大同',
+        'ダ・カーポ ～第2ボタンの誓い～ (达·卡波～第2颗扣子的誓言～)-安野希世乃',
+        'サインはB-高橋李依',
+        'キセキ (奇迹)-高橋李依',
+        'カラフル。 (色彩缤纷。)-沢井美空',
+        'ありがとう (谢谢)-高橋李依',
+        'ULTIMATE-安野希世乃',
+        'M♭-安野希世乃',
+        'Love Song-方大同',
+        'GLISTENING♭-安野希世乃',
+        'ETERNAL♭-安野希世乃',
+        'Cherish you-矢作紗友里'
+    ];
+    let audios = [];
+    songs.forEach((item) => {
+        const songInfo = item.split('-');
+        audios.push({
+            name: songInfo[0],
+            artist: songInfo[1],
+            url: musicDir + item + '/song.mp3',
+            cover: musicDir + item + '/cover.jpg',   
+            lrc: musicDir + item + '/lyric.lrc'       
+        });
+    });
+    
+    const ap = new APlayer({ 
+        container: document.getElementById('aplayer'),
+        lrcType: 3,
+        audio: audios,
+        
+        fixed: true,
+        listMaxHeight: '300px',
+    });
+
+    
+
+    window.onbeforeunload = () => {
+        
+        const playInfo = {
+            index: ap.list.index,
+            currentTime: ap.audio.currentTime,
+            paused: ap.paused
+        };
+        localStorage.setItem("playInfo", JSON.stringify(playInfo));
+    };
+
+    
+
+    window.onload = () => {
+        
+        const playInfo = JSON.parse(localStorage.getItem("playInfo"));
+        if (!playInfo) {
+            return;
+        }
+        
+        ap.list.switch(playInfo.index);
+        
+        setTimeout(() => {
+            
+            ap.seek(playInfo.currentTime);
+            
+            if (!playInfo.paused) {
+                ap.play()
+            }
+        }, 500);
+    };
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/pjax/pjax.min.js"></script>
+
+<script>
+    var pjax = new Pjax({
+        selectors: [".main-container"]
+    })
+
+    pjax._handleResponse = pjax.handleResponse;
+    pjax.handleResponse = function(responseText, request, href, options) {
+        if (request.responseText.match("<html")) {
+            
+            let newDom = new DOMParser().parseFromString(responseText, 'text/html');
+            
+            let bodyClass = newDom.body.className;
+            document.body.setAttribute("class", bodyClass)
+            
+            pjax._handleResponse(responseText, request, href, options);
+        } else {
+            
+        }
+    }
+
+    
+    document.addEventListener('pjax:complete', () => {
+        
+        window.Stack.init();
+    })
+</script>
+    </body>
+</html>
