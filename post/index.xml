@@ -8,319 +8,6 @@
         <language>zh-cn</language>
         <copyright>SilentThink</copyright>
         <lastBuildDate>Sat, 09 Nov 2024 14:11:41 +0800</lastBuildDate><atom:link href="https://SilentThink.github.io/post/index.xml" rel="self" type="application/rss+xml" /><item>
-        <title>Graph Compression Tech</title>
-        <link>https://SilentThink.github.io/p/graph-compression-tech/</link>
-        <pubDate>Sat, 09 Nov 2024 14:11:41 +0800</pubDate>
-        
-        <guid>https://SilentThink.github.io/p/graph-compression-tech/</guid>
-        <description>&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109141743105.png&#34;
-	width=&#34;1220&#34;
-	height=&#34;587&#34;
-	srcset=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109141743105_hu1302417917710764173.png 480w, https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109141743105_hu7815822504371464812.png 1024w&#34;
-	loading=&#34;lazy&#34;
-	
-		alt=&#34;image-20241109141743105&#34;
-	
-	
-		class=&#34;gallery-image&#34; 
-		data-flex-grow=&#34;207&#34;
-		data-flex-basis=&#34;498px&#34;
-	
-&gt;&lt;/p&gt;
-&lt;p&gt;论文链接：http://joces.nudt.edu.cn/CN/Y2020/V42/I01/89&lt;/p&gt;
-&lt;h1 id=&#34;图数据压缩技术综述&#34;&gt;图数据压缩技术综述
-&lt;/h1&gt;&lt;h2 id=&#34;1-引言&#34;&gt;1 引言
-&lt;/h2&gt;&lt;p&gt;随着大数据时代的到来，数据规模以前所未有的方式不断增长，数据结构也呈现出复杂性和多样性。图，作为一种特殊的数据结构在众多领域有重要的研究价值。&lt;/p&gt;
-&lt;p&gt;随着图在各个领域的广泛应用，传统的图存储结构已经不能支持超大规模图数据的管理和分析。中国互联网络中心 2018 年发布的《第 41 次中国互联网络发展状况报告》 中提到， 网页的数量约为2600亿。若采用图模型存储上述网页节点及节点关系， 至少需要 42TB 的存储空间，并且随着因特网的不断发展，需要的存储开销也越来越大。如何存储和操作上亿万个节点的图数据的问题受国内外研究人员广泛研究。&lt;/p&gt;
-&lt;p&gt;图数据压缩技术：主要思想是消除图数据中的冗余信息，将图数据以压缩的形式存储到内存中。&lt;/p&gt;
-&lt;p&gt;本文主要从3个方面讨论图数据压缩技术：&lt;/p&gt;
-&lt;p&gt;（1）基于邻接矩阵的压缩技术：主要思想是尽可能地压缩邻接矩阵中的“0” 元素。&lt;/p&gt;
-&lt;p&gt;（2）基于形式化方法的压缩技术： 主要思想是对所给的图进行编码&amp;quot; 使其转化为布尔代数&amp;quot; 再利用决策图对布尔代数进行表示和化简。&lt;/p&gt;
-&lt;p&gt;（3）基于邻接表的压缩技术： 主要思想是利用节点的邻居节点集的相似性和局部引用性来进行压缩。&lt;/p&gt;
-&lt;h2 id=&#34;2-基于邻接矩阵的压缩技术&#34;&gt;2 基于邻接矩阵的压缩技术
-&lt;/h2&gt;&lt;h3 id=&#34;1k-tree-压缩技术&#34;&gt;（1）k²-tree 压缩技术
-&lt;/h3&gt;&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;构造过程&lt;/strong&gt;
-&lt;ul&gt;
-&lt;li&gt;步骤 1：对于给定的邻接矩阵，判断是否为的幂。若是，进入步骤 2；若不是，增加行和列使（为正整数），新增元素用 “0” 填充，再进入步骤 2 递归划分。&lt;/li&gt;
-&lt;li&gt;步骤 2：依据 MXQuntree 规则把矩阵划分为个大小一致的子矩阵。若子矩阵至少有一个 “1” 元素，标记为 1，否则标记为 0，自上而下、自左而右排列这些值作为根节点的 4 个儿子节点，完成树的第 1 层节点构造。对标记为 1 的矩阵递归处理，其值作为树的第 2 层节点，重复直至划分后的矩阵全为 0 或已划分到原始矩阵元素，递归停止。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;示例及优势&lt;/strong&gt;：以图1中 4 个节点的网页图和 图2中11 个节点的网页图为例，11 个节点网页图用邻接矩阵存储需 121bit，用k²-tree 存储需 72bit，可见k²-tree 空间利用率更高，且节点数增加时节省空间更多，还支持常数时间内查询节点直接邻居和反向邻居。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109145737643.png&#34;
-	width=&#34;507&#34;
-	height=&#34;337&#34;
-	srcset=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109145737643_hu5468181000944773502.png 480w, https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109145737643_hu12259586588007654240.png 1024w&#34;
-	loading=&#34;lazy&#34;
-	
-		alt=&#34;image-20241109145737643&#34;
-	
-	
-		class=&#34;gallery-image&#34; 
-		data-flex-grow=&#34;150&#34;
-		data-flex-basis=&#34;361px&#34;
-	
-&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109145843806.png&#34;
-	width=&#34;556&#34;
-	height=&#34;737&#34;
-	srcset=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109145843806_hu4812718135395188991.png 480w, https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109145843806_hu5766822673250830149.png 1024w&#34;
-	loading=&#34;lazy&#34;
-	
-		alt=&#34;image-20241109145843806&#34;
-	
-	
-		class=&#34;gallery-image&#34; 
-		data-flex-grow=&#34;75&#34;
-		data-flex-basis=&#34;181px&#34;
-	
-&gt;&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;存在问题&lt;/strong&gt;
-&lt;ul&gt;
-&lt;li&gt;网页图中节点和链接分布依赖 URL 排序，传统k²-tree 机械划分会使稠密和稀疏区域在同子矩阵，降低空间利用率。&lt;/li&gt;
-&lt;li&gt;k²-tree 邻居查询时间与树高度成正比，处理上亿节点图数据时，若不处理，邻居查询时间大幅增加。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&#34;2k-partition-技术&#34;&gt;（2）k²-partition 技术
-&lt;/h3&gt;&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;改进思路&lt;/strong&gt;：Claude 等人利用网页图中域的规律，提出k²-partition，沿对角线划分图为不同域，对不同域用传统-tree 表示，实现较好时间 / 空间均衡。&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;效果对比&lt;/strong&gt;：如对图 2 中的矩阵，传统k²-tree 表示需 72bit 存储空间，k²-partition 表示只需 64bit，且随图节点增加效果更明显，同时能获得更好查询时间。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109145943577.png&#34;
-	width=&#34;489&#34;
-	height=&#34;358&#34;
-	srcset=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109145943577_hu5010207668050535099.png 480w, https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109145943577_hu11357765550976966176.png 1024w&#34;
-	loading=&#34;lazy&#34;
-	
-		alt=&#34;image-20241109145943577&#34;
-	
-	
-		class=&#34;gallery-image&#34; 
-		data-flex-grow=&#34;136&#34;
-		data-flex-basis=&#34;327px&#34;
-	
-&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109150021518.png&#34;
-	width=&#34;970&#34;
-	height=&#34;723&#34;
-	srcset=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109150021518_hu4601760404461213331.png 480w, https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109150021518_hu10362979661923429665.png 1024w&#34;
-	loading=&#34;lazy&#34;
-	
-		alt=&#34;image-20241109150021518&#34;
-	
-	
-		class=&#34;gallery-image&#34; 
-		data-flex-grow=&#34;134&#34;
-		data-flex-basis=&#34;321px&#34;
-	
-&gt;&lt;/p&gt;
-&lt;h3 id=&#34;3kᵈ-tree-技术&#34;&gt;（3）kᵈ-tree 技术
-&lt;/h3&gt;&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;提出背景及构造&lt;/strong&gt;：Caro 等人针对多维数据紧凑表示需求，利用 $k^2$-tree 构造思想提出 $k^d$-tree。它是 $k^2$-tree 的一般化形式，用于表示 $d$ 维二元矩阵，将规模为 $n_1 \times n_2 \times \cdots \times n_d$ 的 $d$ 维矩阵递归划分为 $k^d$ 个子矩阵。假设 $n_i = n$（$1 \leq i \leq d$），每个树节点有 $k^d$ 个儿子节点表示子矩阵，按从高维到低维次序确定 $k^d$-tree 各层值。&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;示例说明&lt;/strong&gt;：图 5 展示了不同维度下 $k^d$-tree（$k = 2$）的表示方法。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109151517769.png&#34;
-	width=&#34;885&#34;
-	height=&#34;318&#34;
-	srcset=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109151517769_hu18030989117608907124.png 480w, https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109151517769_hu7765763705472588375.png 1024w&#34;
-	loading=&#34;lazy&#34;
-	
-		alt=&#34;image-20241109151517769&#34;
-	
-	
-		class=&#34;gallery-image&#34; 
-		data-flex-grow=&#34;278&#34;
-		data-flex-basis=&#34;667px&#34;
-	
-&gt;&lt;/p&gt;
-&lt;h2 id=&#34;3-基于形式化方法的压缩技术&#34;&gt;3 基于形式化方法的压缩技术
-&lt;/h2&gt;&lt;h3 id=&#34;1二叉决策图bdd与有序二叉决策图obdd&#34;&gt;（1）二叉决策图（BDD）与有序二叉决策图（OBDD）
-&lt;/h3&gt;&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;核心思想&lt;/strong&gt;：杨志飞等人将符号计算运用到大规模图数据压缩表示中，把图中节点二进制编码，链接关系转布尔代数，再用 OBDD 求解。利用布尔代数节点取值冗余，通过 OBDD 化简和删除规则共享子图以提高存储效率。在这种表示下，图的多种操作可转化为 OBDD 的相关操作。例如，查询节点度数可转化为 OBDD 的可满足性问题等。&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;示例&lt;/strong&gt;：对于有 $n$ 个节点的有向图，用布尔变量编码节点和边转化为布尔表达式。例如，对于 4 个节点有向图（设为图 $G$），需要 2 个布尔变量（设为 $x_1, x_2$ 和 $y_1, y_2$）分别表示有向边的起点和终点。若节点 0（编码为 $x_1&amp;rsquo;x_2&amp;rsquo;$，即 $x_1 = 1, x_2 = 1$）到节点 1（编码为 $y_1&amp;rsquo;y_2&amp;rsquo;$，即 $y_1 = 1, y_2 = 1$）有一条有向边，则表示为 $x_1&amp;rsquo;x_2&amp;rsquo;y_1&amp;rsquo;y_2&amp;rsquo;$。编码每条边即可得到图 $G$ 对应的 OBDD（如图 6b）。但 OBDD 终节点只能为 0 或 1，因此只能表示无权图。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109152228969.png&#34;
-	width=&#34;783&#34;
-	height=&#34;598&#34;
-	srcset=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109152228969_hu14334409717977972375.png 480w, https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109152228969_hu2338441746854892337.png 1024w&#34;
-	loading=&#34;lazy&#34;
-	
-		alt=&#34;image-20241109152228969&#34;
-	
-	
-		class=&#34;gallery-image&#34; 
-		data-flex-grow=&#34;130&#34;
-		data-flex-basis=&#34;314px&#34;
-	
-&gt;&lt;/p&gt;
-&lt;h3 id=&#34;2代数决策图add&#34;&gt;（2）代数决策图（ADD）
-&lt;/h3&gt;&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;拓展内容&lt;/strong&gt;：Bahar 等人提出 ADD，将布尔代数拓展到伪布尔代数，将无权图拓展到带权图，丰富了图的布尔代数表示方法。其将图转化为 ADD 的思想与 OBDD 类似，但 ADD 的终节点是图中边的权重值。例如，4 个节点带权有向图（设为图 $H$）对应的邻接矩阵 $M_G$ 及代数决策图（如图 7）所示。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109152254944.png&#34;
-	width=&#34;784&#34;
-	height=&#34;738&#34;
-	srcset=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109152254944_hu11550239566068396951.png 480w, https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109152254944_hu7571442442170511511.png 1024w&#34;
-	loading=&#34;lazy&#34;
-	
-		alt=&#34;image-20241109152254944&#34;
-	
-	
-		class=&#34;gallery-image&#34; 
-		data-flex-grow=&#34;106&#34;
-		data-flex-basis=&#34;254px&#34;
-	
-&gt;&lt;/p&gt;
-&lt;h3 id=&#34;3k-mdd-技术&#34;&gt;（3）k²-MDD 技术
-&lt;/h3&gt;&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;strong&gt;提出背景及构造&lt;/strong&gt;：针对 $k^2$-tree 存在同构子树、只能压缩稀疏图和表示静态图等问题，董荣胜等人将多值决策图（MDD）与 $k^2$-tree 结合，提出了 $k^2$-MDD。构造过程分三步：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;strong&gt;步骤 1&lt;/strong&gt;：将邻接矩阵用传统 $k^2$-tree 表示。&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;strong&gt;步骤 2&lt;/strong&gt;：删除 $k^2$-tree 中所有 0 节点，合并叶子节点中为 1 的节点。&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;strong&gt;步骤 3&lt;/strong&gt;：对 $k^2$-tree 每个分支进行二进制编码（$k = 2$），合并节点值相等且儿子节点相同的节点（共享子图）。&lt;/p&gt;
-&lt;p&gt;例如，11 个顶点邻接矩阵的 $k^2$-tree 表示（如图 8）、传统 $k^2$-tree 的同构子树分布（如图 9）及 $k^2$-tree 的 MDD 表示（如图 10）展示了其构造过程及效果。&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109152358715.png&#34;
-	width=&#34;883&#34;
-	height=&#34;954&#34;
-	srcset=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109152358715_hu8484991723977186367.png 480w, https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109152358715_hu11369012216425933232.png 1024w&#34;
-	loading=&#34;lazy&#34;
-	
-		alt=&#34;image-20241109152358715&#34;
-	
-	
-		class=&#34;gallery-image&#34; 
-		data-flex-grow=&#34;92&#34;
-		data-flex-basis=&#34;222px&#34;
-	
-&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109152418583.png&#34;
-	width=&#34;855&#34;
-	height=&#34;499&#34;
-	srcset=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109152418583_hu12605624156883740085.png 480w, https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109152418583_hu7013264210014297743.png 1024w&#34;
-	loading=&#34;lazy&#34;
-	
-		alt=&#34;image-20241109152418583&#34;
-	
-	
-		class=&#34;gallery-image&#34; 
-		data-flex-grow=&#34;171&#34;
-		data-flex-basis=&#34;411px&#34;
-	
-&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109152438744.png&#34;
-	width=&#34;709&#34;
-	height=&#34;763&#34;
-	srcset=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109152438744_hu18316473331553620671.png 480w, https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109152438744_hu289061197503840619.png 1024w&#34;
-	loading=&#34;lazy&#34;
-	
-		alt=&#34;image-20241109152438744&#34;
-	
-	
-		class=&#34;gallery-image&#34; 
-		data-flex-grow=&#34;92&#34;
-		data-flex-basis=&#34;223px&#34;
-	
-&gt;&lt;/p&gt;
-&lt;h3 id=&#34;4技术优势总结&#34;&gt;（4）技术优势总结
-&lt;/h3&gt;&lt;ul&gt;
-&lt;li&gt;实验对比（如用真实网页图和社交网络数据集）表明，在 $k^2$-tree、$k^2$-MDD 和 OBDD 中，用位串 $T$ 记录除最后一层节点的 0 值和 1 值，位串 $L$ 记录最后一层节点的 0 值和 1 值，$T$ 和 $L$ 的总和为存储空间。以网页图数据集（如 $cnr, in, uk, indochina$）和社交网络数据集（如 $enron, dblp-1, dblp-2, dewiki$）为例，采用 OBDD 压缩网页图，$T$ 和 $L$ 的总和约为 $k^2$-tree 的 21%；采用 $k^2$-MDD 压缩网页图，$T$ 和 $L$ 的总和约为 $k^2$-tree 的 3%。在社交网络数据集上也有类似结果，显著改善了存储空间需求，体现了形式化方法在大规模图数据压缩处理上的优势。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&#34;4-基于邻接表的压缩技术&#34;&gt;4 基于邻接表的压缩技术
-&lt;/h2&gt;&lt;h3 id=&#34;1空隙编码&#34;&gt;（1）空隙编码
-&lt;/h3&gt;&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;strong&gt;编码依据及思想&lt;/strong&gt;：研究表明多数网页图具有局部性，即页面直接邻居集合挨得很近。Boldi 等人据此提出空隙编码，其思想是用连续节点标签值替代原始值以压缩节点标签，减少存储空间。设 $A(x)=(a_1, a_2, a_3, \cdots, a_n)$ 为第 $x$ 个节点的直接邻居标签值序列，$x$ 对应的空隙编码 $B(x)=(c(a_1 - x), a_2 - a_1 - 1, a_3 - a_2 - 1, \cdots, a_n - a_{n - 1} - 1)$，其中
-&lt;/p&gt;
-$$
-  c(x)=\begin{cases}2x, &amp; x \geq 0 \\ 2|x| - 1, &amp; x &lt; 0\end{cases}
-  $$&lt;p&gt;
-例如，对于网页图邻接表（如表 1），可得到对应的空隙编码（如表 2）。&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109152957033.png&#34;
-	width=&#34;723&#34;
-	height=&#34;1027&#34;
-	srcset=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109152957033_hu9159345574902275234.png 480w, https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109152957033_hu12680410699856896633.png 1024w&#34;
-	loading=&#34;lazy&#34;
-	
-		alt=&#34;image-20241109152957033&#34;
-	
-	
-		class=&#34;gallery-image&#34; 
-		data-flex-grow=&#34;70&#34;
-		data-flex-basis=&#34;168px&#34;
-	
-&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&#34;2参考压缩&#34;&gt;（2）参考压缩
-&lt;/h3&gt;&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;压缩原理&lt;/strong&gt;：利用网页的相似性，即位置较近的网页的后继集较为相似。Suel 等人提出参考压缩，用一个节点的邻接表表示其余邻接表。设 $s(x)$ 为参考表，$s(y)$ 为复制表，$y - x$ 为参考系数 $r$。若 $s(x)$ 的后继在 $s(y)$ 中存在，复制表的对应位置为 $1$，否则为 $0$，$s(y)$ 中不在 $s(x)$ 中的后继为额外节点。例如，网页图邻接表的参考压缩如表 3 所示。但上述两种技术要求节点直接邻居集合有序，若需保存原始链接顺序则不适用。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109153044044.png&#34;
-	width=&#34;921&#34;
-	height=&#34;579&#34;
-	srcset=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109153044044_hu7968697724391349137.png 480w, https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109153044044_hu13358933604241574138.png 1024w&#34;
-	loading=&#34;lazy&#34;
-	
-		alt=&#34;image-20241109153044044&#34;
-	
-	
-		class=&#34;gallery-image&#34; 
-		data-flex-grow=&#34;159&#34;
-		data-flex-basis=&#34;381px&#34;
-	
-&gt;&lt;/p&gt;
-&lt;h3 id=&#34;3repair-算法&#34;&gt;（3）Repair 算法
-&lt;/h3&gt;&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;算法思想及操作&lt;/strong&gt;：Adler 和 Faust 等人发现邻接表节点后继存在相似信息，提出了 Repair 算法。该算法将所有节点后继看成序列 $T$，每次用未在 $T$ 中出现的符号 $s$ 替换 $T$ 中最频繁的符号对，直到 $T$ 中无频繁模式为止。设图 $G=(V, E)$，则 $T(G)=v_1v_{1,1}v_{1,2}v_{1,3}\cdots v_{1,n}v_2v_{2,1}v_{2,2}v_{2,3}\cdots v_{2,n}\cdots v_nv_{n,1}v_{n,2}v_{n,3}\cdots v_{n,n}$，$Ptrs[m]$ 记录节点在 $T$ 中的起始位置。例如，给定图邻接表的 Repair 压缩如图 11 所示。该算法将邻接表压缩成字典规则集合 $R$、指针数组 $Ptrs$ 和序列 $T$。查询节点信息时，仅需部分解压缩即可。但对于大规模图，由于每次添加新规则导致字典规则集合增大，Bille 等人改进了该算法，取得了较好的时间和空间平衡。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109153109352.png&#34;
-	width=&#34;956&#34;
-	height=&#34;683&#34;
-	srcset=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109153109352_hu17665443857374671002.png 480w, https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109153109352_hu7914380863332275378.png 1024w&#34;
-	loading=&#34;lazy&#34;
-	
-		alt=&#34;image-20241109153109352&#34;
-	
-	
-		class=&#34;gallery-image&#34; 
-		data-flex-grow=&#34;139&#34;
-		data-flex-basis=&#34;335px&#34;
-	
-&gt;&lt;/p&gt;
-&lt;h3 id=&#34;4lz78-算法&#34;&gt;（4）LZ78 算法
-&lt;/h3&gt;&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;算法流程及特点&lt;/strong&gt;：另一种基于邻接表的压缩算法 LZ78 由 Ziv 和 Lempel 提出，思想是建立字典表，读入字符时判断是否在表中。若不在，保存字符并建立索引；若在，保存索引并添加新字符形成字符串表示。具体流程如下：先建立空字典表，依次读取新字符 $c$，查找当前前缀 $P$ 与 $c$ 的组合 $P + c$。若 $P + c$ 在字典表中，更新前缀 $P$ 为 $P + c$；若不在，输出当前前缀索引及 $c$，将 $P + c$ 保存至字典表，并将前缀 $P$ 设为空，重复直到所有字符串编码完成。例如，图 11 邻接表的 LZ78 压缩结果如表 4 所示。LZ78 算法和 Repair 算法的区别在于压缩时，LZ78 算法的字典表以结果形式输出，查询节点信息的速度比 Repair 算法快，但每次解压需要从结果开始构造字典 $R$，只能压缩邻接表边表，限制了性能。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109153141282.png&#34;
-	width=&#34;658&#34;
-	height=&#34;764&#34;
-	srcset=&#34;https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109153141282_hu7505122720141397655.png 480w, https://SilentThink.github.io/p/graph-compression-tech/img/image-20241109153141282_hu15865306040073812203.png 1024w&#34;
-	loading=&#34;lazy&#34;
-	
-		alt=&#34;image-20241109153141282&#34;
-	
-	
-		class=&#34;gallery-image&#34; 
-		data-flex-grow=&#34;86&#34;
-		data-flex-basis=&#34;206px&#34;
-	
-&gt;&lt;/p&gt;
-</description>
-        </item>
-        <item>
         <title>非独立同分布图上的联邦图分类</title>
         <link>https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/</link>
         <pubDate>Sat, 09 Nov 2024 14:11:41 +0800</pubDate>
@@ -344,26 +31,195 @@ $$
 &lt;p&gt;github仓库：https://github.com/Oxfordblue7/GCFL&lt;/p&gt;
 &lt;h1 id=&#34;federated-graph-classification-over-non-iid-graphs&#34;&gt;Federated Graph Classification over Non-IID Graphs
 &lt;/h1&gt;&lt;h2 id=&#34;摘要&#34;&gt;摘要
-&lt;/h2&gt;&lt;p&gt;联邦学习（Federated Learning, FL）在不同领域训练机器学习模型方面已成为重要范式，对于图分类等图级任务，图可视为特殊数据样本，可分布于不同本地系统。本文通过分析发现真实世界的图具有共同属性，但不同来源的图在结构和节点特征上呈现非独立同分布（Non-IID）。为此提出图聚类联邦学习（Graph Clustered Federated Learning, GCFL）框架，根据图神经网络（Graph Neural Network, GNN）的梯度动态聚类本地系统，以减少图的结构和特征异质性。同时观察到GCFL中GNN梯度波动影响聚类，进而设计基于动态时间规整（Dynamic Time Warping, DTW）的梯度序列聚类机制（GCFL+），实验验证了框架有效性。&lt;/p&gt;
+&lt;/h2&gt;&lt;p&gt;联邦学习中的图分类等图级任务，图可分布于不同本地系统。本文通过分析发现真实世界的图具有共同属性，但不同来源的图在结构和节点特征上呈现非独立同分布（Non-IID）。为此提出图聚类联邦学习（Graph Clustered Federated Learning, GCFL）框架，根据图神经网络（Graph Neural Network, GNN）的梯度动态聚类本地系统，以减少图的结构和特征异质性。同时观察到GCFL中GNN梯度波动影响聚类，进而设计基于动态时间规整（Dynamic Time Warping, DTW）的梯度序列聚类机制（GCFL+），实验验证了框架有效性。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;什么是非独立同分布（Non-IID）数据？&lt;/strong&gt; （ref:https://www.zhihu.com/question/395555567）&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;strong&gt;维基百科&lt;/strong&gt;：在&lt;a class=&#34;link&#34; href=&#34;https://zh.wikipedia.org/wiki/%e6%a6%82%e7%8e%87%e8%ae%ba&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;概率论&lt;/a&gt;与&lt;a class=&#34;link&#34; href=&#34;https://zh.wikipedia.org/wiki/%e7%bb%9f%e8%ae%a1%e5%ad%a6&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;统计学&lt;/a&gt;中，&lt;strong&gt;独立同分布&lt;/strong&gt;（&lt;strong&gt;Independent and identically distributed&lt;/strong&gt;，或称独立同分配，缩写为IID）是指一组&lt;a class=&#34;link&#34; href=&#34;https://zh.wikipedia.org/wiki/%e9%9a%8f%e6%9c%ba%e5%8f%98%e9%87%8f&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;随机变量&lt;/a&gt;中每个变量的&lt;a class=&#34;link&#34; href=&#34;https://zh.wikipedia.org/wiki/%e6%a6%82%e7%8e%87%e5%88%86%e5%b8%83&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;概率分布&lt;/a&gt;都相同，且这些随机变量互相&lt;a class=&#34;link&#34; href=&#34;https://zh.wikipedia.org/wiki/%e7%8b%ac%e7%ab%8b_%28%e6%a6%82%e7%8e%87%e8%ae%ba%29&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;独立&lt;/a&gt;。一组随机变量独立同分布并不意味着它们的&lt;a class=&#34;link&#34; href=&#34;https://zh.wikipedia.org/wiki/%e6%a0%b7%e6%9c%ac%e7%a9%ba%e9%97%b4&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;样本空间&lt;/a&gt;中每个事件发生概率都相同。例如，投掷非均匀骰子得到的结果序列是独立同分布的，但掷出每个面朝上的概率并不相同。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;独立：每次抽样之间没有关系，不会相互影响。比如你在随便丢骰子，每次抛到的数字是几就是几，是独立的。 但如果我要求你要两次抛到的数字和大于等于9，第一次和第二次抛就不独立，因为他们相互关联。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;同分布：你丢骰子，每次丢骰子到任何一个数字的概率都是1/6，是相等概率。或者说，在&lt;a class=&#34;link&#34; href=&#34;https://zhida.zhihu.com/search?content_id=312060753&amp;amp;content_type=Answer&amp;amp;match_order=1&amp;amp;q=%e6%a6%82%e7%8e%87%e7%a9%ba%e9%97%b4&amp;amp;zhida_source=entity&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;概率空间&lt;/a&gt;里面， 你不论进行几次抽样实验，他们都服从同样一个分布。又比如说，现在一个大小为pi的圆放在大小为4的 正方形，你丢一根针进去，结果分为在圆里面和圆外面。每次丢进这个圆的概率都是pi/4，你重复+∞次会 无限接近于这个pi/4.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;在联邦学习中，由于数据存储在不同的本地设备上，这些设备可能&lt;strong&gt;采集不同类型的数据、数据量不同、数据质量不同，或者数据在不同时间和地点收集&lt;/strong&gt;，因此不同设备上的数据样本之间可能具有不同的分布特性或相关性，而不满足独立同分布的假设。&lt;/p&gt;
+&lt;p&gt;**图数据的 Non - IID **:图数据在结构和特征方面存在显著的异构性，即不同客户端拥有的图数据在结构分布和节点特征分布上不遵循相同的模式。&lt;/p&gt;
 &lt;h2 id=&#34;1-引言&#34;&gt;1. 引言
-&lt;/h2&gt;&lt;p&gt;联邦学习允许本地系统在保护数据隐私的同时受益于其他系统的数据，但面临数据分布异质性问题。图学习中的图分类任务具有广泛应用场景，如分子属性预测、蛋白质分类、社交网络分析等。本文研究发现不同来源的真实世界图存在共同属性，但也存在结构和特征异质性，因此提出GCFL框架，根据GNN梯度聚类客户端以降低异质性，并进一步改进为GCFL+以应对梯度波动问题。&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109165639474.png&#34;
-	width=&#34;1796&#34;
-	height=&#34;262&#34;
-	srcset=&#34;https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109165639474_hu7425386156257880488.png 480w, https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109165639474_hu11289344801834132672.png 1024w&#34;
+&lt;/h2&gt;&lt;p&gt;联邦学习允许本地系统在保护数据隐私的同时受益于其他系统的数据，但面临数据分布异质性问题。本文研究发现不同来源的真实世界图存在共同属性，但也存在结构和特征异质性，因此提出GCFL框架，根据GNN梯度聚类客户端以降低异质性，并进一步改进为GCFL+以应对梯度波动问题。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;真实世界图数据的共性与异构性&lt;/strong&gt;：&lt;/p&gt;
+&lt;p&gt;通过对不同领域的真实世界图数据集（如 &lt;code&gt;PTC_MR（分子结构）&lt;/code&gt;、&lt;code&gt;ENZYMES（蛋白质结构）&lt;/code&gt;、&lt;code&gt;IMDB - BINARY （社交社区）&lt;/code&gt;和 &lt;code&gt;MSRC_21（超像素网络）&lt;/code&gt;）的初步数据分析，发现它们在某些图属性上（如节点度分布的峰度、平均最短路径长度、最大连通分量大小和聚类系数）与随机图相比具有显著的共性，这为跨数据集和跨领域的联邦学习提供了可能性。&lt;/p&gt;
+&lt;p&gt;然而，不同数据集或领域的图在详细结构和节点特征上仍存在差异，表现出结构和特征的异构性，这种异构性在跨数据集的联邦学习设置中被称为 Non - IID 图，可能导致传统联邦学习算法（如 FedAvg）失效。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109225839946.png&#34;
+	width=&#34;1028&#34;
+	height=&#34;319&#34;
+	srcset=&#34;https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109225839946_hu8119855003118046353.png 480w, https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109225839946_hu12092621488659428310.png 1024w&#34;
 	loading=&#34;lazy&#34;
 	
-		alt=&#34;image-20241109165639474&#34;
+		alt=&#34;image-20241109225839946&#34;
 	
 	
 		class=&#34;gallery-image&#34; 
-		data-flex-grow=&#34;685&#34;
-		data-flex-basis=&#34;1645px&#34;
+		data-flex-grow=&#34;322&#34;
+		data-flex-basis=&#34;773px&#34;
 	
 &gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;度量指标解释&lt;/strong&gt;：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;峰度（Kurtosis）&lt;/strong&gt;：用于衡量数据分布的陡峭程度或峰值的尖锐程度。在节点度分布中，较大的峰度值（如文中提到的 ENZYMES、IMDB - BINARY 和 MSRC_21 数据集）表明节点度呈现&lt;strong&gt;长尾分布&lt;/strong&gt;，即少数节点具有非常高的度，而大多数节点的度相对较低。这种分布特征可能对图的结构和功能产生重要影响，例如在社交网络中，少数高度连接的节点（如意见领袖）可能对信息传播起着关键作用；在生物网络中，高连接度的节点可能代表着关键的生物分子或功能模块。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;平均最短路径长度（avg.shortest path length）&lt;/strong&gt;：是指图中所有节点对之间最短路径长度的平均值。PTC_MR、ENZYMES 和 MSRC_21 数据集尽管实际图的大小差异较大，但具有相似的平均最短路径长度。这一属性反映了图中节点之间的连接紧密程度或信息传递的效率。在一些网络中，较短的平均最短路径长度可能意味着信息能够快速传播，例如在互联网路由网络中，较短的路径长度有助于减少数据传输延迟；而在其他网络中，较长的路径长度可能表示网络具有更高的层次结构或模块化程度，如生物代谢网络中，不同的代谢途径可能通过较长的路径相互连接。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;聚类系数（Clustering Coefficient，CC）&lt;/strong&gt;：衡量图中节点聚集程度的指标，即节点的邻居之间相互连接的紧密程度。ENZYMES、IMDB - BINARY 和 MSRC_21 数据集具有较大的聚类系数，这意味着这些图中存在较多的三角形结构或节点聚类现象。在社交网络中，高聚类系数可能表示社交圈子内的成员之间联系紧密，信息容易在小群体内传播；在生物网络中，高聚类系数可能暗示着生物分子之间存在功能相关的模块或复合物。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;最大连通分量大小（Largest Component Size，LC）&lt;/strong&gt;：表示图中最大连通分量（即相互连接的节点集合）所占的比例。几乎所有数据集都观察到较大的 LC 值，这表明这些图在很大程度上是连通的，即大多数节点可以通过路径相互到达。在一些网络应用中，高连通性是确保信息或资源能够在整个网络中有效传播和共享的关键，例如在电力网络中，高连通性有助于维持电力供应的稳定性；而在某些情况下，较低的连通性可能意味着网络存在瓶颈或脆弱点，如交通网络中的拥堵路段可能导致局部连通性下降。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;差异显著性指标&lt;/strong&gt;：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;真实值（real）&lt;/strong&gt;：指的是对实际的真实世界图数据集（如 PTC_MR、ENZYMES、IMDB - BINARY、MSRC_21 等）进行测量得到的相应图属性的值。例如，对于 PTC_MR 数据集的度分布峰度，其真实值为 2.1535，这是通过对该数据集中所有图的节点度分布进行计算得出的实际峰度数值。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;随机值（random）&lt;/strong&gt;：表示使用 Erdős–Rényi 模型生成的具有相同节点数量和链接数量的随机图的相应图属性的值。该模型是一种生成随机图的经典方法，通过随机连接节点来构建图结构。对于每个真实数据集，都生成了具有相似规模（节点和链接数量相同）的随机图，并计算其图属性，作为对比基准。例如，与 PTC_MR 数据集对比的随机图的度分布峰度为 2.4424。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;p-value&lt;/strong&gt;:用于衡量真实数据集的图属性与随机图的图属性之间差异的显著性水平。它是在假设检验中使用的一个统计量，用于判断观察到的差异是由于随机因素还是真实存在的系统性差异导致的。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;较小的 p - value表明真实数据集的图属性与随机图的图属性之间的差异在统计上是显著的，即不太可能是由随机因素引起的。例如，ENZYMES 数据集的度分布峰度的 p - value 为 0.0027，这意味着其与随机图在峰度上的差异是显著的，说明 ENZYMES 数据集的节点度分布具有与随机图不同的、特定的结构特征。&lt;/li&gt;
+&lt;li&gt;较大的 p - value（接近 1）则表示真实数据集和随机图在该图属性上的差异不显著，可能是由于随机波动导致的，不能确定真实数据集具有特殊的结构或模式。如 PTC_MR 数据集的度分布峰度的 p - value 为 0.9999，说明其与随机图在峰度方面的差异不具有统计学意义，即从这个指标来看，PTC_MR 数据集的节点度分布在结构上与随机图较为相似，没有明显的特殊结构特征被检测到。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
 &lt;h2 id=&#34;2-相关工作&#34;&gt;2. 相关工作
 &lt;/h2&gt;&lt;h3 id=&#34;21联邦学习&#34;&gt;2.1联邦学习
 &lt;/h3&gt;&lt;p&gt;联邦学习在数据分布于远程设备且模型由中央服务器协调训练的场景下受到关注。FedAvg是首个基本FL算法，但在处理非IID数据时存在收敛慢、精度下降等问题。已有研究从数据共享、优化收敛、个性化学习、聚类学习等方面进行改进，但仍面临挑战。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;水平联邦学习：&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241110000339457.png&#34;
+	width=&#34;1001&#34;
+	height=&#34;610&#34;
+	srcset=&#34;https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241110000339457_hu5901682845017342868.png 480w, https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241110000339457_hu12018848661346556969.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241110000339457&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;164&#34;
+		data-flex-basis=&#34;393px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;FedAvg:联邦学习的开山之作&lt;/strong&gt;：&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;论文地址&lt;/strong&gt;：https://proceedings.mlr.press/v54/mcmahan17a/mcmahan17a.pdf
+&lt;strong&gt;源码地址&lt;/strong&gt;：https://github.com/shaoxiongji/federated-learning&lt;/p&gt;
+&lt;p&gt;**针对的问题：**移动设备中有大量的数据，但显然我们不能收集这些数据到云端以进行集中训练，所以引入了一种分布式的机器学习方法，即联邦学习Federal Learning。在FL中，server将全局模型下放给各client，client利用本地的数据去训练模型，并将训练后的权重上传到server，从而实现全局模型的更新。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;算法介绍：&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;联邦随机梯度下降算法（FedSGD）&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;设定固定的学习率 $\eta$，对 $K$ 个客户端（client）的数据计算损失梯度：
+&lt;/p&gt;
+$$
+g_k = \bigtriangledown F_k(w_t)
+$$&lt;p&gt;服务器（server）将聚合每个客户端计算的梯度，以此来更新模型参数：
+&lt;/p&gt;
+$$
+w_{t+1} \leftarrow w_t - \eta \sum\limits_{k=1}^K \frac{n_k}{n} g_k = w_t - \eta \bigtriangledown f(w_t)
+$$&lt;p&gt;FedSGD 的不足之处：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;高通信成本&lt;/strong&gt;：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;FedSGD 要求每个客户端在每次迭代中计算一次梯度后立即与服务器同步更新模型参数。对于大规模联邦学习系统，每个客户端频繁通信会带来高昂的网络开销和延迟，尤其在客户端数量较多或带宽有限的情况下。&lt;/li&gt;
+&lt;li&gt;这种设计在实际中会导致资源消耗大，且模型参数更新效率低下，系统负载明显。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;对本地数据的利用不足&lt;/strong&gt;：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;FedSGD 在客户端每次只进行一次梯度计算，无法充分利用客户端的本地数据。这样每次更新依赖的样本量有限，导致每个客户端传回的梯度更新效果有限，模型难以高效逼近最优解。&lt;/li&gt;
+&lt;li&gt;尤其在数据分布存在差异的场景下（非IID情况），一次梯度更新很难反映出本地数据的整体特征。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;非独立同分布（Non-IID）数据适应性差&lt;/strong&gt;：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;在联邦学习中，客户端的数据分布通常非独立同分布，各客户端的样本特性可能差异较大。FedSGD 将所有客户端的一次梯度直接聚合，未考虑到各客户端数据分布的差异，这会导致模型收敛效果不佳。&lt;/li&gt;
+&lt;li&gt;由于梯度更新频繁，FedSGD 的模型在这种场景下容易受到局部梯度波动的影响，难以平衡不同客户端的数据贡献。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;收敛速度较慢&lt;/strong&gt;：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;FedSGD 的一次更新只包含每个客户端单次计算的梯度，信息量较少，导致模型收敛缓慢。在同样的通信轮数下，FedSGD 无法充分逼近全局最优解。&lt;/li&gt;
+&lt;li&gt;由于不能在本地多轮迭代优化，FedSGD 对客户端的计算资源利用率较低，浪费了部分算力。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;联邦平均算法（FedAvg）&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;FedAvg 针对上述不足之处做出改进：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;减少通信频率&lt;/strong&gt;：FedAvg 允许客户端在本地训练多轮后再上传更新结果，大大降低了每次通信所需的频率。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;充分利用本地数据&lt;/strong&gt;：客户端可以在本地多轮更新权重，充分利用本地数据特征，使得更新后的模型更具泛化性。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;更好的适应非IID数据&lt;/strong&gt;：FedAvg 使用权重加权平均，能够更好地整合不同客户端的模型，降低数据分布差异带来的负面影响。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;加速收敛&lt;/strong&gt;：通过本地多轮迭代，FedAvg 使得模型在每次通信时都能积累更多优化信息，从而在较少通信轮次下获得更好的收敛效果。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;算法流程如下：&lt;/p&gt;
+&lt;p&gt;给定$K$个客户端，在第t轮训练过程中：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;中心服务器随机选择部分客户端&lt;/li&gt;
+&lt;li&gt;客户端从中心服务器下载模型根据本地数据训练$E$轮&lt;/li&gt;
+&lt;li&gt;各个客户端发送训练后的参数到中心服务器，中心服务器根据下式更新参数：
+其中$ n_k $为客户端$k$样本数，$n$为所有客户端的样本总数。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;在客户端进行局部模型的更新：
+&lt;/p&gt;
+$$
+w_{t+1}^k \leftarrow w_t - \eta g_k
+$$&lt;p&gt;服务器对每个客户端更新后的权重进行加权平均：
+&lt;/p&gt;
+$$
+w_{t+1} \leftarrow \sum_{k=1}^K \frac{n_k}{n} w_{t+1}^k
+$$&lt;ul&gt;
+&lt;li&gt;$n_k$ 是 &lt;strong&gt;客户端 \( k \) 的数据样本数量&lt;/strong&gt;。&lt;/li&gt;
+&lt;li&gt;$ \eta $ 是&lt;strong&gt;学习率&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;注意&lt;/strong&gt;：每个客户端可以在本地独立地多次更新本地权重，然后将更好的权重参数发给服务器进行加权平均。这样做的好处是不用每更新一次就去聚合，从而大大减少了通信量。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241110001925541.png&#34;
+	width=&#34;830&#34;
+	height=&#34;780&#34;
+	srcset=&#34;https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241110001925541_hu15838834219672122020.png 480w, https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241110001925541_hu4267270663499946759.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241110001925541&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;106&#34;
+		data-flex-basis=&#34;255px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;FedAvg 的计算量&lt;/strong&gt;：&lt;/p&gt;
+&lt;p&gt;FedAvg 的计算量与以下三个参数有关：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;$C$：每轮训练选择客户端的比例，即每一轮通信时只选择 $C \times K$ 个客户端；（$K$ 为客户端总数）&lt;/li&gt;
+&lt;li&gt;$E$：每个客户端更新本地权重时，在本地数据集上训练 $E$ 轮；&lt;/li&gt;
+&lt;li&gt;$B$：客户端更新权重时，每次梯度下降所使用的数据量，即本地数据集的 batch size；&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;每次从训练集中随机抽取一定数量的数据样本（即 Batch Size）进行梯度计算，这种方法能够在保证收敛速度的同时节省计算资源，是最常用的优化方式。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;特例关系&lt;/strong&gt;：&lt;/p&gt;
+&lt;p&gt;FedSGD 是 FedAvg 的一个特例，即当参数 $E = 1$，$B = \infty$ 时，FedAvg 等价于 FedSGD。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;注：$B = \infty$ 表示 batch size 大小就是本地数据集大小。&lt;/p&gt;
+&lt;/blockquote&gt;
 &lt;h3 id=&#34;22联邦学习在图数据上的应用&#34;&gt;2.2联邦学习在图数据上的应用
 &lt;/h3&gt;&lt;p&gt;已有研究将FL应用于图数据，但多数研究集中于节点分类和链接预测，无法直接应用于图分类任务。本文研究跨数据集/跨域的联邦图分类，具有创新性。&lt;/p&gt;
 &lt;h2 id=&#34;3-预备知识&#34;&gt;3. 预备知识
@@ -372,12 +228,99 @@ $$
 &lt;h3 id=&#34;32-fedavg算法&#34;&gt;3.2 FedAvg算法
 &lt;/h3&gt;&lt;p&gt;FedAvg是基本的FL算法，通过聚合本地客户端更新的模型参数并重新分发平均参数来训练模型，但在处理非IID数据时存在不足。&lt;/p&gt;
 &lt;h2 id=&#34;4-gcfl框架&#34;&gt;4. GCFL框架
-&lt;/h2&gt;&lt;h3 id=&#34;41跨客户端的非iid结构和特征&#34;&gt;4.1跨客户端的非IID结构和特征
-&lt;/h3&gt;&lt;p&gt;真实世界图在结构和特征上存在不同程度的异质性，这种异质性使得传统FL算法如FedAvg在处理非IID图数据时可能无效甚至产生负面影响。&lt;/p&gt;
+&lt;/h2&gt;&lt;h3 id=&#34;41跨客户端的non-iid数据结构与特征分析&#34;&gt;4.1跨客户端的Non-IID数据结构与特征分析
+&lt;/h3&gt;&lt;h3 id=&#34;异构性度量标准&#34;&gt;&lt;strong&gt;异构性度量标准&lt;/strong&gt;
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;结构异构性度量&lt;/strong&gt;：使用AEWs(Anonymous Walk Embeddings)生成每个图的表示，计算各个图AWE表示之间的Jensen-Shannon距离。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;特征异构性度量&lt;/strong&gt;：计算各个图内部节点之间特征相似性的经验分布，计算各个图特征相似性经验分布之间的Jensen-Shannon散度。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;数据集分析&#34;&gt;&lt;strong&gt;数据集分析&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241110021506047.png&#34;
+	width=&#34;1640&#34;
+	height=&#34;411&#34;
+	srcset=&#34;https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241110021506047_hu6493724754996558486.png 480w, https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241110021506047_hu1844409429037069736.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241110021506047&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;399&#34;
+		data-flex-basis=&#34;957px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;如表2所示，单一数据集、单一领域及不同领域内的图数据在结构和特征上均表现出不同程度的异构性，其中&lt;strong&gt;结构异构性使得模型难以学习到不同客户端之间重要的相似图模式，而特征异构性则使得模型难以学习到在不同客户端之间具有泛化能力的消息传递机制&lt;/strong&gt;。&lt;/p&gt;
 &lt;h3 id=&#34;42问题表述&#34;&gt;4.2问题表述
 &lt;/h3&gt;&lt;p&gt;GCFL旨在联合找到具有相似结构和特征图的客户端集群，并在同一集群内使用FedAvg训练图挖掘模型。目标是最小化损失函数，同时动态维护集群分配。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;主要思想&lt;/strong&gt;：联合&lt;strong&gt;寻找具有相似结构和特征的图所在的客户端&lt;/strong&gt;，并在同一簇内的客户端之间使用FedAvg训练图模型。具体而言:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;给定一个中央服务器和个本地客户端，中央服务器可动态地将客户端划分为若干个簇及对应个&lt;code&gt;cluster-wise&lt;/code&gt;模型。&lt;/li&gt;
+&lt;li&gt;假设客户端具有一个图集合，，其中为节点集合，为边集合，为节点特征图，为图分类标签，各个客户端的任务即为预测图标签，其中为客户端所在簇内学习到的图学习模型。&lt;/li&gt;
+&lt;li&gt;最终优化目标为最小化所有簇的损失，其中为簇中客户端的本地损失函数，且为对应的映射函数。&lt;/li&gt;
+&lt;/ul&gt;
 &lt;h3 id=&#34;43技术设计&#34;&gt;4.3技术设计
 &lt;/h3&gt;&lt;p&gt;GCFL利用GNN的强大表示能力，根据客户端传输的梯度动态聚类。通过引入超参数$\varepsilon_1$和$\varepsilon_2$作为聚类准则，当满足条件时，服务器基于余弦相似度矩阵和Stoer-Wagner最小割算法对集群进行二分。客户端在本地训练后传输梯度，服务器聚合梯度更新模型参数。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;传统FL框架处理non-IID数据存在什么问题？GCFL如何解决？&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;客户端数据分布异构性强时，传统FL框架可能无法在同时优化其损失函数，且在若干轮后容易陷入驻点( stationary point)，且客户端上传的梯度不会全部趋向于0，如何解决？
+引入超参数作为标准决定在传统FL框架到达驻点时是否停止，即：$\varepsilon_1$&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241110023002450.png&#34;
+	width=&#34;1124&#34;
+	height=&#34;152&#34;
+	srcset=&#34;https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241110023002450_hu18317620292148690002.png 480w, https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241110023002450_hu8761103426410564591.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241110023002450&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;739&#34;
+		data-flex-basis=&#34;1774px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;客户端传输梯度范数仍然过大，则意味着该簇中的客户端具有高度异构性，如何消除其带来的负面影响？
+使用聚类，并引入超参数作为划分标准，即：$\varepsilon_2$&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241110023029382.png&#34;
+	width=&#34;1088&#34;
+	height=&#34;76&#34;
+	srcset=&#34;https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241110023029382_hu14994682250030394115.png 480w, https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241110023029382_hu17385936342151289840.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241110023029382&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;1431&#34;
+		data-flex-basis=&#34;3435px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;技术设计要点&#34;&gt;技术设计要点
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;选择GNNs作为图挖掘模型&lt;/strong&gt;：GNNs在学习图表示方面能力强大且广泛应用于图挖掘，其模型参数和梯度能反映图结构与特征信息（详见4.4节），因此被用于GCFL框架。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;动态聚类机制&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;聚类依据&lt;/strong&gt;：当客户端数据分布高度异构时，通用联邦学习（FL）接近平稳点时，客户端传输梯度范数不全趋于零。引入超参数 $\varepsilon_1$ 判断是否接近平稳点（$\delta_{\text{mean}} = \left|\sum_{i \in [n]} \frac{\left|\mathcal{G}&lt;em&gt;{i}\right|}{|\mathcal{G}|} \Delta \theta&lt;/em&gt;{i}\right| &amp;lt; \varepsilon_{1}$），同时若存在客户端梯度范数较大，引入 $\varepsilon_2$ 决定是否分裂簇（$\delta_{\text{max}} = \max\left(\left|\Delta \theta_{i}\right|\right) &amp;gt; \varepsilon_{2} &amp;gt; 0$）。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;聚类过程&lt;/strong&gt;：GCFL采用自上而下的二分机制。在通信轮次 $t$ 时，服务器接收不同簇客户端的梯度，若某簇 $C_k$ 满足分裂条件，计算簇内余弦相似度矩阵 $\alpha_k$ 构建全连接图，用Stoer-Wagner最小割算法将该簇二分为 $C_{k1}$ 和 $C_{k2}$。此机制可自动动态确定簇的数量，超参数可通过验证集实验进行设置。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;客户端与服务器交互&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;簇 $C_k$ 中的客户端 $S_i$ 寻找接近真实解 $\theta_{k, i}^*$ 的 $\hat{\theta}&lt;em&gt;{k, i}$，在轮次 $t$ 将梯度 $\Delta \theta&lt;/em&gt;{k, i}^{t} = \hat{\theta}&lt;em&gt;{k, i}^{t} - \theta&lt;/em&gt;{k, i}^{t - 1}$ 传输给服务器。&lt;/li&gt;
+&lt;li&gt;服务器维护簇分配，并按簇聚合梯度：$\theta_{k}^{t + 1} = \theta_{k}^{t} + \sum_{i \in [n_{k}]} \Delta \theta_{k, i}^{t}$。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
 &lt;h3 id=&#34;44理论分析&#34;&gt;4.4理论分析
 &lt;/h3&gt;&lt;p&gt;利用梯度范数波动和动态时间规整技术，GCFL+通过维护多变量时间序列矩阵$Q$，根据梯度序列的距离矩阵进行聚类，能够更好地捕捉客户端长期行为，形成更同质的集群。&lt;/p&gt;
 &lt;ol&gt;
@@ -385,25 +328,14 @@ $$
 &lt;li&gt;&lt;strong&gt;结构与特征差异捕获&lt;/strong&gt;：针对结构和特征差异的两个命题，证明了不同结构或特征的图在训练SGC时，权重差异与结构/特征差异有界，即梯度会随结构和特征变化。&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;任务异质性捕获&lt;/strong&gt;：命题表明不同任务训练下，SGC权重有界，意味着GCFL框架有潜力扩展到跨任务图级联邦学习。&lt;/li&gt;
 &lt;/ol&gt;
-&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109165734375.png&#34;
-	width=&#34;1784&#34;
-	height=&#34;190&#34;
-	srcset=&#34;https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109165734375_hu4459023451507195955.png 480w, https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109165734375_hu4085154459656770796.png 1024w&#34;
-	loading=&#34;lazy&#34;
-	
-		alt=&#34;image-20241109165734375&#34;
-	
-	
-		class=&#34;gallery-image&#34; 
-		data-flex-grow=&#34;938&#34;
-		data-flex-basis=&#34;2253px&#34;
-	
-&gt;&lt;/p&gt;
 &lt;h2 id=&#34;5-gcfl基于梯度观测序列改进的gcfl&#34;&gt;5. GCFL+：基于梯度观测序列改进的GCFL
-&lt;/h2&gt;&lt;h3 id=&#34;51梯度范数波动&#34;&gt;5.1梯度范数波动
-&lt;/h3&gt;&lt;p&gt;GCFL训练中梯度范数波动大，不同客户端梯度尺度不同，反映结构和特征异质性。原始GCFL基于最后一轮梯度聚类可能忽略重要信息，受噪声误导。&lt;/p&gt;
-&lt;h3 id=&#34;52技术设计&#34;&gt;5.2技术设计
-&lt;/h3&gt;&lt;p&gt;GCFL+通过维护矩阵$Q$记录梯度范数序列，使用DTW计算距离矩阵$\beta$进行聚类，能更好捕捉客户端长期行为，形成更同质集群。&lt;/p&gt;
+&lt;/h2&gt;&lt;h3 id=&#34;gcfl相关内容&#34;&gt;GCFL+相关内容
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;梯度范数波动问题（5.1）&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;在GCFL中观察到梯度范数存在波动现象，具体表现为：一是梯度范数持续变化；二是不同客户端的梯度范数尺度不同。这表明客户端梯度的更新方向和距离各异，进一步体现了结构和特征的异构性。在原始GCFL框架中，服务器在聚类条件满足时仅依据最后传输的梯度计算余弦相似度矩阵，但这种基于单点梯度的聚类方式可能忽略重要的客户端行为并受噪声干扰。例如，在图1(a)中，GCFL在第119轮基于该轮梯度进行聚类，未能有效找到异构性较低的图。&lt;/li&gt;
+&lt;/ul&gt;
 &lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109165828948.png&#34;
 	width=&#34;1460&#34;
 	height=&#34;398&#34;
@@ -418,6 +350,19 @@ $$
 		data-flex-basis=&#34;880px&#34;
 	
 &gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;GCFL+的技术设计（5.2）&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;针对上述问题，提出改进的GCFL+。服务器维护一个多变量时间序列矩阵 $Q \in \mathbb{R}^{n, d}$（其中 $n$ 为客户端数量，$d$ 为跟踪的梯度序列长度）。在每轮通信 $t$ 时，将梯度范数 $\left|\Delta \theta_{i}^{t}\right|$ 添加到 $Q(i, :)$ 并移除过期数据。GCFL+采用与GCFL相同的聚类标准（公式4和5），当满足条件时，服务器使用动态时间规整（DTW）技术计算距离矩阵 $\beta$，其元素为两两梯度序列的距离。对于簇 $C_k$，服务器通过 $\beta_{k}(p, q) = \text{dist}(Q(p, :), Q(q, :))$（其中 $p, q \in \text{idx}({S_{i}})$，$\text{idx}({S_{i}})$ 为簇 $C_k$ 中所有客户端 ${S_{i}}$ 的索引）计算各客户端之间的距离。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;基于此距离矩阵，服务器对满足聚类标准的簇进行二分。如图1(b)所示，GCFL+在第118轮基于长度为10的梯度序列进行聚类，能捕捉客户端更长期的行为，形成更同质的簇。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
 &lt;h2 id=&#34;6-实验&#34;&gt;6. 实验
 &lt;/h2&gt;&lt;h3 id=&#34;61实验设置&#34;&gt;6.1实验设置
 &lt;/h3&gt;&lt;ol&gt;
@@ -509,6 +454,319 @@ $$
 &lt;/h3&gt;&lt;p&gt;提供详细的客户端性能分布小提琴图，包括重叠与非重叠数据划分、原始与合成节点特征、GCFL+中标准化与非标准化梯度序列矩阵等不同设置下的结果。总体上，框架在多种设置下均表现出较好性能提升效果。&lt;/p&gt;
 &lt;h2 id=&#34;7-结论&#34;&gt;7. 结论
 &lt;/h2&gt;&lt;p&gt;本文提出跨数据集和跨域联邦图分类设置及GCFL和GCFL+技术，允许数据所有者协同训练图分类神经网络，虽未深入研究数据隐私等问题，但为未来研究奠定基础。&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>图数据压缩技术综述</title>
+        <link>https://SilentThink.github.io/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/</link>
+        <pubDate>Sat, 09 Nov 2024 14:11:41 +0800</pubDate>
+        
+        <guid>https://SilentThink.github.io/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/</guid>
+        <description>&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241109141743105.png&#34;
+	width=&#34;1220&#34;
+	height=&#34;587&#34;
+	srcset=&#34;https://SilentThink.github.io/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241109141743105_hu1302417917710764173.png 480w, https://SilentThink.github.io/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241109141743105_hu7815822504371464812.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241109141743105&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;207&#34;
+		data-flex-basis=&#34;498px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;论文链接：http://joces.nudt.edu.cn/CN/Y2020/V42/I01/89&lt;/p&gt;
+&lt;h1 id=&#34;图数据压缩技术综述&#34;&gt;图数据压缩技术综述
+&lt;/h1&gt;&lt;h2 id=&#34;1-引言&#34;&gt;1 引言
+&lt;/h2&gt;&lt;p&gt;随着大数据时代的到来，数据规模以前所未有的方式不断增长，数据结构也呈现出复杂性和多样性。图，作为一种特殊的数据结构在众多领域有重要的研究价值。&lt;/p&gt;
+&lt;p&gt;随着图在各个领域的广泛应用，传统的图存储结构已经不能支持超大规模图数据的管理和分析。中国互联网络中心 2018 年发布的《第 41 次中国互联网络发展状况报告》 中提到， 网页的数量约为2600亿。若采用图模型存储上述网页节点及节点关系， 至少需要 42TB 的存储空间，并且随着因特网的不断发展，需要的存储开销也越来越大。如何存储和操作上亿万个节点的图数据的问题受国内外研究人员广泛研究。&lt;/p&gt;
+&lt;p&gt;图数据压缩技术：主要思想是消除图数据中的冗余信息，将图数据以压缩的形式存储到内存中。&lt;/p&gt;
+&lt;p&gt;本文主要从3个方面讨论图数据压缩技术：&lt;/p&gt;
+&lt;p&gt;（1）基于邻接矩阵的压缩技术：主要思想是尽可能地压缩邻接矩阵中的“0” 元素。&lt;/p&gt;
+&lt;p&gt;（2）基于形式化方法的压缩技术： 主要思想是对所给的图进行编码&amp;quot; 使其转化为布尔代数&amp;quot; 再利用决策图对布尔代数进行表示和化简。&lt;/p&gt;
+&lt;p&gt;（3）基于邻接表的压缩技术： 主要思想是利用节点的邻居节点集的相似性和局部引用性来进行压缩。&lt;/p&gt;
+&lt;h2 id=&#34;2-基于邻接矩阵的压缩技术&#34;&gt;2 基于邻接矩阵的压缩技术
+&lt;/h2&gt;&lt;h3 id=&#34;1k-tree-压缩技术&#34;&gt;（1）k²-tree 压缩技术
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;构造过程&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;步骤 1：对于给定的邻接矩阵，判断是否为的幂。若是，进入步骤 2；若不是，增加行和列使（为正整数），新增元素用 “0” 填充，再进入步骤 2 递归划分。&lt;/li&gt;
+&lt;li&gt;步骤 2：依据 MXQuntree 规则把矩阵划分为个大小一致的子矩阵。若子矩阵至少有一个 “1” 元素，标记为 1，否则标记为 0，自上而下、自左而右排列这些值作为根节点的 4 个儿子节点，完成树的第 1 层节点构造。对标记为 1 的矩阵递归处理，其值作为树的第 2 层节点，重复直至划分后的矩阵全为 0 或已划分到原始矩阵元素，递归停止。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;示例及优势&lt;/strong&gt;：以图1中 4 个节点的网页图和 图2中11 个节点的网页图为例，11 个节点网页图用邻接矩阵存储需 121bit，用k²-tree 存储需 72bit，可见k²-tree 空间利用率更高，且节点数增加时节省空间更多，还支持常数时间内查询节点直接邻居和反向邻居。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241109145737643.png&#34;
+	width=&#34;507&#34;
+	height=&#34;337&#34;
+	srcset=&#34;https://SilentThink.github.io/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241109145737643_hu5468181000944773502.png 480w, https://SilentThink.github.io/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241109145737643_hu12259586588007654240.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241109145737643&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;150&#34;
+		data-flex-basis=&#34;361px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241109145843806.png&#34;
+	width=&#34;556&#34;
+	height=&#34;737&#34;
+	srcset=&#34;https://SilentThink.github.io/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241109145843806_hu4812718135395188991.png 480w, https://SilentThink.github.io/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241109145843806_hu5766822673250830149.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241109145843806&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;75&#34;
+		data-flex-basis=&#34;181px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;存在问题&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;网页图中节点和链接分布依赖 URL 排序，传统k²-tree 机械划分会使稠密和稀疏区域在同子矩阵，降低空间利用率。&lt;/li&gt;
+&lt;li&gt;k²-tree 邻居查询时间与树高度成正比，处理上亿节点图数据时，若不处理，邻居查询时间大幅增加。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;2k-partition-技术&#34;&gt;（2）k²-partition 技术
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;改进思路&lt;/strong&gt;：Claude 等人利用网页图中域的规律，提出k²-partition，沿对角线划分图为不同域，对不同域用传统-tree 表示，实现较好时间 / 空间均衡。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;效果对比&lt;/strong&gt;：如对图 2 中的矩阵，传统k²-tree 表示需 72bit 存储空间，k²-partition 表示只需 64bit，且随图节点增加效果更明显，同时能获得更好查询时间。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241109145943577.png&#34;
+	width=&#34;489&#34;
+	height=&#34;358&#34;
+	srcset=&#34;https://SilentThink.github.io/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241109145943577_hu5010207668050535099.png 480w, https://SilentThink.github.io/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241109145943577_hu11357765550976966176.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241109145943577&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;136&#34;
+		data-flex-basis=&#34;327px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241109150021518.png&#34;
+	width=&#34;970&#34;
+	height=&#34;723&#34;
+	srcset=&#34;https://SilentThink.github.io/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241109150021518_hu4601760404461213331.png 480w, https://SilentThink.github.io/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241109150021518_hu10362979661923429665.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241109150021518&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;134&#34;
+		data-flex-basis=&#34;321px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;3kᵈ-tree-技术&#34;&gt;（3）kᵈ-tree 技术
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;提出背景及构造&lt;/strong&gt;：Caro 等人针对多维数据紧凑表示需求，利用 $k^2$-tree 构造思想提出 $k^d$-tree。它是 $k^2$-tree 的一般化形式，用于表示 $d$ 维二元矩阵，将规模为 $n_1 \times n_2 \times \cdots \times n_d$ 的 $d$ 维矩阵递归划分为 $k^d$ 个子矩阵。假设 $n_i = n$（$1 \leq i \leq d$），每个树节点有 $k^d$ 个儿子节点表示子矩阵，按从高维到低维次序确定 $k^d$-tree 各层值。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;示例说明&lt;/strong&gt;：图 5 展示了不同维度下 $k^d$-tree（$k = 2$）的表示方法。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241109151517769.png&#34;
+	width=&#34;885&#34;
+	height=&#34;318&#34;
+	srcset=&#34;https://SilentThink.github.io/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241109151517769_hu18030989117608907124.png 480w, https://SilentThink.github.io/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241109151517769_hu7765763705472588375.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241109151517769&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;278&#34;
+		data-flex-basis=&#34;667px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;3-基于形式化方法的压缩技术&#34;&gt;3 基于形式化方法的压缩技术
+&lt;/h2&gt;&lt;h3 id=&#34;1二叉决策图bdd与有序二叉决策图obdd&#34;&gt;（1）二叉决策图（BDD）与有序二叉决策图（OBDD）
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;核心思想&lt;/strong&gt;：杨志飞等人将符号计算运用到大规模图数据压缩表示中，把图中节点二进制编码，链接关系转布尔代数，再用 OBDD 求解。利用布尔代数节点取值冗余，通过 OBDD 化简和删除规则共享子图以提高存储效率。在这种表示下，图的多种操作可转化为 OBDD 的相关操作。例如，查询节点度数可转化为 OBDD 的可满足性问题等。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;示例&lt;/strong&gt;：对于有 $n$ 个节点的有向图，用布尔变量编码节点和边转化为布尔表达式。例如，对于 4 个节点有向图（设为图 $G$），需要 2 个布尔变量（设为 $x_1, x_2$ 和 $y_1, y_2$）分别表示有向边的起点和终点。若节点 0（编码为 $x_1&amp;rsquo;x_2&amp;rsquo;$，即 $x_1 = 1, x_2 = 1$）到节点 1（编码为 $y_1&amp;rsquo;y_2&amp;rsquo;$，即 $y_1 = 1, y_2 = 1$）有一条有向边，则表示为 $x_1&amp;rsquo;x_2&amp;rsquo;y_1&amp;rsquo;y_2&amp;rsquo;$。编码每条边即可得到图 $G$ 对应的 OBDD（如图 6b）。但 OBDD 终节点只能为 0 或 1，因此只能表示无权图。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241109152228969.png&#34;
+	width=&#34;783&#34;
+	height=&#34;598&#34;
+	srcset=&#34;https://SilentThink.github.io/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241109152228969_hu14334409717977972375.png 480w, https://SilentThink.github.io/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241109152228969_hu2338441746854892337.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241109152228969&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;130&#34;
+		data-flex-basis=&#34;314px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;2代数决策图add&#34;&gt;（2）代数决策图（ADD）
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;拓展内容&lt;/strong&gt;：Bahar 等人提出 ADD，将布尔代数拓展到伪布尔代数，将无权图拓展到带权图，丰富了图的布尔代数表示方法。其将图转化为 ADD 的思想与 OBDD 类似，但 ADD 的终节点是图中边的权重值。例如，4 个节点带权有向图（设为图 $H$）对应的邻接矩阵 $M_G$ 及代数决策图（如图 7）所示。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241109152254944.png&#34;
+	width=&#34;784&#34;
+	height=&#34;738&#34;
+	srcset=&#34;https://SilentThink.github.io/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241109152254944_hu11550239566068396951.png 480w, https://SilentThink.github.io/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241109152254944_hu7571442442170511511.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241109152254944&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;106&#34;
+		data-flex-basis=&#34;254px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;3k-mdd-技术&#34;&gt;（3）k²-MDD 技术
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;提出背景及构造&lt;/strong&gt;：针对 $k^2$-tree 存在同构子树、只能压缩稀疏图和表示静态图等问题，董荣胜等人将多值决策图（MDD）与 $k^2$-tree 结合，提出了 $k^2$-MDD。构造过程分三步：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;步骤 1&lt;/strong&gt;：将邻接矩阵用传统 $k^2$-tree 表示。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;步骤 2&lt;/strong&gt;：删除 $k^2$-tree 中所有 0 节点，合并叶子节点中为 1 的节点。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;步骤 3&lt;/strong&gt;：对 $k^2$-tree 每个分支进行二进制编码（$k = 2$），合并节点值相等且儿子节点相同的节点（共享子图）。&lt;/p&gt;
+&lt;p&gt;例如，11 个顶点邻接矩阵的 $k^2$-tree 表示（如图 8）、传统 $k^2$-tree 的同构子树分布（如图 9）及 $k^2$-tree 的 MDD 表示（如图 10）展示了其构造过程及效果。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241109152358715.png&#34;
+	width=&#34;883&#34;
+	height=&#34;954&#34;
+	srcset=&#34;https://SilentThink.github.io/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241109152358715_hu8484991723977186367.png 480w, https://SilentThink.github.io/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241109152358715_hu11369012216425933232.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241109152358715&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;92&#34;
+		data-flex-basis=&#34;222px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241109152418583.png&#34;
+	width=&#34;855&#34;
+	height=&#34;499&#34;
+	srcset=&#34;https://SilentThink.github.io/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241109152418583_hu12605624156883740085.png 480w, https://SilentThink.github.io/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241109152418583_hu7013264210014297743.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241109152418583&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;171&#34;
+		data-flex-basis=&#34;411px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241109152438744.png&#34;
+	width=&#34;709&#34;
+	height=&#34;763&#34;
+	srcset=&#34;https://SilentThink.github.io/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241109152438744_hu18316473331553620671.png 480w, https://SilentThink.github.io/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241109152438744_hu289061197503840619.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241109152438744&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;92&#34;
+		data-flex-basis=&#34;223px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;4技术优势总结&#34;&gt;（4）技术优势总结
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;实验对比（如用真实网页图和社交网络数据集）表明，在 $k^2$-tree、$k^2$-MDD 和 OBDD 中，用位串 $T$ 记录除最后一层节点的 0 值和 1 值，位串 $L$ 记录最后一层节点的 0 值和 1 值，$T$ 和 $L$ 的总和为存储空间。以网页图数据集（如 $cnr, in, uk, indochina$）和社交网络数据集（如 $enron, dblp-1, dblp-2, dewiki$）为例，采用 OBDD 压缩网页图，$T$ 和 $L$ 的总和约为 $k^2$-tree 的 21%；采用 $k^2$-MDD 压缩网页图，$T$ 和 $L$ 的总和约为 $k^2$-tree 的 3%。在社交网络数据集上也有类似结果，显著改善了存储空间需求，体现了形式化方法在大规模图数据压缩处理上的优势。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;4-基于邻接表的压缩技术&#34;&gt;4 基于邻接表的压缩技术
+&lt;/h2&gt;&lt;h3 id=&#34;1空隙编码&#34;&gt;（1）空隙编码
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;编码依据及思想&lt;/strong&gt;：研究表明多数网页图具有局部性，即页面直接邻居集合挨得很近。Boldi 等人据此提出空隙编码，其思想是用连续节点标签值替代原始值以压缩节点标签，减少存储空间。设 $A(x)=(a_1, a_2, a_3, \cdots, a_n)$ 为第 $x$ 个节点的直接邻居标签值序列，$x$ 对应的空隙编码 $B(x)=(c(a_1 - x), a_2 - a_1 - 1, a_3 - a_2 - 1, \cdots, a_n - a_{n - 1} - 1)$，其中
+&lt;/p&gt;
+$$
+  c(x)=\begin{cases}2x, &amp; x \geq 0 \\ 2|x| - 1, &amp; x &lt; 0\end{cases}
+  $$&lt;p&gt;
+例如，对于网页图邻接表（如表 1），可得到对应的空隙编码（如表 2）。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241109152957033.png&#34;
+	width=&#34;723&#34;
+	height=&#34;1027&#34;
+	srcset=&#34;https://SilentThink.github.io/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241109152957033_hu9159345574902275234.png 480w, https://SilentThink.github.io/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241109152957033_hu12680410699856896633.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241109152957033&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;70&#34;
+		data-flex-basis=&#34;168px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;2参考压缩&#34;&gt;（2）参考压缩
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;压缩原理&lt;/strong&gt;：利用网页的相似性，即位置较近的网页的后继集较为相似。Suel 等人提出参考压缩，用一个节点的邻接表表示其余邻接表。设 $s(x)$ 为参考表，$s(y)$ 为复制表，$y - x$ 为参考系数 $r$。若 $s(x)$ 的后继在 $s(y)$ 中存在，复制表的对应位置为 $1$，否则为 $0$，$s(y)$ 中不在 $s(x)$ 中的后继为额外节点。例如，网页图邻接表的参考压缩如表 3 所示。但上述两种技术要求节点直接邻居集合有序，若需保存原始链接顺序则不适用。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241109153044044.png&#34;
+	width=&#34;921&#34;
+	height=&#34;579&#34;
+	srcset=&#34;https://SilentThink.github.io/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241109153044044_hu7968697724391349137.png 480w, https://SilentThink.github.io/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241109153044044_hu13358933604241574138.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241109153044044&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;159&#34;
+		data-flex-basis=&#34;381px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;3repair-算法&#34;&gt;（3）Repair 算法
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;算法思想及操作&lt;/strong&gt;：Adler 和 Faust 等人发现邻接表节点后继存在相似信息，提出了 Repair 算法。该算法将所有节点后继看成序列 $T$，每次用未在 $T$ 中出现的符号 $s$ 替换 $T$ 中最频繁的符号对，直到 $T$ 中无频繁模式为止。设图 $G=(V, E)$，则 $T(G)=v_1v_{1,1}v_{1,2}v_{1,3}\cdots v_{1,n}v_2v_{2,1}v_{2,2}v_{2,3}\cdots v_{2,n}\cdots v_nv_{n,1}v_{n,2}v_{n,3}\cdots v_{n,n}$，$Ptrs[m]$ 记录节点在 $T$ 中的起始位置。例如，给定图邻接表的 Repair 压缩如图 11 所示。该算法将邻接表压缩成字典规则集合 $R$、指针数组 $Ptrs$ 和序列 $T$。查询节点信息时，仅需部分解压缩即可。但对于大规模图，由于每次添加新规则导致字典规则集合增大，Bille 等人改进了该算法，取得了较好的时间和空间平衡。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241109153109352.png&#34;
+	width=&#34;956&#34;
+	height=&#34;683&#34;
+	srcset=&#34;https://SilentThink.github.io/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241109153109352_hu17665443857374671002.png 480w, https://SilentThink.github.io/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241109153109352_hu7914380863332275378.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241109153109352&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;139&#34;
+		data-flex-basis=&#34;335px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;4lz78-算法&#34;&gt;（4）LZ78 算法
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;算法流程及特点&lt;/strong&gt;：另一种基于邻接表的压缩算法 LZ78 由 Ziv 和 Lempel 提出，思想是建立字典表，读入字符时判断是否在表中。若不在，保存字符并建立索引；若在，保存索引并添加新字符形成字符串表示。具体流程如下：先建立空字典表，依次读取新字符 $c$，查找当前前缀 $P$ 与 $c$ 的组合 $P + c$。若 $P + c$ 在字典表中，更新前缀 $P$ 为 $P + c$；若不在，输出当前前缀索引及 $c$，将 $P + c$ 保存至字典表，并将前缀 $P$ 设为空，重复直到所有字符串编码完成。例如，图 11 邻接表的 LZ78 压缩结果如表 4 所示。LZ78 算法和 Repair 算法的区别在于压缩时，LZ78 算法的字典表以结果形式输出，查询节点信息的速度比 Repair 算法快，但每次解压需要从结果开始构造字典 $R$，只能压缩邻接表边表，限制了性能。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241109153141282.png&#34;
+	width=&#34;658&#34;
+	height=&#34;764&#34;
+	srcset=&#34;https://SilentThink.github.io/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241109153141282_hu7505122720141397655.png 480w, https://SilentThink.github.io/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241109153141282_hu15865306040073812203.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241109153141282&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;86&#34;
+		data-flex-basis=&#34;206px&#34;
+	
+&gt;&lt;/p&gt;
 </description>
         </item>
         <item>

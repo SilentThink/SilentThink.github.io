@@ -286,16 +286,18 @@
     </li>
     <li><a href="#4-gcfl框架">4. GCFL框架</a>
       <ol>
-        <li><a href="#41跨客户端的非iid结构和特征">4.1跨客户端的非IID结构和特征</a></li>
+        <li><a href="#41跨客户端的non-iid数据结构与特征分析">4.1跨客户端的Non-IID数据结构与特征分析</a></li>
+        <li><a href="#异构性度量标准"><strong>异构性度量标准</strong></a></li>
+        <li><a href="#数据集分析"><strong>数据集分析</strong></a></li>
         <li><a href="#42问题表述">4.2问题表述</a></li>
         <li><a href="#43技术设计">4.3技术设计</a></li>
+        <li><a href="#技术设计要点">技术设计要点</a></li>
         <li><a href="#44理论分析">4.4理论分析</a></li>
       </ol>
     </li>
     <li><a href="#5-gcfl基于梯度观测序列改进的gcfl">5. GCFL+：基于梯度观测序列改进的GCFL</a>
       <ol>
-        <li><a href="#51梯度范数波动">5.1梯度范数波动</a></li>
-        <li><a href="#52技术设计">5.2技术设计</a></li>
+        <li><a href="#gcfl相关内容">GCFL+相关内容</a></li>
       </ol>
     </li>
     <li><a href="#6-实验">6. 实验</a>
@@ -364,7 +366,7 @@
 
 
                 <time class="article-time--reading">
-                    阅读时长: 6 分钟
+                    阅读时长: 17 分钟
                 </time>
             </div>
         
@@ -397,26 +399,195 @@
 <p>github仓库：https://github.com/Oxfordblue7/GCFL</p>
 <h1 id="federated-graph-classification-over-non-iid-graphs">Federated Graph Classification over Non-IID Graphs
 </h1><h2 id="摘要">摘要
-</h2><p>联邦学习（Federated Learning, FL）在不同领域训练机器学习模型方面已成为重要范式，对于图分类等图级任务，图可视为特殊数据样本，可分布于不同本地系统。本文通过分析发现真实世界的图具有共同属性，但不同来源的图在结构和节点特征上呈现非独立同分布（Non-IID）。为此提出图聚类联邦学习（Graph Clustered Federated Learning, GCFL）框架，根据图神经网络（Graph Neural Network, GNN）的梯度动态聚类本地系统，以减少图的结构和特征异质性。同时观察到GCFL中GNN梯度波动影响聚类，进而设计基于动态时间规整（Dynamic Time Warping, DTW）的梯度序列聚类机制（GCFL+），实验验证了框架有效性。</p>
+</h2><p>联邦学习中的图分类等图级任务，图可分布于不同本地系统。本文通过分析发现真实世界的图具有共同属性，但不同来源的图在结构和节点特征上呈现非独立同分布（Non-IID）。为此提出图聚类联邦学习（Graph Clustered Federated Learning, GCFL）框架，根据图神经网络（Graph Neural Network, GNN）的梯度动态聚类本地系统，以减少图的结构和特征异质性。同时观察到GCFL中GNN梯度波动影响聚类，进而设计基于动态时间规整（Dynamic Time Warping, DTW）的梯度序列聚类机制（GCFL+），实验验证了框架有效性。</p>
+<blockquote>
+<p><strong>什么是非独立同分布（Non-IID）数据？</strong> （ref:https://www.zhihu.com/question/395555567）</p>
+</blockquote>
+<p><strong>维基百科</strong>：在<a class="link" href="https://zh.wikipedia.org/wiki/%e6%a6%82%e7%8e%87%e8%ae%ba"  target="_blank" rel="noopener"
+    >概率论</a>与<a class="link" href="https://zh.wikipedia.org/wiki/%e7%bb%9f%e8%ae%a1%e5%ad%a6"  target="_blank" rel="noopener"
+    >统计学</a>中，<strong>独立同分布</strong>（<strong>Independent and identically distributed</strong>，或称独立同分配，缩写为IID）是指一组<a class="link" href="https://zh.wikipedia.org/wiki/%e9%9a%8f%e6%9c%ba%e5%8f%98%e9%87%8f"  target="_blank" rel="noopener"
+    >随机变量</a>中每个变量的<a class="link" href="https://zh.wikipedia.org/wiki/%e6%a6%82%e7%8e%87%e5%88%86%e5%b8%83"  target="_blank" rel="noopener"
+    >概率分布</a>都相同，且这些随机变量互相<a class="link" href="https://zh.wikipedia.org/wiki/%e7%8b%ac%e7%ab%8b_%28%e6%a6%82%e7%8e%87%e8%ae%ba%29"  target="_blank" rel="noopener"
+    >独立</a>。一组随机变量独立同分布并不意味着它们的<a class="link" href="https://zh.wikipedia.org/wiki/%e6%a0%b7%e6%9c%ac%e7%a9%ba%e9%97%b4"  target="_blank" rel="noopener"
+    >样本空间</a>中每个事件发生概率都相同。例如，投掷非均匀骰子得到的结果序列是独立同分布的，但掷出每个面朝上的概率并不相同。</p>
+<ol>
+<li>
+<p>独立：每次抽样之间没有关系，不会相互影响。比如你在随便丢骰子，每次抛到的数字是几就是几，是独立的。 但如果我要求你要两次抛到的数字和大于等于9，第一次和第二次抛就不独立，因为他们相互关联。</p>
+</li>
+<li>
+<p>同分布：你丢骰子，每次丢骰子到任何一个数字的概率都是1/6，是相等概率。或者说，在<a class="link" href="https://zhida.zhihu.com/search?content_id=312060753&amp;content_type=Answer&amp;match_order=1&amp;q=%e6%a6%82%e7%8e%87%e7%a9%ba%e9%97%b4&amp;zhida_source=entity"  target="_blank" rel="noopener"
+    >概率空间</a>里面， 你不论进行几次抽样实验，他们都服从同样一个分布。又比如说，现在一个大小为pi的圆放在大小为4的 正方形，你丢一根针进去，结果分为在圆里面和圆外面。每次丢进这个圆的概率都是pi/4，你重复+∞次会 无限接近于这个pi/4.</p>
+</li>
+</ol>
+<p>在联邦学习中，由于数据存储在不同的本地设备上，这些设备可能<strong>采集不同类型的数据、数据量不同、数据质量不同，或者数据在不同时间和地点收集</strong>，因此不同设备上的数据样本之间可能具有不同的分布特性或相关性，而不满足独立同分布的假设。</p>
+<p>**图数据的 Non - IID **:图数据在结构和特征方面存在显著的异构性，即不同客户端拥有的图数据在结构分布和节点特征分布上不遵循相同的模式。</p>
 <h2 id="1-引言">1. 引言
-</h2><p>联邦学习允许本地系统在保护数据隐私的同时受益于其他系统的数据，但面临数据分布异质性问题。图学习中的图分类任务具有广泛应用场景，如分子属性预测、蛋白质分类、社交网络分析等。本文研究发现不同来源的真实世界图存在共同属性，但也存在结构和特征异质性，因此提出GCFL框架，根据GNN梯度聚类客户端以降低异质性，并进一步改进为GCFL+以应对梯度波动问题。</p>
-<p><img src="/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109165639474.png"
-	width="1796"
-	height="262"
-	srcset="/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109165639474_hu7425386156257880488.png 480w, /p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109165639474_hu11289344801834132672.png 1024w"
+</h2><p>联邦学习允许本地系统在保护数据隐私的同时受益于其他系统的数据，但面临数据分布异质性问题。本文研究发现不同来源的真实世界图存在共同属性，但也存在结构和特征异质性，因此提出GCFL框架，根据GNN梯度聚类客户端以降低异质性，并进一步改进为GCFL+以应对梯度波动问题。</p>
+<p><strong>真实世界图数据的共性与异构性</strong>：</p>
+<p>通过对不同领域的真实世界图数据集（如 <code>PTC_MR（分子结构）</code>、<code>ENZYMES（蛋白质结构）</code>、<code>IMDB - BINARY （社交社区）</code>和 <code>MSRC_21（超像素网络）</code>）的初步数据分析，发现它们在某些图属性上（如节点度分布的峰度、平均最短路径长度、最大连通分量大小和聚类系数）与随机图相比具有显著的共性，这为跨数据集和跨领域的联邦学习提供了可能性。</p>
+<p>然而，不同数据集或领域的图在详细结构和节点特征上仍存在差异，表现出结构和特征的异构性，这种异构性在跨数据集的联邦学习设置中被称为 Non - IID 图，可能导致传统联邦学习算法（如 FedAvg）失效。</p>
+<p><img src="/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109225839946.png"
+	width="1028"
+	height="319"
+	srcset="/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109225839946_hu8119855003118046353.png 480w, /p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109225839946_hu12092621488659428310.png 1024w"
 	loading="lazy"
 	
-		alt="image-20241109165639474"
+		alt="image-20241109225839946"
 	
 	
 		class="gallery-image" 
-		data-flex-grow="685"
-		data-flex-basis="1645px"
+		data-flex-grow="322"
+		data-flex-basis="773px"
 	
 ></p>
+<p><strong>度量指标解释</strong>：</p>
+<ul>
+<li><strong>峰度（Kurtosis）</strong>：用于衡量数据分布的陡峭程度或峰值的尖锐程度。在节点度分布中，较大的峰度值（如文中提到的 ENZYMES、IMDB - BINARY 和 MSRC_21 数据集）表明节点度呈现<strong>长尾分布</strong>，即少数节点具有非常高的度，而大多数节点的度相对较低。这种分布特征可能对图的结构和功能产生重要影响，例如在社交网络中，少数高度连接的节点（如意见领袖）可能对信息传播起着关键作用；在生物网络中，高连接度的节点可能代表着关键的生物分子或功能模块。</li>
+<li><strong>平均最短路径长度（avg.shortest path length）</strong>：是指图中所有节点对之间最短路径长度的平均值。PTC_MR、ENZYMES 和 MSRC_21 数据集尽管实际图的大小差异较大，但具有相似的平均最短路径长度。这一属性反映了图中节点之间的连接紧密程度或信息传递的效率。在一些网络中，较短的平均最短路径长度可能意味着信息能够快速传播，例如在互联网路由网络中，较短的路径长度有助于减少数据传输延迟；而在其他网络中，较长的路径长度可能表示网络具有更高的层次结构或模块化程度，如生物代谢网络中，不同的代谢途径可能通过较长的路径相互连接。</li>
+<li><strong>聚类系数（Clustering Coefficient，CC）</strong>：衡量图中节点聚集程度的指标，即节点的邻居之间相互连接的紧密程度。ENZYMES、IMDB - BINARY 和 MSRC_21 数据集具有较大的聚类系数，这意味着这些图中存在较多的三角形结构或节点聚类现象。在社交网络中，高聚类系数可能表示社交圈子内的成员之间联系紧密，信息容易在小群体内传播；在生物网络中，高聚类系数可能暗示着生物分子之间存在功能相关的模块或复合物。</li>
+<li><strong>最大连通分量大小（Largest Component Size，LC）</strong>：表示图中最大连通分量（即相互连接的节点集合）所占的比例。几乎所有数据集都观察到较大的 LC 值，这表明这些图在很大程度上是连通的，即大多数节点可以通过路径相互到达。在一些网络应用中，高连通性是确保信息或资源能够在整个网络中有效传播和共享的关键，例如在电力网络中，高连通性有助于维持电力供应的稳定性；而在某些情况下，较低的连通性可能意味着网络存在瓶颈或脆弱点，如交通网络中的拥堵路段可能导致局部连通性下降。</li>
+</ul>
+<p><strong>差异显著性指标</strong>：</p>
+<ul>
+<li>
+<p><strong>真实值（real）</strong>：指的是对实际的真实世界图数据集（如 PTC_MR、ENZYMES、IMDB - BINARY、MSRC_21 等）进行测量得到的相应图属性的值。例如，对于 PTC_MR 数据集的度分布峰度，其真实值为 2.1535，这是通过对该数据集中所有图的节点度分布进行计算得出的实际峰度数值。</p>
+</li>
+<li>
+<p><strong>随机值（random）</strong>：表示使用 Erdős–Rényi 模型生成的具有相同节点数量和链接数量的随机图的相应图属性的值。该模型是一种生成随机图的经典方法，通过随机连接节点来构建图结构。对于每个真实数据集，都生成了具有相似规模（节点和链接数量相同）的随机图，并计算其图属性，作为对比基准。例如，与 PTC_MR 数据集对比的随机图的度分布峰度为 2.4424。</p>
+</li>
+<li>
+<p><strong>p-value</strong>:用于衡量真实数据集的图属性与随机图的图属性之间差异的显著性水平。它是在假设检验中使用的一个统计量，用于判断观察到的差异是由于随机因素还是真实存在的系统性差异导致的。</p>
+<ul>
+<li>较小的 p - value表明真实数据集的图属性与随机图的图属性之间的差异在统计上是显著的，即不太可能是由随机因素引起的。例如，ENZYMES 数据集的度分布峰度的 p - value 为 0.0027，这意味着其与随机图在峰度上的差异是显著的，说明 ENZYMES 数据集的节点度分布具有与随机图不同的、特定的结构特征。</li>
+<li>较大的 p - value（接近 1）则表示真实数据集和随机图在该图属性上的差异不显著，可能是由于随机波动导致的，不能确定真实数据集具有特殊的结构或模式。如 PTC_MR 数据集的度分布峰度的 p - value 为 0.9999，说明其与随机图在峰度方面的差异不具有统计学意义，即从这个指标来看，PTC_MR 数据集的节点度分布在结构上与随机图较为相似，没有明显的特殊结构特征被检测到。</li>
+</ul>
+</li>
+</ul>
 <h2 id="2-相关工作">2. 相关工作
 </h2><h3 id="21联邦学习">2.1联邦学习
 </h3><p>联邦学习在数据分布于远程设备且模型由中央服务器协调训练的场景下受到关注。FedAvg是首个基本FL算法，但在处理非IID数据时存在收敛慢、精度下降等问题。已有研究从数据共享、优化收敛、个性化学习、聚类学习等方面进行改进，但仍面临挑战。</p>
+<p><strong>水平联邦学习：</strong></p>
+<p><img src="/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241110000339457.png"
+	width="1001"
+	height="610"
+	srcset="/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241110000339457_hu5901682845017342868.png 480w, /p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241110000339457_hu12018848661346556969.png 1024w"
+	loading="lazy"
+	
+		alt="image-20241110000339457"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="164"
+		data-flex-basis="393px"
+	
+></p>
+<p><strong>FedAvg:联邦学习的开山之作</strong>：</p>
+<p><strong>论文地址</strong>：https://proceedings.mlr.press/v54/mcmahan17a/mcmahan17a.pdf
+<strong>源码地址</strong>：https://github.com/shaoxiongji/federated-learning</p>
+<p>**针对的问题：**移动设备中有大量的数据，但显然我们不能收集这些数据到云端以进行集中训练，所以引入了一种分布式的机器学习方法，即联邦学习Federal Learning。在FL中，server将全局模型下放给各client，client利用本地的数据去训练模型，并将训练后的权重上传到server，从而实现全局模型的更新。</p>
+<p><strong>算法介绍：</strong></p>
+<ul>
+<li><strong>联邦随机梯度下降算法（FedSGD）</strong></li>
+</ul>
+<p>设定固定的学习率 $\eta$，对 $K$ 个客户端（client）的数据计算损失梯度：
+</p>
+$$
+g_k = \bigtriangledown F_k(w_t)
+$$<p>服务器（server）将聚合每个客户端计算的梯度，以此来更新模型参数：
+</p>
+$$
+w_{t+1} \leftarrow w_t - \eta \sum\limits_{k=1}^K \frac{n_k}{n} g_k = w_t - \eta \bigtriangledown f(w_t)
+$$<p>FedSGD 的不足之处：</p>
+<ol>
+<li>
+<p><strong>高通信成本</strong>：</p>
+<ul>
+<li>FedSGD 要求每个客户端在每次迭代中计算一次梯度后立即与服务器同步更新模型参数。对于大规模联邦学习系统，每个客户端频繁通信会带来高昂的网络开销和延迟，尤其在客户端数量较多或带宽有限的情况下。</li>
+<li>这种设计在实际中会导致资源消耗大，且模型参数更新效率低下，系统负载明显。</li>
+</ul>
+</li>
+<li>
+<p><strong>对本地数据的利用不足</strong>：</p>
+<ul>
+<li>FedSGD 在客户端每次只进行一次梯度计算，无法充分利用客户端的本地数据。这样每次更新依赖的样本量有限，导致每个客户端传回的梯度更新效果有限，模型难以高效逼近最优解。</li>
+<li>尤其在数据分布存在差异的场景下（非IID情况），一次梯度更新很难反映出本地数据的整体特征。</li>
+</ul>
+</li>
+<li>
+<p><strong>非独立同分布（Non-IID）数据适应性差</strong>：</p>
+<ul>
+<li>在联邦学习中，客户端的数据分布通常非独立同分布，各客户端的样本特性可能差异较大。FedSGD 将所有客户端的一次梯度直接聚合，未考虑到各客户端数据分布的差异，这会导致模型收敛效果不佳。</li>
+<li>由于梯度更新频繁，FedSGD 的模型在这种场景下容易受到局部梯度波动的影响，难以平衡不同客户端的数据贡献。</li>
+</ul>
+</li>
+<li>
+<p><strong>收敛速度较慢</strong>：</p>
+<ul>
+<li>FedSGD 的一次更新只包含每个客户端单次计算的梯度，信息量较少，导致模型收敛缓慢。在同样的通信轮数下，FedSGD 无法充分逼近全局最优解。</li>
+<li>由于不能在本地多轮迭代优化，FedSGD 对客户端的计算资源利用率较低，浪费了部分算力。</li>
+</ul>
+</li>
+</ol>
+<ul>
+<li><strong>联邦平均算法（FedAvg）</strong></li>
+</ul>
+<p>FedAvg 针对上述不足之处做出改进：</p>
+<ul>
+<li><strong>减少通信频率</strong>：FedAvg 允许客户端在本地训练多轮后再上传更新结果，大大降低了每次通信所需的频率。</li>
+<li><strong>充分利用本地数据</strong>：客户端可以在本地多轮更新权重，充分利用本地数据特征，使得更新后的模型更具泛化性。</li>
+<li><strong>更好的适应非IID数据</strong>：FedAvg 使用权重加权平均，能够更好地整合不同客户端的模型，降低数据分布差异带来的负面影响。</li>
+<li><strong>加速收敛</strong>：通过本地多轮迭代，FedAvg 使得模型在每次通信时都能积累更多优化信息，从而在较少通信轮次下获得更好的收敛效果。</li>
+</ul>
+<p>算法流程如下：</p>
+<p>给定$K$个客户端，在第t轮训练过程中：</p>
+<ul>
+<li>中心服务器随机选择部分客户端</li>
+<li>客户端从中心服务器下载模型根据本地数据训练$E$轮</li>
+<li>各个客户端发送训练后的参数到中心服务器，中心服务器根据下式更新参数：
+其中$ n_k $为客户端$k$样本数，$n$为所有客户端的样本总数。</li>
+</ul>
+<p>在客户端进行局部模型的更新：
+</p>
+$$
+w_{t+1}^k \leftarrow w_t - \eta g_k
+$$<p>服务器对每个客户端更新后的权重进行加权平均：
+</p>
+$$
+w_{t+1} \leftarrow \sum_{k=1}^K \frac{n_k}{n} w_{t+1}^k
+$$<ul>
+<li>$n_k$ 是 <strong>客户端 \( k \) 的数据样本数量</strong>。</li>
+<li>$ \eta $ 是<strong>学习率</strong></li>
+</ul>
+<blockquote>
+<p><strong>注意</strong>：每个客户端可以在本地独立地多次更新本地权重，然后将更好的权重参数发给服务器进行加权平均。这样做的好处是不用每更新一次就去聚合，从而大大减少了通信量。</p>
+</blockquote>
+<p><img src="/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241110001925541.png"
+	width="830"
+	height="780"
+	srcset="/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241110001925541_hu15838834219672122020.png 480w, /p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241110001925541_hu4267270663499946759.png 1024w"
+	loading="lazy"
+	
+		alt="image-20241110001925541"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="106"
+		data-flex-basis="255px"
+	
+></p>
+<p><strong>FedAvg 的计算量</strong>：</p>
+<p>FedAvg 的计算量与以下三个参数有关：</p>
+<ul>
+<li>$C$：每轮训练选择客户端的比例，即每一轮通信时只选择 $C \times K$ 个客户端；（$K$ 为客户端总数）</li>
+<li>$E$：每个客户端更新本地权重时，在本地数据集上训练 $E$ 轮；</li>
+<li>$B$：客户端更新权重时，每次梯度下降所使用的数据量，即本地数据集的 batch size；</li>
+</ul>
+<p>每次从训练集中随机抽取一定数量的数据样本（即 Batch Size）进行梯度计算，这种方法能够在保证收敛速度的同时节省计算资源，是最常用的优化方式。</p>
+<p><strong>特例关系</strong>：</p>
+<p>FedSGD 是 FedAvg 的一个特例，即当参数 $E = 1$，$B = \infty$ 时，FedAvg 等价于 FedSGD。</p>
+<blockquote>
+<p>注：$B = \infty$ 表示 batch size 大小就是本地数据集大小。</p>
+</blockquote>
 <h3 id="22联邦学习在图数据上的应用">2.2联邦学习在图数据上的应用
 </h3><p>已有研究将FL应用于图数据，但多数研究集中于节点分类和链接预测，无法直接应用于图分类任务。本文研究跨数据集/跨域的联邦图分类，具有创新性。</p>
 <h2 id="3-预备知识">3. 预备知识
@@ -425,12 +596,99 @@
 <h3 id="32-fedavg算法">3.2 FedAvg算法
 </h3><p>FedAvg是基本的FL算法，通过聚合本地客户端更新的模型参数并重新分发平均参数来训练模型，但在处理非IID数据时存在不足。</p>
 <h2 id="4-gcfl框架">4. GCFL框架
-</h2><h3 id="41跨客户端的非iid结构和特征">4.1跨客户端的非IID结构和特征
-</h3><p>真实世界图在结构和特征上存在不同程度的异质性，这种异质性使得传统FL算法如FedAvg在处理非IID图数据时可能无效甚至产生负面影响。</p>
+</h2><h3 id="41跨客户端的non-iid数据结构与特征分析">4.1跨客户端的Non-IID数据结构与特征分析
+</h3><h3 id="异构性度量标准"><strong>异构性度量标准</strong>
+</h3><ul>
+<li><strong>结构异构性度量</strong>：使用AEWs(Anonymous Walk Embeddings)生成每个图的表示，计算各个图AWE表示之间的Jensen-Shannon距离。</li>
+<li><strong>特征异构性度量</strong>：计算各个图内部节点之间特征相似性的经验分布，计算各个图特征相似性经验分布之间的Jensen-Shannon散度。</li>
+</ul>
+<h3 id="数据集分析"><strong>数据集分析</strong>
+</h3><p><img src="/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241110021506047.png"
+	width="1640"
+	height="411"
+	srcset="/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241110021506047_hu6493724754996558486.png 480w, /p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241110021506047_hu1844409429037069736.png 1024w"
+	loading="lazy"
+	
+		alt="image-20241110021506047"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="399"
+		data-flex-basis="957px"
+	
+></p>
+<p>如表2所示，单一数据集、单一领域及不同领域内的图数据在结构和特征上均表现出不同程度的异构性，其中<strong>结构异构性使得模型难以学习到不同客户端之间重要的相似图模式，而特征异构性则使得模型难以学习到在不同客户端之间具有泛化能力的消息传递机制</strong>。</p>
 <h3 id="42问题表述">4.2问题表述
 </h3><p>GCFL旨在联合找到具有相似结构和特征图的客户端集群，并在同一集群内使用FedAvg训练图挖掘模型。目标是最小化损失函数，同时动态维护集群分配。</p>
+<p><strong>主要思想</strong>：联合<strong>寻找具有相似结构和特征的图所在的客户端</strong>，并在同一簇内的客户端之间使用FedAvg训练图模型。具体而言:</p>
+<ul>
+<li>给定一个中央服务器和个本地客户端，中央服务器可动态地将客户端划分为若干个簇及对应个<code>cluster-wise</code>模型。</li>
+<li>假设客户端具有一个图集合，，其中为节点集合，为边集合，为节点特征图，为图分类标签，各个客户端的任务即为预测图标签，其中为客户端所在簇内学习到的图学习模型。</li>
+<li>最终优化目标为最小化所有簇的损失，其中为簇中客户端的本地损失函数，且为对应的映射函数。</li>
+</ul>
 <h3 id="43技术设计">4.3技术设计
 </h3><p>GCFL利用GNN的强大表示能力，根据客户端传输的梯度动态聚类。通过引入超参数$\varepsilon_1$和$\varepsilon_2$作为聚类准则，当满足条件时，服务器基于余弦相似度矩阵和Stoer-Wagner最小割算法对集群进行二分。客户端在本地训练后传输梯度，服务器聚合梯度更新模型参数。</p>
+<p><strong>传统FL框架处理non-IID数据存在什么问题？GCFL如何解决？</strong></p>
+<ul>
+<li>客户端数据分布异构性强时，传统FL框架可能无法在同时优化其损失函数，且在若干轮后容易陷入驻点( stationary point)，且客户端上传的梯度不会全部趋向于0，如何解决？
+引入超参数作为标准决定在传统FL框架到达驻点时是否停止，即：$\varepsilon_1$</li>
+</ul>
+<p><img src="/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241110023002450.png"
+	width="1124"
+	height="152"
+	srcset="/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241110023002450_hu18317620292148690002.png 480w, /p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241110023002450_hu8761103426410564591.png 1024w"
+	loading="lazy"
+	
+		alt="image-20241110023002450"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="739"
+		data-flex-basis="1774px"
+	
+></p>
+<ul>
+<li>客户端传输梯度范数仍然过大，则意味着该簇中的客户端具有高度异构性，如何消除其带来的负面影响？
+使用聚类，并引入超参数作为划分标准，即：$\varepsilon_2$</li>
+</ul>
+<p><img src="/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241110023029382.png"
+	width="1088"
+	height="76"
+	srcset="/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241110023029382_hu14994682250030394115.png 480w, /p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241110023029382_hu17385936342151289840.png 1024w"
+	loading="lazy"
+	
+		alt="image-20241110023029382"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="1431"
+		data-flex-basis="3435px"
+	
+></p>
+<h3 id="技术设计要点">技术设计要点
+</h3><ol>
+<li>
+<p><strong>选择GNNs作为图挖掘模型</strong>：GNNs在学习图表示方面能力强大且广泛应用于图挖掘，其模型参数和梯度能反映图结构与特征信息（详见4.4节），因此被用于GCFL框架。</p>
+</li>
+<li>
+<p><strong>动态聚类机制</strong></p>
+<ul>
+<li>
+<p><strong>聚类依据</strong>：当客户端数据分布高度异构时，通用联邦学习（FL）接近平稳点时，客户端传输梯度范数不全趋于零。引入超参数 $\varepsilon_1$ 判断是否接近平稳点（$\delta_{\text{mean}} = \left|\sum_{i \in [n]} \frac{\left|\mathcal{G}<em>{i}\right|}{|\mathcal{G}|} \Delta \theta</em>{i}\right| &lt; \varepsilon_{1}$），同时若存在客户端梯度范数较大，引入 $\varepsilon_2$ 决定是否分裂簇（$\delta_{\text{max}} = \max\left(\left|\Delta \theta_{i}\right|\right) &gt; \varepsilon_{2} &gt; 0$）。</p>
+</li>
+<li>
+<p><strong>聚类过程</strong>：GCFL采用自上而下的二分机制。在通信轮次 $t$ 时，服务器接收不同簇客户端的梯度，若某簇 $C_k$ 满足分裂条件，计算簇内余弦相似度矩阵 $\alpha_k$ 构建全连接图，用Stoer-Wagner最小割算法将该簇二分为 $C_{k1}$ 和 $C_{k2}$。此机制可自动动态确定簇的数量，超参数可通过验证集实验进行设置。</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>客户端与服务器交互</strong></p>
+<ul>
+<li>簇 $C_k$ 中的客户端 $S_i$ 寻找接近真实解 $\theta_{k, i}^*$ 的 $\hat{\theta}<em>{k, i}$，在轮次 $t$ 将梯度 $\Delta \theta</em>{k, i}^{t} = \hat{\theta}<em>{k, i}^{t} - \theta</em>{k, i}^{t - 1}$ 传输给服务器。</li>
+<li>服务器维护簇分配，并按簇聚合梯度：$\theta_{k}^{t + 1} = \theta_{k}^{t} + \sum_{i \in [n_{k}]} \Delta \theta_{k, i}^{t}$。</li>
+</ul>
+</li>
+</ol>
 <h3 id="44理论分析">4.4理论分析
 </h3><p>利用梯度范数波动和动态时间规整技术，GCFL+通过维护多变量时间序列矩阵$Q$，根据梯度序列的距离矩阵进行聚类，能够更好地捕捉客户端长期行为，形成更同质的集群。</p>
 <ol>
@@ -438,25 +696,14 @@
 <li><strong>结构与特征差异捕获</strong>：针对结构和特征差异的两个命题，证明了不同结构或特征的图在训练SGC时，权重差异与结构/特征差异有界，即梯度会随结构和特征变化。</li>
 <li><strong>任务异质性捕获</strong>：命题表明不同任务训练下，SGC权重有界，意味着GCFL框架有潜力扩展到跨任务图级联邦学习。</li>
 </ol>
-<p><img src="/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109165734375.png"
-	width="1784"
-	height="190"
-	srcset="/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109165734375_hu4459023451507195955.png 480w, /p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109165734375_hu4085154459656770796.png 1024w"
-	loading="lazy"
-	
-		alt="image-20241109165734375"
-	
-	
-		class="gallery-image" 
-		data-flex-grow="938"
-		data-flex-basis="2253px"
-	
-></p>
 <h2 id="5-gcfl基于梯度观测序列改进的gcfl">5. GCFL+：基于梯度观测序列改进的GCFL
-</h2><h3 id="51梯度范数波动">5.1梯度范数波动
-</h3><p>GCFL训练中梯度范数波动大，不同客户端梯度尺度不同，反映结构和特征异质性。原始GCFL基于最后一轮梯度聚类可能忽略重要信息，受噪声误导。</p>
-<h3 id="52技术设计">5.2技术设计
-</h3><p>GCFL+通过维护矩阵$Q$记录梯度范数序列，使用DTW计算距离矩阵$\beta$进行聚类，能更好捕捉客户端长期行为，形成更同质集群。</p>
+</h2><h3 id="gcfl相关内容">GCFL+相关内容
+</h3><ol>
+<li>
+<p><strong>梯度范数波动问题（5.1）</strong></p>
+<ul>
+<li>在GCFL中观察到梯度范数存在波动现象，具体表现为：一是梯度范数持续变化；二是不同客户端的梯度范数尺度不同。这表明客户端梯度的更新方向和距离各异，进一步体现了结构和特征的异构性。在原始GCFL框架中，服务器在聚类条件满足时仅依据最后传输的梯度计算余弦相似度矩阵，但这种基于单点梯度的聚类方式可能忽略重要的客户端行为并受噪声干扰。例如，在图1(a)中，GCFL在第119轮基于该轮梯度进行聚类，未能有效找到异构性较低的图。</li>
+</ul>
 <p><img src="/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109165828948.png"
 	width="1460"
 	height="398"
@@ -471,6 +718,19 @@
 		data-flex-basis="880px"
 	
 ></p>
+</li>
+<li>
+<p><strong>GCFL+的技术设计（5.2）</strong></p>
+<ul>
+<li>
+<p>针对上述问题，提出改进的GCFL+。服务器维护一个多变量时间序列矩阵 $Q \in \mathbb{R}^{n, d}$（其中 $n$ 为客户端数量，$d$ 为跟踪的梯度序列长度）。在每轮通信 $t$ 时，将梯度范数 $\left|\Delta \theta_{i}^{t}\right|$ 添加到 $Q(i, :)$ 并移除过期数据。GCFL+采用与GCFL相同的聚类标准（公式4和5），当满足条件时，服务器使用动态时间规整（DTW）技术计算距离矩阵 $\beta$，其元素为两两梯度序列的距离。对于簇 $C_k$，服务器通过 $\beta_{k}(p, q) = \text{dist}(Q(p, :), Q(q, :))$（其中 $p, q \in \text{idx}({S_{i}})$，$\text{idx}({S_{i}})$ 为簇 $C_k$ 中所有客户端 ${S_{i}}$ 的索引）计算各客户端之间的距离。</p>
+</li>
+<li>
+<p>基于此距离矩阵，服务器对满足聚类标准的簇进行二分。如图1(b)所示，GCFL+在第118轮基于长度为10的梯度序列进行聚类，能捕捉客户端更长期的行为，形成更同质的簇。</p>
+</li>
+</ul>
+</li>
+</ol>
 <h2 id="6-实验">6. 实验
 </h2><h3 id="61实验设置">6.1实验设置
 </h3><ol>
