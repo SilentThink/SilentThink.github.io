@@ -326,14 +326,18 @@ $$
         <pubDate>Sat, 09 Nov 2024 14:11:41 +0800</pubDate>
         
         <guid>https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/</guid>
-        <description>&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/img/image-20241109165208229.png&#34;
-	
-	
-	
+        <description>&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109165208229.png&#34;
+	width=&#34;2148&#34;
+	height=&#34;646&#34;
+	srcset=&#34;https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109165208229_hu9717037065713379141.png 480w, https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109165208229_hu18071637744850924922.png 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 		alt=&#34;image-20241109165208229&#34;
 	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;332&#34;
+		data-flex-basis=&#34;798px&#34;
 	
 &gt;&lt;/p&gt;
 &lt;p&gt;论文链接：https://arxiv.org/abs/2106.13423&lt;/p&gt;
@@ -343,14 +347,18 @@ $$
 &lt;/h2&gt;&lt;p&gt;联邦学习（Federated Learning, FL）在不同领域训练机器学习模型方面已成为重要范式，对于图分类等图级任务，图可视为特殊数据样本，可分布于不同本地系统。本文通过分析发现真实世界的图具有共同属性，但不同来源的图在结构和节点特征上呈现非独立同分布（Non-IID）。为此提出图聚类联邦学习（Graph Clustered Federated Learning, GCFL）框架，根据图神经网络（Graph Neural Network, GNN）的梯度动态聚类本地系统，以减少图的结构和特征异质性。同时观察到GCFL中GNN梯度波动影响聚类，进而设计基于动态时间规整（Dynamic Time Warping, DTW）的梯度序列聚类机制（GCFL+），实验验证了框架有效性。&lt;/p&gt;
 &lt;h2 id=&#34;1-引言&#34;&gt;1. 引言
 &lt;/h2&gt;&lt;p&gt;联邦学习允许本地系统在保护数据隐私的同时受益于其他系统的数据，但面临数据分布异质性问题。图学习中的图分类任务具有广泛应用场景，如分子属性预测、蛋白质分类、社交网络分析等。本文研究发现不同来源的真实世界图存在共同属性，但也存在结构和特征异质性，因此提出GCFL框架，根据GNN梯度聚类客户端以降低异质性，并进一步改进为GCFL+以应对梯度波动问题。&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/img/image-20241109165639474.png&#34;
-	
-	
-	
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109165639474.png&#34;
+	width=&#34;1796&#34;
+	height=&#34;262&#34;
+	srcset=&#34;https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109165639474_hu7425386156257880488.png 480w, https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109165639474_hu11289344801834132672.png 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 		alt=&#34;image-20241109165639474&#34;
 	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;685&#34;
+		data-flex-basis=&#34;1645px&#34;
 	
 &gt;&lt;/p&gt;
 &lt;h2 id=&#34;2-相关工作&#34;&gt;2. 相关工作
@@ -377,14 +385,18 @@ $$
 &lt;li&gt;&lt;strong&gt;结构与特征差异捕获&lt;/strong&gt;：针对结构和特征差异的两个命题，证明了不同结构或特征的图在训练SGC时，权重差异与结构/特征差异有界，即梯度会随结构和特征变化。&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;任务异质性捕获&lt;/strong&gt;：命题表明不同任务训练下，SGC权重有界，意味着GCFL框架有潜力扩展到跨任务图级联邦学习。&lt;/li&gt;
 &lt;/ol&gt;
-&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/img/image-20241109165734375.png&#34;
-	
-	
-	
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109165734375.png&#34;
+	width=&#34;1784&#34;
+	height=&#34;190&#34;
+	srcset=&#34;https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109165734375_hu4459023451507195955.png 480w, https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109165734375_hu4085154459656770796.png 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 		alt=&#34;image-20241109165734375&#34;
 	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;938&#34;
+		data-flex-basis=&#34;2253px&#34;
 	
 &gt;&lt;/p&gt;
 &lt;h2 id=&#34;5-gcfl基于梯度观测序列改进的gcfl&#34;&gt;5. GCFL+：基于梯度观测序列改进的GCFL
@@ -392,14 +404,18 @@ $$
 &lt;/h3&gt;&lt;p&gt;GCFL训练中梯度范数波动大，不同客户端梯度尺度不同，反映结构和特征异质性。原始GCFL基于最后一轮梯度聚类可能忽略重要信息，受噪声误导。&lt;/p&gt;
 &lt;h3 id=&#34;52技术设计&#34;&gt;5.2技术设计
 &lt;/h3&gt;&lt;p&gt;GCFL+通过维护矩阵$Q$记录梯度范数序列，使用DTW计算距离矩阵$\beta$进行聚类，能更好捕捉客户端长期行为，形成更同质集群。&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/img/image-20241109165828948.png&#34;
-	
-	
-	
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109165828948.png&#34;
+	width=&#34;1460&#34;
+	height=&#34;398&#34;
+	srcset=&#34;https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109165828948_hu287875601932156558.png 480w, https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109165828948_hu4056417335687065879.png 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 		alt=&#34;image-20241109165828948&#34;
 	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;366&#34;
+		data-flex-basis=&#34;880px&#34;
 	
 &gt;&lt;/p&gt;
 &lt;h2 id=&#34;6-实验&#34;&gt;6. 实验
@@ -415,56 +431,76 @@ $$
 &lt;li&gt;&lt;strong&gt;跨多数据集联邦图分类&lt;/strong&gt;：该设置下客户端异质性更强，GCFL和GCFL+仍能有效提升性能，GCFL+相比FedAvg能使更多客户端受益，且在多数据集设置中，两者均能显著降低集群内结构和特征异质性，不同领域数据集也能相互受益，体现了框架的有效性。&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;超参数影响&lt;/strong&gt;：$\varepsilon_1$和$\varepsilon_2$分别为停止准则和聚类控制参数，在合理范围内变化对GCFL和GCFL+性能影响较小。&lt;/li&gt;
 &lt;/ol&gt;
-&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/img/image-20241109165920858.png&#34;
-	
-	
-	
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109165920858.png&#34;
+	width=&#34;1826&#34;
+	height=&#34;478&#34;
+	srcset=&#34;https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109165920858_hu2814989953639989442.png 480w, https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109165920858_hu3777308628778709942.png 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 		alt=&#34;image-20241109165920858&#34;
 	
 	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;382&#34;
+		data-flex-basis=&#34;916px&#34;
+	
 &gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/img/image-20241109170053080.png&#34;
-	
-	
-	
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109170053080.png&#34;
+	width=&#34;2162&#34;
+	height=&#34;508&#34;
+	srcset=&#34;https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109170053080_hu3505378610475296149.png 480w, https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109170053080_hu10296543656287493654.png 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 		alt=&#34;image-20241109170053080&#34;
 	
 	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;425&#34;
+		data-flex-basis=&#34;1021px&#34;
+	
 &gt;&lt;/p&gt;
 &lt;h3 id=&#34;63集群内结构和特征分析&#34;&gt;6.3集群内结构和特征分析
 &lt;/h3&gt;&lt;p&gt;GCFL和GCFL+聚类后显著降低集群内图的结构和特征异质性，尤其在多数据集设置中。同一数据集内特征异质性降低较少，结构异质性显著降低；多数据集设置中两者均显著降低。聚类结果显示来自同一领域的数据集更易聚在一起，但不同领域数据集也能相互受益，表明框架能根据性能动态聚类的必要性。&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/img/image-20241109170128856.png&#34;
-	
-	
-	
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109170128856.png&#34;
+	width=&#34;1930&#34;
+	height=&#34;678&#34;
+	srcset=&#34;https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109170128856_hu15867330119190743568.png 480w, https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109170128856_hu1663040317190815956.png 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 		alt=&#34;image-20241109170128856&#34;
 	
 	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;284&#34;
+		data-flex-basis=&#34;683px&#34;
+	
 &gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/img/image-20241109170205306.png&#34;
-	
-	
-	
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109170205306.png&#34;
+	width=&#34;2156&#34;
+	height=&#34;670&#34;
+	srcset=&#34;https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109170205306_hu1977954846862555021.png 480w, https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109170205306_hu6630365169109961588.png 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 		alt=&#34;image-20241109170205306&#34;
 	
 	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;321&#34;
+		data-flex-basis=&#34;772px&#34;
+	
 &gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/img/image-20241109170229862.png&#34;
-	
-	
-	
+&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109170229862.png&#34;
+	width=&#34;2128&#34;
+	height=&#34;662&#34;
+	srcset=&#34;https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109170229862_hu7399956646108525029.png 480w, https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109170229862_hu16126231737127887703.png 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 		alt=&#34;image-20241109170229862&#34;
 	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;321&#34;
+		data-flex-basis=&#34;771px&#34;
 	
 &gt;&lt;/p&gt;
 &lt;h3 id=&#34;64收敛性分析&#34;&gt;6.4收敛性分析
