@@ -280,7 +280,7 @@
     </li>
     <li><a href="#3-基于形式化方法的压缩技术">3 基于形式化方法的压缩技术</a>
       <ol>
-        <li><a href="#1二叉决策图bdd与有序二叉决策图obdd">（1）二叉决策图（BDD）与有序二叉决策图（OBDD）</a></li>
+        <li><a href="#1有序二叉决策图obdd">（1）有序二叉决策图（OBDD）</a></li>
         <li><a href="#2代数决策图add">（2）代数决策图（ADD）</a></li>
         <li><a href="#3k-mdd-技术">（3）k²-MDD 技术</a></li>
         <li><a href="#4技术优势总结">（4）技术优势总结</a></li>
@@ -292,6 +292,13 @@
         <li><a href="#2参考压缩">（2）参考压缩</a></li>
         <li><a href="#3repair-算法">（3）Repair 算法</a></li>
         <li><a href="#4lz78-算法">（4）LZ78 算法</a></li>
+      </ol>
+    </li>
+    <li><a href="#5-图数据压缩技术比较">5. 图数据压缩技术比较</a>
+      <ol>
+        <li><a href="#实验方法">实验方法</a></li>
+        <li><a href="#实验结果">实验结果</a></li>
+        <li><a href="#结论">结论</a></li>
       </ol>
     </li>
   </ol>
@@ -350,7 +357,7 @@
 
 
                 <time class="article-time--reading">
-                    阅读时长: 7 分钟
+                    阅读时长: 10 分钟
                 </time>
             </div>
         
@@ -489,10 +496,11 @@
 	
 ></p>
 <h2 id="3-基于形式化方法的压缩技术">3 基于形式化方法的压缩技术
-</h2><h3 id="1二叉决策图bdd与有序二叉决策图obdd">（1）二叉决策图（BDD）与有序二叉决策图（OBDD）
+</h2><h3 id="1有序二叉决策图obdd">（1）有序二叉决策图（OBDD）
 </h3><ul>
 <li><strong>核心思想</strong>：杨志飞等人将符号计算运用到大规模图数据压缩表示中，把图中节点二进制编码，链接关系转布尔代数，再用 OBDD 求解。利用布尔代数节点取值冗余，通过 OBDD 化简和删除规则共享子图以提高存储效率。在这种表示下，图的多种操作可转化为 OBDD 的相关操作。例如，查询节点度数可转化为 OBDD 的可满足性问题等。</li>
-<li><strong>示例</strong>：对于有 $n$ 个节点的有向图，用布尔变量编码节点和边转化为布尔表达式。例如，对于 4 个节点有向图（设为图 $G$），需要 2 个布尔变量（设为 $x_1, x_2$ 和 $y_1, y_2$）分别表示有向边的起点和终点。若节点 0（编码为 $x_1&rsquo;x_2&rsquo;$，即 $x_1 = 1, x_2 = 1$）到节点 1（编码为 $y_1&rsquo;y_2&rsquo;$，即 $y_1 = 1, y_2 = 1$）有一条有向边，则表示为 $x_1&rsquo;x_2&rsquo;y_1&rsquo;y_2&rsquo;$。编码每条边即可得到图 $G$ 对应的 OBDD（如图 6b）。但 OBDD 终节点只能为 0 或 1，因此只能表示无权图。</li>
+<li><strong>示例</strong>：对于有 $n$ 个节点的有向图，用布尔变量编码节点和边转化为布尔表达式。例如，对于 4 个节点有向图（设为图 $G$），需要 2 个布尔变量（设为 $x_1, x_2$ 和 $y_1, y_2$）分别表示有向边的起点和终点。若节点 0（编码为 $x_1&rsquo;x_2&rsquo;$，即 $x_1 = 1, x_2 = 1$）到节点 1（编码为 $y_1&rsquo;y_2&rsquo;$，即 $y_1 = 1, y_2 = 1$）有一条有向边，则表示为 $x_1&rsquo;x_2&rsquo;y_1&rsquo;y_2&rsquo;$。编码每条边即可得到图 $G$ 对应的 OBDD（如图 6b）。</li>
+<li><strong>缺陷</strong>：但 OBDD 终节点只能为 0 或 1，因此只能表示无权图。</li>
 </ul>
 <p><img src="/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241109152228969.png"
 	width="783"
@@ -670,6 +678,142 @@ $$
 		data-flex-basis="206px"
 	
 ></p>
+<p>LZ78算法的压缩过程非常简单。在压缩时维护一个动态词典Dictionary，其包括了历史字符串的index与内容；压缩情况分为三种：</p>
+<ol>
+<li>若当前字符c未出现在词典中，则编码为<code>(0, c)</code>；</li>
+<li>若当前字符c出现在词典中，则与词典做最长匹配，然后编码为<code>(prefixIndex,lastChar)</code>，其中，prefixIndex为最长匹配的前缀字符串，lastChar为最长匹配后的第一个字符；</li>
+<li>为对最后一个字符的特殊处理，编码为<code>(prefixIndex,)</code>。</li>
+</ol>
+<p>如果对于上述压缩的过程稍感费解，下面给出三个例子。<strong>例子一</strong>，对于字符串“ABBCBCABABCAABCAAB”压缩编码过程如下：</p>
+<p><img src="/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/399159-20170113163533931-223025881.jpg"
+	width="736"
+	height="399"
+	srcset="/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/399159-20170113163533931-223025881_hu1627762956492366515.jpg 480w, /p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/399159-20170113163533931-223025881_hu3580675545665889543.jpg 1024w"
+	loading="lazy"
+	
+		alt="img"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="184"
+		data-flex-basis="442px"
+	
+></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="mi">1</span><span class="p">.</span><span class="w"> </span><span class="n">A</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="k">Dictionary</span><span class="p">;</span><span class="w"> </span><span class="k">insert</span><span class="w"> </span><span class="n">it</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="mi">2</span><span class="p">.</span><span class="w"> </span><span class="n">B</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="k">Dictionary</span><span class="p">;</span><span class="w"> </span><span class="k">insert</span><span class="w"> </span><span class="n">it</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="mi">3</span><span class="p">.</span><span class="w"> </span><span class="n">B</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="k">Dictionary</span><span class="p">.</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">BC</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="k">Dictionary</span><span class="p">;</span><span class="w"> </span><span class="k">insert</span><span class="w"> </span><span class="n">it</span><span class="p">.</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="mi">4</span><span class="p">.</span><span class="w"> </span><span class="n">B</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="k">Dictionary</span><span class="p">.</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">BC</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="k">Dictionary</span><span class="p">.</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">BCA</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="k">Dictionary</span><span class="p">;</span><span class="w"> </span><span class="k">insert</span><span class="w"> </span><span class="n">it</span><span class="p">.</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="mi">5</span><span class="p">.</span><span class="w"> </span><span class="n">B</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="k">Dictionary</span><span class="p">.</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">BA</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="k">Dictionary</span><span class="p">;</span><span class="w"> </span><span class="k">insert</span><span class="w"> </span><span class="n">it</span><span class="p">.</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="mi">6</span><span class="p">.</span><span class="w"> </span><span class="n">B</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="k">Dictionary</span><span class="p">.</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">BC</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="k">Dictionary</span><span class="p">.</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">BCA</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="k">Dictionary</span><span class="p">.</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">BCAA</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="k">Dictionary</span><span class="p">;</span><span class="w"> </span><span class="k">insert</span><span class="w"> </span><span class="n">it</span><span class="p">.</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="mi">7</span><span class="p">.</span><span class="w"> </span><span class="n">B</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="k">Dictionary</span><span class="p">.</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">BC</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="k">Dictionary</span><span class="p">.</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">BCA</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="k">Dictionary</span><span class="p">.</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">BCAA</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="k">Dictionary</span><span class="p">.</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">BCAAB</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="k">Dictionary</span><span class="p">;</span><span class="w"> </span><span class="k">insert</span><span class="w"> </span><span class="n">it</span><span class="p">.</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="5-图数据压缩技术比较">5. 图数据压缩技术比较
+</h2><p>文献(<a class="link" href="https://jos.org.cn/jos/article/abstract/4636"  target="_blank" rel="noopener"
+    >图数据表示与压缩技术综述</a>) 采用来自米兰大学 LAW  的真实网页图数据集和社交网络数据集，对多种压缩技术进行对比。其中，表 5 展示了网页图数据集的相关属性，表 6 呈现了社交网络数据集的属性。通过一系列实验，该文献得出结论：k²-tree 的压缩率明显低于 Repair、LZ78 等算法，但能实现较好的时间 / 空间均衡。为凸显符号计算在大规模图数据压缩处理中的优势，本文又将 k²-tree 分别与 OBDD、k²-MDD 两种压缩技术进行实验对比，其结果分别记录在表 7 和表 8 中。</p>
+<p><img src="/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241110110849460.png"
+	width="790"
+	height="385"
+	srcset="/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241110110849460_hu16900765882097589252.png 480w, /p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241110110849460_hu9459051955099956959.png 1024w"
+	loading="lazy"
+	
+		alt="image-20241110110849460"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="205"
+		data-flex-basis="492px"
+	
+></p>
+<p><img src="/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241110110909745.png"
+	width="777"
+	height="381"
+	srcset="/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241110110909745_hu13629732684431140023.png 480w, /p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241110110909745_hu8703427925115481794.png 1024w"
+	loading="lazy"
+	
+		alt="image-20241110110909745"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="203"
+		data-flex-basis="489px"
+	
+></p>
+<p><img src="/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241110111001066.png"
+	width="780"
+	height="388"
+	srcset="/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241110111001066_hu10271013632970272209.png 480w, /p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241110111001066_hu4622947316596969282.png 1024w"
+	loading="lazy"
+	
+		alt="image-20241110111001066"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="201"
+		data-flex-basis="482px"
+	
+></p>
+<p><img src="/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241110111013548.png"
+	width="778"
+	height="383"
+	srcset="/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241110111013548_hu9214840030328214137.png 480w, /p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241110111013548_hu9974269726354404711.png 1024w"
+	loading="lazy"
+	
+		alt="image-20241110111013548"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="203"
+		data-flex-basis="487px"
+	
+></p>
+<p>在三种数据结构<code>k²-tree</code>、<code>k²-MDD</code>、<code>OBDD</code>中，使用一个位串<code>T</code>记录除最后一层节点的 0 值和 1 值，用一个位串<code>L</code>记录最后一层节点的 0 值和 1 值，<code>T</code>和<code>L</code>的总和为所需的存储空间。实验表明，采用<code>OBDD</code>压缩网页图时，<code>T</code>和<code>L</code>的总和约为<code>k²-tree</code>的 21%；采用<code>k²-MDD</code>压缩网页图时，<code>T</code>和<code>L</code>的总和约为<code>k²-tree</code>的 3%。在社交网络数据集<code>enron</code>、<code>dblp1</code>、<code>dblp-2</code>、<code>dewiki</code>上进行实验，得到的<code>T</code>和<code>L</code>的总和分别为<code>k²-tree</code>的 4.8%、5.1%、4.7%、3%，对存储空间的需求得到有效改善。</p>
+<h3 id="实验方法">实验方法
+</h3><ol>
+<li><strong>数据结构选择</strong>：选取<code>k²-tree</code>、<code>k²-MDD</code>、<code>OBDD</code>三种数据结构进行实验。</li>
+<li><strong>位串记录</strong>：使用位串<code>T</code>记录除最后一层节点的 0 值和 1 值，位串<code>L</code>记录最后一层节点的 0 值和 1 值。</li>
+<li><strong>数据集选择</strong>：使用社交网络数据集<code>enron</code>、<code>dblp1</code>、<code>dblp-2</code>、<code>dewiki</code>进行实验对比。</li>
+</ol>
+<h3 id="实验结果">实验结果
+</h3><ol>
+<li><strong>网页图压缩</strong>：采用<code>OBDD</code>压缩网页图，<code>T</code>和<code>L</code>的总和约为<code>k²-tree</code>的 21%；采用<code>k²-MDD</code>压缩网页图，<code>T</code>和<code>L</code>的总和约为<code>k²-tree</code>的 3%。</li>
+<li><strong>社交网络数据集实验</strong>：在<code>enron</code>、<code>dblp1</code>、<code>dblp-2</code>、<code>dewiki</code>数据集上进行实验，得到的<code>T</code>和<code>L</code>的总和分别为<code>k²-tree</code>的 4.8%、5.1%、4.7%、3%。</li>
+</ol>
+<h3 id="结论">结论
+</h3><p>通过实验可以看出，使用<code>k²-MDD</code>和<code>OBDD</code>对网页图进行压缩以及在社交网络数据集上的实验，都有效地改善了存储空间的需求。</p>
 
 </section>
 
