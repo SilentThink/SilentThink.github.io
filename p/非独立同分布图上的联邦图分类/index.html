@@ -690,7 +690,10 @@ $$<ul>
 <li><strong>选择GNNs作为图挖掘模型</strong>：GNNs在学习图表示方面能力强大且广泛应用于图挖掘，其模型参数和梯度能反映图结构与特征信息（详见4.4节），因此被用于GCFL框架。</li>
 <li><strong>动态聚类机制</strong>
 <ul>
-<li><strong>聚类依据</strong>：当客户端数据分布高度异构时，通用联邦学习（FL）接近平稳点时，客户端传输梯度范数不全趋于零。引入超参数 $\varepsilon_1$ 判断是否接近平稳点（$\delta_{\text{mean}} = \left|\sum_{i \in [n]} \frac{\left|\mathcal{G}<em>{i}\right|}{|\mathcal{G}|} \Delta \theta</em>{i}\right| &lt; \varepsilon_{1}$），同时若存在客户端梯度范数较大，引入 $\varepsilon_2$ 决定是否分裂簇（$\delta_{\text{max}} = \max\left(\left|\Delta \theta_{i}\right|\right) &gt; \varepsilon_{2} &gt; 0$）。</li>
+<li><strong>聚类依据</strong>：当客户端数据分布高度异构时，通用联邦学习（FL）接近平稳点时，客户端传输梯度范数不全趋于零。引入超参数 $\varepsilon_1$ 判断是否接近平稳点</li>
+<li>$$\delta_{\text{mean}} = \left\|\sum_{i \in [n]} \frac{\left|\mathcal{G}_{i}\right|}{|\mathcal{G}|} \Delta \theta_{i}\right\| < \varepsilon_{1}$$</li>
+<li>，同时若存在客户端梯度范数较大，引入 $\varepsilon_2$ 决定是否分裂簇:</li>
+<li>$\delta_{\text{max}} = \max\left(\left|\Delta \theta_{i}\right|\right) &gt; \varepsilon_{2} &gt; 0$</li>
 <li><strong>聚类过程</strong>：GCFL采用自上而下的二分机制。在通信轮次 $t$ 时，服务器接收不同簇客户端的梯度，若某簇 $C_k$ 满足分裂条件，计算簇内<code>余弦相似度矩阵</code> $\alpha_k$ 构建全连接图，用Stoer-Wagner最小割算法将该簇二分为 $C_{k1}$ 和 $C_{k2}$。此机制可自动动态确定簇的数量，超参数可通过验证集实验进行设置。</li>
 </ul>
 </li>
