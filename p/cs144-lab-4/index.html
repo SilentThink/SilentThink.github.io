@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="zh-cn" dir="ltr">
     <head><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Lab 3：interoperating in the world 1.介绍 到目前为止，在这门课程中，你已经以几乎完全符合标准的方式实现了传输控制协议。可以说，TCP 实现是世界上最受欢迎的单一计算机程序，存在于数十亿的设备中。大多数实现使用与你的不同的策略，但由于所有的 TCP 实现都共享一种共同的语言，它们都是可互操作的 —— 每个 TCP 实现都可以与任何其他实现成为对等方。这个检查点是关于在现实世界中测试你的 TCP 实现，并测量特定互联网路径的长期统计信息。\n">
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Lab 4：interoperating in the world 1.介绍 到目前为止，在这门课程中，你已经以几乎完全符合标准的方式实现了传输控制协议。可以说，TCP 实现是世界上最受欢迎的单一计算机程序，存在于数十亿的设备中。大多数实现使用与你的不同的策略，但由于所有的 TCP 实现都共享一种共同的语言，它们都是可互操作的 —— 每个 TCP 实现都可以与任何其他实现成为对等方。这个检查点是关于在现实世界中测试你的 TCP 实现，并测量特定互联网路径的长期统计信息。\n">
 <title>CS144 Lab 4</title>
 
 <link rel='canonical' href='https://SilentThink.github.io/p/cs144-lab-4/'>
 
 <link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="CS144 Lab 4">
-<meta property='og:description' content="Lab 3：interoperating in the world 1.介绍 到目前为止，在这门课程中，你已经以几乎完全符合标准的方式实现了传输控制协议。可以说，TCP 实现是世界上最受欢迎的单一计算机程序，存在于数十亿的设备中。大多数实现使用与你的不同的策略，但由于所有的 TCP 实现都共享一种共同的语言，它们都是可互操作的 —— 每个 TCP 实现都可以与任何其他实现成为对等方。这个检查点是关于在现实世界中测试你的 TCP 实现，并测量特定互联网路径的长期统计信息。\n">
+<meta property='og:description' content="Lab 4：interoperating in the world 1.介绍 到目前为止，在这门课程中，你已经以几乎完全符合标准的方式实现了传输控制协议。可以说，TCP 实现是世界上最受欢迎的单一计算机程序，存在于数十亿的设备中。大多数实现使用与你的不同的策略，但由于所有的 TCP 实现都共享一种共同的语言，它们都是可互操作的 —— 每个 TCP 实现都可以与任何其他实现成为对等方。这个检查点是关于在现实世界中测试你的 TCP 实现，并测量特定互联网路径的长期统计信息。\n">
 <meta property='og:url' content='https://SilentThink.github.io/p/cs144-lab-4/'>
 <meta property='og:site_name' content='SilentThink 博客'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2024-11-08T00:14:19&#43;08:00'/><meta property='article:modified_time' content='2024-11-08T00:14:19&#43;08:00'/>
 <meta name="twitter:title" content="CS144 Lab 4">
-<meta name="twitter:description" content="Lab 3：interoperating in the world 1.介绍 到目前为止，在这门课程中，你已经以几乎完全符合标准的方式实现了传输控制协议。可以说，TCP 实现是世界上最受欢迎的单一计算机程序，存在于数十亿的设备中。大多数实现使用与你的不同的策略，但由于所有的 TCP 实现都共享一种共同的语言，它们都是可互操作的 —— 每个 TCP 实现都可以与任何其他实现成为对等方。这个检查点是关于在现实世界中测试你的 TCP 实现，并测量特定互联网路径的长期统计信息。\n">
+<meta name="twitter:description" content="Lab 4：interoperating in the world 1.介绍 到目前为止，在这门课程中，你已经以几乎完全符合标准的方式实现了传输控制协议。可以说，TCP 实现是世界上最受欢迎的单一计算机程序，存在于数十亿的设备中。大多数实现使用与你的不同的策略，但由于所有的 TCP 实现都共享一种共同的语言，它们都是可互操作的 —— 每个 TCP 实现都可以与任何其他实现成为对等方。这个检查点是关于在现实世界中测试你的 TCP 实现，并测量特定互联网路径的长期统计信息。\n">
     <link rel="shortcut icon" href="/favicon2.ico" />
 
     </head>
@@ -270,7 +270,7 @@
         <div class="widget--toc">
             <nav id="TableOfContents">
   <ol>
-    <li><a href="#lab-3interoperating-in-the-world">Lab 3：<strong>interoperating in the world</strong></a>
+    <li><a href="#lab-4interoperating-in-the-world">Lab 4：<strong>interoperating in the world</strong></a>
       <ol>
         <li><a href="#1介绍">1.介绍</a></li>
         <li><a href="#2-准备开始">2. 准备开始</a></li>
@@ -348,7 +348,7 @@
     <section class="article-content">
     
     
-    <h2 id="lab-3interoperating-in-the-world">Lab 3：<strong>interoperating in the world</strong>
+    <h2 id="lab-4interoperating-in-the-world">Lab 4：<strong>interoperating in the world</strong>
 </h2><h3 id="1介绍">1.介绍
 </h3><p>到目前为止，在这门课程中，你已经以几乎完全符合标准的方式实现了传输控制协议。可以说，TCP 实现是世界上最受欢迎的单一计算机程序，存在于数十亿的设备中。大多数实现使用与你的不同的策略，但由于所有的 TCP 实现都共享一种共同的语言，它们都是可互操作的 —— 每个 TCP 实现都可以与任何其他实现成为对等方。这个检查点是关于在现实世界中测试你的 TCP 实现，并测量特定互联网路径的长期统计信息。</p>
 <p>如果你的 TCP 实现编写正确，你可能不需要为这个检查点编写任何代码。但是，尽管我们做出了努力，错误仍有可能逃过我们的单元测试。如果你发现问题，我们将欢迎你用 Wireshark 进行调试并修复任何错误。</p>

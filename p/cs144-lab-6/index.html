@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Lab 6：building an IP router（构建IP路由器） 1. 概述 在本实验检查点中，你将在已有的 NetworkInterface 基础上实现一个 IP 路由器。路由器具有多个网络接口，能够通过其中任意一个接收互联网数据报。路由器的任务是依据路由表转发接收到的数据报，路由表是一系列规则，用于告知路由器对于任何给定的数据报：\n">
+<title>CS144 Lab 6</title>
+
+<link rel='canonical' href='https://SilentThink.github.io/p/cs144-lab-6/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="CS144 Lab 6">
+<meta property='og:description' content="Lab 6：building an IP router（构建IP路由器） 1. 概述 在本实验检查点中，你将在已有的 NetworkInterface 基础上实现一个 IP 路由器。路由器具有多个网络接口，能够通过其中任意一个接收互联网数据报。路由器的任务是依据路由表转发接收到的数据报，路由表是一系列规则，用于告知路由器对于任何给定的数据报：\n">
+<meta property='og:url' content='https://SilentThink.github.io/p/cs144-lab-6/'>
+<meta property='og:site_name' content='SilentThink 博客'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2024-11-11T15:50:21&#43;08:00'/><meta property='article:modified_time' content='2024-11-11T15:50:21&#43;08:00'/>
+<meta name="twitter:title" content="CS144 Lab 6">
+<meta name="twitter:description" content="Lab 6：building an IP router（构建IP路由器） 1. 概述 在本实验检查点中，你将在已有的 NetworkInterface 基础上实现一个 IP 路由器。路由器具有多个网络接口，能够通过其中任意一个接收互联网数据报。路由器的任务是依据路由表转发接收到的数据报，路由表是一系列规则，用于告知路由器对于任何给定的数据报：\n">
+    <link rel="shortcut icon" href="/favicon2.ico" />
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/%E5%8A%A0%E8%97%A4%E6%83%A0_hu8574714599784400491.png" width="300"
+                            height="301" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">😋</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">SilentThink 博客</a></h1>
+            <h2 class="site-description">欢迎</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/SilentThink'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E9%93%BE%E6%8E%A5/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>链接</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+                    
+                        <li id="i18n-switch">  
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M4 5h7" />
+  <path d="M9 3v2c0 4.418 -2.239 8 -5 8" />
+  <path d="M5 9c-.003 2.144 2.952 3.908 6.7 4" />
+  <path d="M12 20l4 -9l4 9" />
+  <path d="M19.1 18h-6.2" />
+</svg>
+
+
+
+                            <select name="language" title="language" onchange="window.location.href = this.selectedOptions[0].value">
+                                
+                                    <option value="https://SilentThink.github.io/en/" >English</option>
+                                
+                                    <option value="https://SilentThink.github.io/" selected>简体中文</option>
+                                
+                            </select>
+                        </li>
+                    
+                
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#lab-6building-an-ip-router构建ip路由器">Lab 6：<strong>building an IP router</strong>（构建IP路由器）</a>
+      <ol>
+        <li><a href="#1-概述">1. 概述</a></li>
+        <li><a href="#2-准备开始">2. 准备开始</a></li>
+        <li><a href="#3-路由器router实现">3. 路由器（Router）实现</a>
+          <ol>
+            <li><a href="#互联网设计的抽象特性">互联网设计的抽象特性</a></li>
+          </ol>
+        </li>
+        <li><a href="#代码实现">代码实现</a></li>
+        <li><a href="#测试">测试</a></li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/cs144-lab-6/">CS144 Lab 6</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">2024-11-11</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 4 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h2 id="lab-6building-an-ip-router构建ip路由器">Lab 6：<strong>building an IP router</strong>（构建IP路由器）
+</h2><h3 id="1-概述">1. 概述
+</h3><p>在本实验检查点中，你将在已有的 <code>NetworkInterface</code> 基础上实现一个 IP 路由器。路由器具有多个网络接口，能够通过其中任意一个接收互联网数据报。路由器的任务是依据路由表转发接收到的数据报，路由表是一系列规则，用于告知路由器对于任何给定的数据报：</p>
+<ol>
+<li>应从哪个接口发送出去。</li>
+<li>下一跳的 IP 地址。</li>
+</ol>
+<p>你的工作是实现一个能够为任何给定数据报确定这两件事的路由器。（你无需实现生成路由表的算法，例如 RIP、OSPF、BGP 或 SDN 控制器相关算法，仅需实现遵循路由表的转发算法。）</p>
+<p>你对路由器的实现将使用 <code>Minnow</code> 库中的新 <code>Router</code> 类，并且通过测试来检查路由器在模拟网络中的功能。检查点 6 基于检查点 5 中对 <code>NetworkInterface</code> 的实现，但不使用之前实现的 TCP 栈。IP 路由器无需了解 TCP、ARP 或以太网（仅需处理 IP 相关内容）。预计你的实现大约需要 30 - 60 行代码。（脚本 / 代码行数工具显示起始代码中 “Router: 38 行代码”，示例解决方案为 “89 行代码”。）</p>
+<h3 id="2-准备开始">2. 准备开始
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">git fetch --all
+</span></span><span class="line"><span class="cl">git merge origin/check6-startercode
+</span></span><span class="line"><span class="cl">git merge upstream/check5-startercode
+</span></span><span class="line"><span class="cl">cmake -S . -B build
+</span></span><span class="line"><span class="cl">cmake --build build
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/p/cs144-lab-6/img/image-20241111170205164.png"
+	width="1059"
+	height="539"
+	srcset="/p/cs144-lab-6/img/image-20241111170205164_hu15090707024543503556.png 480w, /p/cs144-lab-6/img/image-20241111170205164_hu11939191934393222914.png 1024w"
+	loading="lazy"
+	
+		alt="image-20241111170205164"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="196"
+		data-flex-basis="471px"
+	
+></p>
+<h3 id="3-路由器router实现">3. 路由器（Router）实现
+</h3><p>在本次实验中，你需要实现一个 Router 类，该类应具备以下两个主要功能：</p>
+<ol>
+<li><strong>跟踪路由表</strong>：记录一系列转发规则（路由），这些规则用于确定数据报的转发路径。</li>
+<li><strong>转发数据报</strong>：对于接收到的每个数据报，能够准确地将其转发到正确的下一跳，并通过正确的外出网络接口发送。</li>
+</ol>
+<p>你的实现代码将添加到 router.hh 和 router.cc 这两个骨架文件中。在开始编码之前，请务必仔细查阅 router.hh 中关于新 Router 类的文档，以确保你的实现符合要求并正确理解相关概念和接口。</p>
+<p><strong>添加路由表项方法（add_route）</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-C++" data-lang="C++"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">add_route</span><span class="p">(</span><span class="kt">uint32_t</span> <span class="n">route_prefix</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">			   <span class="kt">uint8_t</span> <span class="n">prefix_length</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">			   <span class="n">optional</span><span class="o">&lt;</span><span class="n">Address</span><span class="o">&gt;</span> <span class="n">next_hop</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">			   <span class="n">size_t</span> <span class="n">interface_num</span><span class="p">);</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li><strong>功能</strong>：向路由表添加路由规则，包括路由前缀（32 位数值 IP 地址）、前缀长度（0 - 32）、下一跳地址（若直接连接目标网络可为空，此时下一跳为数据报目的地址；若通过其他路由器连接目标网络，则包含下一路由器的 IP 地址）和发送接口编号。</li>
+<li><strong>操作</strong>：需在 Router 类中添加私有数据结构来存储这些信息，该方法仅保存路由信息以供后续使用。</li>
+</ul>
+<p><strong>数据报转发方法（route）</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-C++" data-lang="C++"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">route</span><span class="p">();</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li><strong>功能</strong>：实现 IP 路由器的 “最长前缀匹配” 逻辑，将每个传入的数据报转发到下一跳的正确接口。</li>
+<li><strong>操作流程</strong></li>
+<li>搜索路由表，找到与数据报目的地址匹配的路由项（目的地址最显著前缀长度位与路由前缀相同）。</li>
+<li>在匹配的路由项中选择前缀长度最大的作为最长前缀匹配路由。</li>
+<li>若没有匹配的路由，则丢弃数据报。</li>
+<li>路由器递减数据报的 TTL（生存时间），若 TTL 原本为 0 或递减后为 0，也丢弃数据报。</li>
+<li>否则，通过指定接口（<code>interface (interface_num)-&gt;send_datagram()</code>）将修改后的数据报发送到下一跳。</li>
+</ul>
+<h4 id="互联网设计的抽象特性">互联网设计的抽象特性
+</h4><p>路由器仅处理互联网数据报，通过 NetworkInterface 抽象与链路层交互，不关心 TCP、ARP、以太网帧、链路层地址解析、链路层寻址方案、链路层帧格式以及数据报有效载荷的含义等问题。</p>
+<h3 id="代码实现">代码实现
+</h3><p>router.hh:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-C++" data-lang="C++"><span class="line"><span class="cl"><span class="c1">// router.hh
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="cp">#pragma once
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;memory&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;optional&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;exception.hh&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;network_interface.hh&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">RouteTableEntry</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// uint32_t route_prefix;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">uint8_t</span> <span class="n">prefix_length</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">std</span><span class="o">::</span><span class="n">optional</span><span class="o">&lt;</span><span class="n">Address</span><span class="o">&gt;</span> <span class="n">next_hop</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">size_t</span> <span class="n">interface_num</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// 默认构造函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">RouteTableEntry</span><span class="p">()</span> <span class="o">:</span> <span class="n">prefix_length</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">next_hop</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">nullopt</span><span class="p">),</span> <span class="n">interface_num</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">RouteTableEntry</span><span class="p">(</span><span class="kt">uint8_t</span> <span class="n">pl</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">optional</span><span class="o">&lt;</span><span class="n">Address</span><span class="o">&gt;</span> <span class="n">nh</span><span class="p">,</span> <span class="n">size_t</span> <span class="n">in</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="o">:</span> <span class="n">prefix_length</span><span class="p">(</span><span class="n">pl</span><span class="p">),</span> <span class="n">next_hop</span><span class="p">(</span><span class="n">nh</span><span class="p">),</span> <span class="n">interface_num</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="kt">bool</span> <span class="k">operator</span><span class="o">&lt;</span><span class="p">(</span> <span class="k">const</span> <span class="n">RouteTableEntry</span><span class="o">&amp;</span> <span class="n">other</span> <span class="p">)</span> <span class="k">const</span>
+</span></span><span class="line"><span class="cl">  <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">prefix_length</span> <span class="o">&gt;</span> <span class="n">other</span><span class="p">.</span><span class="n">prefix_length</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// \brief A router that has multiple network interfaces and
+</span></span></span><span class="line"><span class="cl"><span class="c1">// performs longest-prefix-match routing between them.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">class</span> <span class="nc">Router</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// Add an interface to the router
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">// \param[in] interface an already-constructed network interface
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">// \returns The index of the interface after it has been added to the router
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">size_t</span> <span class="n">add_interface</span><span class="p">(</span> <span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">NetworkInterface</span><span class="o">&gt;</span> <span class="n">interface</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">_interfaces</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span> <span class="n">notnull</span><span class="p">(</span> <span class="s">&#34;add_interface&#34;</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span> <span class="n">interface</span> <span class="p">)</span> <span class="p">)</span> <span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">_interfaces</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// Access an interface by index
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">NetworkInterface</span><span class="o">&gt;</span> <span class="n">interface</span><span class="p">(</span> <span class="k">const</span> <span class="n">size_t</span> <span class="n">N</span> <span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="n">_interfaces</span><span class="p">.</span><span class="n">at</span><span class="p">(</span> <span class="n">N</span> <span class="p">);</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// Add a route (a forwarding rule)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">void</span> <span class="nf">add_route</span><span class="p">(</span> <span class="kt">uint32_t</span> <span class="n">route_prefix</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                  <span class="kt">uint8_t</span> <span class="n">prefix_length</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                  <span class="n">std</span><span class="o">::</span><span class="n">optional</span><span class="o">&lt;</span><span class="n">Address</span><span class="o">&gt;</span> <span class="n">next_hop</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                  <span class="n">size_t</span> <span class="n">interface_num</span> <span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// Route packets between the interfaces
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">void</span> <span class="nf">route</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// The router&#39;s collection of network interfaces
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">NetworkInterface</span><span class="o">&gt;&gt;</span> <span class="n">_interfaces</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">std</span><span class="o">::</span><span class="n">map</span><span class="o">&lt;</span><span class="kt">uint32_t</span><span class="p">,</span> <span class="n">RouteTableEntry</span><span class="o">&gt;</span> <span class="n">_route_table</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>router.cc:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span><span class="lnt">79
+</span><span class="lnt">80
+</span><span class="lnt">81
+</span><span class="lnt">82
+</span><span class="lnt">83
+</span><span class="lnt">84
+</span><span class="lnt">85
+</span><span class="lnt">86
+</span><span class="lnt">87
+</span><span class="lnt">88
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-C++" data-lang="C++"><span class="line"><span class="cl"><span class="c1">// router.cc
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="cp">#include</span> <span class="cpf">&#34;router.hh&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;limits&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// route_prefix: The &#34;up-to-32-bit&#34; IPv4 address prefix to match the datagram&#39;s destination address against
+</span></span></span><span class="line"><span class="cl"><span class="c1">// prefix_length: For this route to be applicable, how many high-order (most-significant) bits of
+</span></span></span><span class="line"><span class="cl"><span class="c1">//    the route_prefix will need to match the corresponding bits of the datagram&#39;s destination address?
+</span></span></span><span class="line"><span class="cl"><span class="c1">// next_hop: The IP address of the next hop. Will be empty if the network is directly attached to the router (in
+</span></span></span><span class="line"><span class="cl"><span class="c1">//    which case, the next hop address should be the datagram&#39;s final destination).
+</span></span></span><span class="line"><span class="cl"><span class="c1">// interface_num: The index of the interface to send the datagram out on.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="n">Router</span><span class="o">::</span><span class="n">add_route</span><span class="p">(</span> <span class="k">const</span> <span class="kt">uint32_t</span> <span class="n">route_prefix</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                        <span class="k">const</span> <span class="kt">uint8_t</span> <span class="n">prefix_length</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                        <span class="k">const</span> <span class="n">optional</span><span class="o">&lt;</span><span class="n">Address</span><span class="o">&gt;</span> <span class="n">next_hop</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                        <span class="k">const</span> <span class="n">size_t</span> <span class="n">interface_num</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;DEBUG: adding route &#34;</span> <span class="o">&lt;&lt;</span> <span class="n">Address</span><span class="o">::</span><span class="n">from_ipv4_numeric</span><span class="p">(</span> <span class="n">route_prefix</span> <span class="p">).</span><span class="n">ip</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;/&#34;</span>
+</span></span><span class="line"><span class="cl">       <span class="o">&lt;&lt;</span> <span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span> <span class="n">prefix_length</span> <span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&#34; =&gt; &#34;</span> <span class="o">&lt;&lt;</span> <span class="p">(</span> <span class="n">next_hop</span><span class="p">.</span><span class="n">has_value</span><span class="p">()</span> <span class="o">?</span> <span class="n">next_hop</span><span class="o">-&gt;</span><span class="n">ip</span><span class="p">()</span> <span class="o">:</span> <span class="s">&#34;(direct)&#34;</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl">       <span class="o">&lt;&lt;</span> <span class="s">&#34; on interface &#34;</span> <span class="o">&lt;&lt;</span> <span class="n">interface_num</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// Your code here.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">_route_table</span><span class="p">[</span><span class="n">route_prefix</span><span class="p">]</span> <span class="o">=</span> <span class="n">RouteTableEntry</span><span class="p">(</span><span class="n">prefix_length</span><span class="p">,</span> <span class="n">next_hop</span><span class="p">,</span> <span class="n">interface_num</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// Go through all the interfaces, and route every incoming datagram to its proper outgoing interface.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="n">Router</span><span class="o">::</span><span class="n">route</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// Your code here.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">size_t</span> <span class="n">interface_size</span> <span class="o">=</span> <span class="n">_interfaces</span><span class="p">.</span><span class="n">size</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">for</span> <span class="p">(</span><span class="n">size_t</span> <span class="n">in_num</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">in_num</span> <span class="o">&lt;</span> <span class="n">interface_size</span><span class="p">;</span> <span class="n">in_num</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">queue</span><span class="o">&lt;</span><span class="n">InternetDatagram</span><span class="o">&gt;&amp;</span> <span class="n">datagrams</span> <span class="o">=</span> <span class="n">interface</span><span class="p">(</span><span class="n">in_num</span><span class="p">).</span><span class="n">get</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">datagrams_received</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">datagrams</span><span class="p">.</span><span class="n">empty</span><span class="p">())</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="k">auto</span> <span class="n">datagram</span> <span class="o">=</span> <span class="n">datagrams</span><span class="p">.</span><span class="n">front</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">      <span class="n">datagrams</span><span class="p">.</span><span class="n">pop</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">      <span class="c1">// Find the route that matches the datagram&#39;s destination address
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>      <span class="kt">uint32_t</span> <span class="n">dst</span> <span class="o">=</span>  <span class="n">datagram</span><span class="p">.</span><span class="n">header</span><span class="p">.</span><span class="n">dst</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="kt">uint8_t</span> <span class="n">ttl</span> <span class="o">=</span> <span class="p">(</span><span class="n">datagram</span><span class="p">.</span><span class="n">header</span><span class="p">.</span><span class="n">ttl</span><span class="o">--</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="k">if</span> <span class="p">(</span><span class="n">ttl</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">continue</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">}</span>
+</span></span><span class="line"><span class="cl">      <span class="n">datagram</span><span class="p">.</span><span class="n">header</span><span class="p">.</span><span class="n">compute_checksum</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">      <span class="kt">uint8_t</span> <span class="n">max_prefix_length</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="n">size_t</span> <span class="n">out_num</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="n">optional</span><span class="o">&lt;</span><span class="n">Address</span><span class="o">&gt;</span> <span class="n">next_hop</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="kt">bool</span> <span class="n">found</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">      <span class="k">for</span> <span class="p">(</span><span class="k">auto</span> <span class="nl">route</span> <span class="p">:</span> <span class="n">_route_table</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">const</span> <span class="kt">uint8_t</span> <span class="n">prefix_length</span> <span class="o">=</span> <span class="n">route</span><span class="p">.</span><span class="n">second</span><span class="p">.</span><span class="n">prefix_length</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">const</span> <span class="kt">uint32_t</span> <span class="n">route_prefix</span> <span class="o">=</span> <span class="n">route</span><span class="p">.</span><span class="n">first</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">((</span><span class="n">dst</span> <span class="o">&amp;</span><span class="p">(</span><span class="n">prefix_length</span><span class="o">?</span> <span class="o">~</span><span class="p">((</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="mi">32</span> <span class="o">-</span> <span class="n">prefix_length</span><span class="p">))</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="o">:</span><span class="mi">0</span><span class="p">))</span> <span class="o">==</span> <span class="p">(</span><span class="n">route_prefix</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">          <span class="k">if</span> <span class="p">(</span><span class="n">prefix_length</span> <span class="o">&gt;=</span> <span class="n">max_prefix_length</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">max_prefix_length</span> <span class="o">=</span> <span class="n">prefix_length</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="n">out_num</span> <span class="o">=</span> <span class="n">route</span><span class="p">.</span><span class="n">second</span><span class="p">.</span><span class="n">interface_num</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="n">next_hop</span> <span class="o">=</span> <span class="n">route</span><span class="p">.</span><span class="n">second</span><span class="p">.</span><span class="n">next_hop</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="n">found</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">          <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">      <span class="p">}</span>
+</span></span><span class="line"><span class="cl">      <span class="k">if</span> <span class="p">(</span><span class="n">found</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="n">next_hop</span><span class="p">.</span><span class="n">has_value</span><span class="p">())</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">          <span class="c1">// Send the new datagram out the corresponding interface
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>          <span class="n">interface</span><span class="p">(</span><span class="n">out_num</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">send_datagram</span><span class="p">(</span><span class="n">datagram</span><span class="p">,</span><span class="o">*</span><span class="n">next_hop</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span> <span class="k">else</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">          <span class="n">Address</span> <span class="n">dst_address</span> <span class="o">=</span> <span class="n">Address</span><span class="o">::</span><span class="n">from_ipv4_numeric</span><span class="p">(</span><span class="n">datagram</span><span class="p">.</span><span class="n">header</span><span class="p">.</span><span class="n">dst</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">          <span class="n">interface</span><span class="p">(</span><span class="n">out_num</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">send_datagram</span><span class="p">(</span><span class="n">datagram</span><span class="p">,</span><span class="n">dst_address</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">      <span class="p">}</span>
+</span></span><span class="line"><span class="cl">      <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="n">next_hop</span><span class="p">.</span><span class="n">has_value</span><span class="p">())</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">          <span class="c1">// Send the new datagram out the corresponding interface
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>          <span class="n">interface</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">send_datagram</span><span class="p">(</span><span class="n">datagram</span><span class="p">,</span><span class="o">*</span><span class="n">next_hop</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span> <span class="k">else</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">          <span class="n">Address</span> <span class="n">dst_address</span> <span class="o">=</span> <span class="n">Address</span><span class="o">::</span><span class="n">from_ipv4_numeric</span><span class="p">(</span><span class="n">datagram</span><span class="p">.</span><span class="n">header</span><span class="p">.</span><span class="n">dst</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">          <span class="n">interface</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">send_datagram</span><span class="p">(</span><span class="n">datagram</span><span class="p">,</span><span class="n">dst_address</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">      <span class="p">}</span>
+</span></span><span class="line"><span class="cl">      
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="测试">测试
+</h3><p>运行<code>cmake --build build --target check6</code>：</p>
+<p><img src="/p/cs144-lab-6/img/image-20241111165917565.png"
+	width="1111"
+	height="285"
+	srcset="/p/cs144-lab-6/img/image-20241111165917565_hu12115799306668179341.png 480w, /p/cs144-lab-6/img/image-20241111165917565_hu15145764613515447423.png 1024w"
+	loading="lazy"
+	
+		alt="image-20241111165917565"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="389"
+		data-flex-basis="935px"
+	
+></p>
+<p><img src="/p/cs144-lab-6/img/image-20241111170054527.png"
+	width="1037"
+	height="1070"
+	srcset="/p/cs144-lab-6/img/image-20241111170054527_hu420763869183894557.png 480w, /p/cs144-lab-6/img/image-20241111170054527_hu8624771129307374387.png 1024w"
+	loading="lazy"
+	
+		alt="image-20241111170054527"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="96"
+		data-flex-basis="232px"
+	
+></p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    </footer>
+
+
+    
+        <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI&#43;WdtXRGWt2kTvGFasHpSy3SV"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG&#43;vnGctmUb0ZY0l8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"integrity="sha384-&#43;VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4&#43;/RRE05"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+        renderMathInElement(document.body, {
+            delimiters: [
+                { left: "$$", right: "$$", display: true },
+                { left: "$", right: "$", display: false },
+                { left: "\\(", right: "\\)", display: false },
+                { left: "\\[", right: "\\]", display: true }
+            ],
+            ignoredClasses: ["gist"]
+        });})
+</script>
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2024 SilentThink
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.29.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.99ce1801c4bad426a42fc436add4721e149159dbb598636e9578fd59cf778c83.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css">
+<div id="aplayer"></div>
+<script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script>
+
+<script>
+    const musicDir = "https://SilentThink.github.io/" + 'music/';
+    const songs = [
+        'Amani-BEYOND',
+        'Shall we talk-陈奕迅',
+        '暧昧-王菲',
+        '暗号-周杰伦',
+        '不浪漫罪名-王杰',
+        '超跑女神-周杰伦',
+        '城府-许嵩',
+        '大笨钟-周杰伦',
+        '单车-陈奕迅',
+        '东京不太热-洛天依',
+        '断桥残雪-许嵩',
+        '发如雪-周杰伦',
+        '枫-周杰伦',
+        '富士山下-陈奕迅',
+        '给我一首歌的时间-周杰伦',
+        '勾指起誓-洛天依Official;ilem',
+        '红玫瑰-陈奕迅',
+        '就是现在-王力宏',
+        '菊花台-周杰伦',
+        '庐州月-许嵩',
+        '你若成风-许嵩',
+        '陪你度过漫长岁月-陈奕迅',
+        '清明雨上-许嵩',
+        '晴天-周杰伦',
+        '如果当时-许嵩',
+        '谁明浪子心-王杰',
+        '霜雪千年-洛天依;乐正绫',
+        '素颜-许嵩',
+        '特别的人-方大同',
+        '听妈妈的话-周杰伦',
+        '烟花易冷-周杰伦',
+        '一场游戏一场梦-王杰',
+        '有何不可-许嵩',
+        '月光-胡彦斌',
+        '最伟大的作品-周杰伦',
+        '奏（かなで） (想唱的叙事诗)-高橋李依',
+        '言わないけどね。 (虽然不会说出口。)-高橋李依',
+        '小小虫-方大同',
+        '小さな恋のうた (小小恋歌)-高橋李依',
+        '小さなてのひら (小手手掌)-安野希世乃',
+        '麦恩莉-方大同',
+        '君色シグナル-春奈るな',
+        '季節を抱きしめて (拥抱季节)-安野希世乃',
+        '勾指起誓-洛天依Official;ilem',
+        '粉雪-高橋李依',
+        '春风吹-方大同',
+        '暗号-周杰伦',
+        '愛唄-高橋李依',
+        '爱爱爱-方大同',
+        'ダ・カーポ ～第2ボタンの誓い～ (达·卡波～第2颗扣子的誓言～)-安野希世乃',
+        'サインはB-高橋李依',
+        'キセキ (奇迹)-高橋李依',
+        'カラフル。 (色彩缤纷。)-沢井美空',
+        'ありがとう (谢谢)-高橋李依',
+        'ULTIMATE-安野希世乃',
+        'M♭-安野希世乃',
+        'Love Song-方大同',
+        'GLISTENING♭-安野希世乃',
+        'ETERNAL♭-安野希世乃',
+        'Cherish you-矢作紗友里'
+    ];
+    let audios = [];
+    songs.forEach((item) => {
+        const songInfo = item.split('-');
+        audios.push({
+            name: songInfo[0],
+            artist: songInfo[1],
+            url: musicDir + item + '/song.mp3',
+            cover: musicDir + item + '/cover.jpg',   
+            lrc: musicDir + item + '/lyric.lrc'       
+        });
+    });
+    
+    const ap = new APlayer({ 
+        container: document.getElementById('aplayer'),
+        lrcType: 3,
+        audio: audios,
+        
+        fixed: true,
+        listMaxHeight: '300px',
+    });
+
+    
+
+    window.onbeforeunload = () => {
+        
+        const playInfo = {
+            index: ap.list.index,
+            currentTime: ap.audio.currentTime,
+            paused: ap.paused
+        };
+        localStorage.setItem("playInfo", JSON.stringify(playInfo));
+    };
+
+    
+
+    window.onload = () => {
+        
+        const playInfo = JSON.parse(localStorage.getItem("playInfo"));
+        if (!playInfo) {
+            return;
+        }
+        
+        ap.list.switch(playInfo.index);
+        
+        setTimeout(() => {
+            
+            ap.seek(playInfo.currentTime);
+            
+            if (!playInfo.paused) {
+                ap.play()
+            }
+        }, 500);
+    };
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/pjax/pjax.min.js"></script>
+
+<script>
+    var pjax = new Pjax({
+        selectors: [".main-container"]
+    })
+
+    pjax._handleResponse = pjax.handleResponse;
+    pjax.handleResponse = function(responseText, request, href, options) {
+        if (request.responseText.match("<html")) {
+            
+            let newDom = new DOMParser().parseFromString(responseText, 'text/html');
+            
+            let bodyClass = newDom.body.className;
+            document.body.setAttribute("class", bodyClass)
+            
+            pjax._handleResponse(responseText, request, href, options);
+        } else {
+            
+        }
+    }
+
+    
+    document.addEventListener('pjax:complete', () => {
+        
+        window.Stack.init();
+    })
+</script>
+    </body>
+</html>

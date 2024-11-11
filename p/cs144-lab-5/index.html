@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Lab 5：down the stack (the network interface) 1.介绍 在本实验中，你将深入网络协议栈，实现一个网络接口，它是在全球传输的互联网数据报与仅传输一跳的链路层以太网帧之间的桥梁。这个组件可以整合到之前实验中实现的 TCP/IP 协议栈下方，并且在 Lab 6 构建路由器时也会使用，用于在不同网络接口之间路由数据报。\n">
+<title>CS144 Lab 5</title>
+
+<link rel='canonical' href='https://SilentThink.github.io/p/cs144-lab-5/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="CS144 Lab 5">
+<meta property='og:description' content="Lab 5：down the stack (the network interface) 1.介绍 在本实验中，你将深入网络协议栈，实现一个网络接口，它是在全球传输的互联网数据报与仅传输一跳的链路层以太网帧之间的桥梁。这个组件可以整合到之前实验中实现的 TCP/IP 协议栈下方，并且在 Lab 6 构建路由器时也会使用，用于在不同网络接口之间路由数据报。\n">
+<meta property='og:url' content='https://SilentThink.github.io/p/cs144-lab-5/'>
+<meta property='og:site_name' content='SilentThink 博客'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2024-11-11T15:50:13&#43;08:00'/><meta property='article:modified_time' content='2024-11-11T15:50:13&#43;08:00'/>
+<meta name="twitter:title" content="CS144 Lab 5">
+<meta name="twitter:description" content="Lab 5：down the stack (the network interface) 1.介绍 在本实验中，你将深入网络协议栈，实现一个网络接口，它是在全球传输的互联网数据报与仅传输一跳的链路层以太网帧之间的桥梁。这个组件可以整合到之前实验中实现的 TCP/IP 协议栈下方，并且在 Lab 6 构建路由器时也会使用，用于在不同网络接口之间路由数据报。\n">
+    <link rel="shortcut icon" href="/favicon2.ico" />
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/%E5%8A%A0%E8%97%A4%E6%83%A0_hu8574714599784400491.png" width="300"
+                            height="301" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">😋</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">SilentThink 博客</a></h1>
+            <h2 class="site-description">欢迎</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/SilentThink'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E9%93%BE%E6%8E%A5/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>链接</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+                    
+                        <li id="i18n-switch">  
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M4 5h7" />
+  <path d="M9 3v2c0 4.418 -2.239 8 -5 8" />
+  <path d="M5 9c-.003 2.144 2.952 3.908 6.7 4" />
+  <path d="M12 20l4 -9l4 9" />
+  <path d="M19.1 18h-6.2" />
+</svg>
+
+
+
+                            <select name="language" title="language" onchange="window.location.href = this.selectedOptions[0].value">
+                                
+                                    <option value="https://SilentThink.github.io/en/" >English</option>
+                                
+                                    <option value="https://SilentThink.github.io/" selected>简体中文</option>
+                                
+                            </select>
+                        </li>
+                    
+                
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#lab-5down-the-stack-the-network-interface">Lab 5：<strong>down the stack (the network interface)</strong></a>
+      <ol>
+        <li><a href="#1介绍">1.介绍</a>
+          <ol>
+            <li><a href="#数据传输方式">数据传输方式</a></li>
+          </ol>
+        </li>
+        <li><a href="#2-准备开始">2. 准备开始</a></li>
+        <li><a href="#3-the-address-resolution-protocolarp协议实现">3. <strong>The Address Resolution Protocol</strong>(ARP协议实现)</a>
+          <ol>
+            <li><a href="#1-send_datagram-函数">1. send_datagram 函数</a></li>
+            <li><a href="#2-recv_frame-函数">2. recv_frame 函数</a></li>
+            <li><a href="#3-tick-函数">3. tick 函数</a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/cs144-lab-5/">CS144 Lab 5</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">2024-11-11</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 7 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h2 id="lab-5down-the-stack-the-network-interface">Lab 5：<strong>down the stack (the network interface)</strong>
+</h2><h3 id="1介绍">1.介绍
+</h3><p>在本实验中，你将深入网络协议栈，实现一个网络接口，它是在全球传输的互联网数据报与仅传输一跳的链路层以太网帧之间的桥梁。这个组件可以整合到之前实验中实现的 TCP/IP 协议栈下方，并且在 Lab 6 构建路由器时也会使用，用于在不同网络接口之间路由数据报。</p>
+<p>过去的实验中，已实现了 TCP 协议，能够与其他支持 TCP 的计算机交换 TCP 段，但未明确这些段如何传输到对等方的 TCP 实现。</p>
+<h4 id="数据传输方式">数据传输方式
+</h4><ol>
+<li><strong>TCP-in-UDP-in-IP</strong>：TCP 段可承载于用户数据报的有效载荷中。在普通（用户空间）环境下，这种方式最易实现，Linux 提供了 “数据报套接字”（UDPSocket）接口，应用只需提供用户数据报有效载荷和目标地址，内核负责构建 UDP 头、IP 头和以太网头，并将数据包发送到下一跳。内核确保每个套接字具有本地和远程地址及端口号的唯一组合，从而保证不同应用间的隔离。</li>
+<li><strong>TCP-in-IP</strong>：通常，TCP 段几乎总是直接置于互联网数据报内，IP 头和 TCP 头之间没有 UDP 头，这就是 “TCP/IP” 的常见形式。实现相对困难，Linux 提供了 TUN 设备接口，应用需提供完整的互联网数据报，内核负责其余操作（如写以太网头并通过物理以太网卡发送等），即应用要自行构建完整的 IP 头而非仅有效载荷。</li>
+<li><strong>TCP-in-IP-in-Ethernet</strong>：在此方式中，部分网络栈功能仍依赖 Linux 内核。每次代码向 TUN 设备写入 IP 数据报时，Linux 需构建包含该 IP 数据报为有效载荷的合适链路层（以太网）帧，这意味着 Linux 要根据下一跳的 IP 地址确定其以太网目的地址。若不知晓该映射，Linux 会广播查询，询问 “谁拥有以下 IP 地址？你的以太网地址是什么？” 并等待响应。</li>
+</ol>
+<p><img src="/p/cs144-lab-5/img/image-20241111163145720.png"
+	width="1019"
+	height="1068"
+	srcset="/p/cs144-lab-5/img/image-20241111163145720_hu5458890779026605474.png 480w, /p/cs144-lab-5/img/image-20241111163145720_hu15605903812430872136.png 1024w"
+	loading="lazy"
+	
+		alt="image-20241111163145720"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="95"
+		data-flex-basis="228px"
+	
+></p>
+<p>网络接口负责将出站 IP 数据报转换为链路层（如以太网）帧，反之亦然。在本周实验中，将实现网络接口并置于 TCP/IP 栈的最底层，代码将生成原始以太网帧，并通过 TAP 设备（类似于 TUN 设备，但更底层，用于交换原始链路层帧而非 IP 数据报）交给 Linux。主要工作是查找（并缓存）每个下一跳 IP 地址对应的以太网地址，此过程涉及地址解析协议（ARP）。实验室已提供单元测试来检验网络接口的功能，在 Lab 6 中，该网络接口将在 TCP 上下文之外作为 IP 路由器的一部分使用。</p>
+<h3 id="2-准备开始">2. 准备开始
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">git fetch --all
+</span></span><span class="line"><span class="cl">git merge origin/check5-startercode
+</span></span><span class="line"><span class="cl">git merge upstream/check5-startercode
+</span></span><span class="line"><span class="cl">cmake -S . -B build
+</span></span><span class="line"><span class="cl">cmake --build build
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="3-the-address-resolution-protocolarp协议实现">3. <strong>The Address Resolution Protocol</strong>(ARP协议实现)
+</h3><p>本次实验的主要任务是在 <code>network_interface.cc</code> 文件中实现 <code>NetworkInterface</code> 的三个主要方法，维护从 IP 地址到以太网地址的映射，该映射是一种缓存（“软状态”），用于提高效率，若需重新开始，映射会自然重新生成且不影响功能。</p>
+<h4 id="1-send_datagram-函数">1. send_datagram 函数
+</h4><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">NetworkInterface</span><span class="o">::</span><span class="n">send_datagram</span><span class="p">(</span><span class="k">const</span> <span class="n">InternetDatagram</span> <span class="o">&amp;</span><span class="n">dgram</span><span class="p">,</span> <span class="k">const</span> <span class="n">Address</span> <span class="o">&amp;</span><span class="n">next_hop</span><span class="p">);</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol>
+<li><strong>功能</strong>：当调用者（如 TCPConnection 或路由器）要向下一跳发送出站互联网（IP）数据报时调用此方法，将数据报转换为以太网帧并发送。</li>
+<li><strong>操作流程</strong></li>
+</ol>
+<ul>
+<li>若目标以太网地址已知，立即创建以太网帧（类型为 EthernetHeader::TYPE_IPv4），设置有效载荷为序列化的数据报，以及源地址和目标地址后发送。</li>
+<li>若目标以太网地址未知，广播 ARP 请求获取下一跳的以太网地址，并将 IP 数据报排队，待收到 ARP 回复后再发送。同时，为避免网络 ARP 请求泛滥，若在过去五秒内已发送过针对同一 IP 地址的 ARP 请求，则不再发送，等待第一个请求的回复。在未获取目标以太网地址前，数据报始终处于排队状态。</li>
+</ul>
+<h4 id="2-recv_frame-函数">2. recv_frame 函数
+</h4><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">NetworkInterface</span><span class="o">::</span><span class="n">recv_frame</span><span class="p">(</span><span class="k">const</span> <span class="n">EthernetFrame</span> <span class="o">&amp;</span><span class="n">frame</span><span class="p">);</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol>
+<li><strong>功能</strong>：当以太网帧从网络到达时调用此方法处理。</li>
+<li><strong>操作流程</strong></li>
+</ol>
+<ul>
+<li>忽略非本网络接口目标的帧（即以太网目的地址不是广播地址或接口自身存储在 ethernet_address 成员变量中的以太网地址的帧）。</li>
+<li>若传入帧为 IPv4 类型，将有效载荷解析为 InternetDatagram，若解析成功（即 parse () 方法返回 ParseResult::NoError），将解析后的数据报放入接收队列。</li>
+<li>若传入帧为 ARP 类型，将有效载荷解析为 ARPMessage，若成功，记住发送方 IP 地址与以太网地址的映射 30 秒（从请求和回复中学习映射）。此外，若为询问本接口 IP 地址的 ARP 请求，则发送相应的 ARP 回复。</li>
+</ul>
+<h4 id="3-tick-函数">3. tick 函数
+</h4><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">NetworkInterface</span><span class="o">::</span><span class="n">tick</span><span class="p">(</span><span class="k">const</span> <span class="n">size</span> <span class="n">t</span> <span class="n">ms</span> <span class="n">since</span> <span class="n">last</span> <span class="n">tick</span><span class="p">);</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol>
+<li><strong>功能</strong>：随着时间推移被调用，用于处理过期的 IP - 以太网地址映射。</li>
+<li><strong>操作</strong>：使任何已过期的 IP - 以太网映射失效。</li>
+</ol>
+<p><strong>代码实现</strong>：</p>
+<p>network_interface.hh:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span><span class="lnt">79
+</span><span class="lnt">80
+</span><span class="lnt">81
+</span><span class="lnt">82
+</span><span class="lnt">83
+</span><span class="lnt">84
+</span><span class="lnt">85
+</span><span class="lnt">86
+</span><span class="lnt">87
+</span><span class="lnt">88
+</span><span class="lnt">89
+</span><span class="lnt">90
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-C++" data-lang="C++"><span class="line"><span class="cl"><span class="c1">// network_interface.hh
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="cp">#pragma once
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;queue&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;address.hh&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;ethernet_frame.hh&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;ipv4_datagram.hh&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;map&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="c1">// A &#34;network interface&#34; that connects IP (the internet layer, or network layer)
+</span></span></span><span class="line"><span class="cl"><span class="c1">// with Ethernet (the network access layer, or link layer).
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="c1">// This module is the lowest layer of a TCP/IP stack
+</span></span></span><span class="line"><span class="cl"><span class="c1">// (connecting IP with the lower-layer network protocol,
+</span></span></span><span class="line"><span class="cl"><span class="c1">// e.g. Ethernet). But the same module is also used repeatedly
+</span></span></span><span class="line"><span class="cl"><span class="c1">// as part of a router: a router generally has many network
+</span></span></span><span class="line"><span class="cl"><span class="c1">// interfaces, and the router&#39;s job is to route Internet datagrams
+</span></span></span><span class="line"><span class="cl"><span class="c1">// between the different interfaces.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="c1">// The network interface translates datagrams (coming from the
+</span></span></span><span class="line"><span class="cl"><span class="c1">// &#34;customer,&#34; e.g. a TCP/IP stack or router) into Ethernet
+</span></span></span><span class="line"><span class="cl"><span class="c1">// frames. To fill in the Ethernet destination address, it looks up
+</span></span></span><span class="line"><span class="cl"><span class="c1">// the Ethernet address of the next IP hop of each datagram, making
+</span></span></span><span class="line"><span class="cl"><span class="c1">// requests with the [Address Resolution Protocol](\ref rfc::rfc826).
+</span></span></span><span class="line"><span class="cl"><span class="c1">// In the opposite direction, the network interface accepts Ethernet
+</span></span></span><span class="line"><span class="cl"><span class="c1">// frames, checks if they are intended for it, and if so, processes
+</span></span></span><span class="line"><span class="cl"><span class="c1">// the the payload depending on its type. If it&#39;s an IPv4 datagram,
+</span></span></span><span class="line"><span class="cl"><span class="c1">// the network interface passes it up the stack. If it&#39;s an ARP
+</span></span></span><span class="line"><span class="cl"><span class="c1">// request or reply, the network interface processes the frame
+</span></span></span><span class="line"><span class="cl"><span class="c1">// and learns or replies as necessary.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">class</span> <span class="nc">NetworkInterface</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// An abstraction for the physical output port where the NetworkInterface sends Ethernet frames
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">class</span> <span class="nc">OutputPort</span>
+</span></span><span class="line"><span class="cl">  <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">virtual</span> <span class="kt">void</span> <span class="n">transmit</span><span class="p">(</span> <span class="k">const</span> <span class="n">NetworkInterface</span><span class="o">&amp;</span> <span class="n">sender</span><span class="p">,</span> <span class="k">const</span> <span class="n">EthernetFrame</span><span class="o">&amp;</span> <span class="n">frame</span> <span class="p">)</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">virtual</span> <span class="o">~</span><span class="n">OutputPort</span><span class="p">()</span> <span class="o">=</span> <span class="k">default</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// Construct a network interface with given Ethernet (network-access-layer) and IP (internet-layer)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">// addresses
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">NetworkInterface</span><span class="p">(</span> <span class="n">std</span><span class="o">::</span><span class="n">string_view</span> <span class="n">name</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">OutputPort</span><span class="o">&gt;</span> <span class="n">port</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="k">const</span> <span class="n">EthernetAddress</span><span class="o">&amp;</span> <span class="n">ethernet_address</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="k">const</span> <span class="n">Address</span><span class="o">&amp;</span> <span class="n">ip_address</span> <span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// Sends an Internet datagram, encapsulated in an Ethernet frame (if it knows the Ethernet destination
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">// address). Will need to use [ARP](\ref rfc::rfc826) to look up the Ethernet destination address for the next
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">// hop. Sending is accomplished by calling `transmit()` (a member variable) on the frame.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">void</span> <span class="nf">send_datagram</span><span class="p">(</span> <span class="k">const</span> <span class="n">InternetDatagram</span><span class="o">&amp;</span> <span class="n">dgram</span><span class="p">,</span> <span class="k">const</span> <span class="n">Address</span><span class="o">&amp;</span> <span class="n">next_hop</span> <span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// Receives an Ethernet frame and responds appropriately.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">// If type is IPv4, pushes the datagram to the datagrams_in queue.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">// If type is ARP request, learn a mapping from the &#34;sender&#34; fields, and send an ARP reply.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">// If type is ARP reply, learn a mapping from the &#34;sender&#34; fields.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">void</span> <span class="nf">recv_frame</span><span class="p">(</span> <span class="k">const</span> <span class="n">EthernetFrame</span><span class="o">&amp;</span> <span class="n">frame</span> <span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// Called periodically when time elapses
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">void</span> <span class="nf">tick</span><span class="p">(</span> <span class="n">size_t</span> <span class="n">ms_since_last_tick</span> <span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// Accessors
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span> <span class="n">name</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span> <span class="k">return</span> <span class="n">name_</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="k">const</span> <span class="n">OutputPort</span><span class="o">&amp;</span> <span class="n">output</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span> <span class="k">return</span> <span class="o">*</span><span class="n">port_</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="n">OutputPort</span><span class="o">&amp;</span> <span class="n">output</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="o">*</span><span class="n">port_</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="n">std</span><span class="o">::</span><span class="n">queue</span><span class="o">&lt;</span><span class="n">InternetDatagram</span><span class="o">&gt;&amp;</span> <span class="n">datagrams_received</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">datagrams_received_</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// Human-readable name of the interface
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">name_</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// The physical output port (+ a helper function `transmit` that uses it to send an Ethernet frame)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">OutputPort</span><span class="o">&gt;</span> <span class="n">port_</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">void</span> <span class="nf">transmit</span><span class="p">(</span> <span class="k">const</span> <span class="n">EthernetFrame</span><span class="o">&amp;</span> <span class="n">frame</span> <span class="p">)</span> <span class="k">const</span> <span class="p">{</span> <span class="n">port_</span><span class="o">-&gt;</span><span class="n">transmit</span><span class="p">(</span> <span class="o">*</span><span class="k">this</span><span class="p">,</span> <span class="n">frame</span> <span class="p">);</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// Ethernet (known as hardware, network-access-layer, or link-layer) address of the interface
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">EthernetAddress</span> <span class="n">ethernet_address_</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// IP (known as internet-layer or network-layer) address of the interface
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">Address</span> <span class="n">ip_address_</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// Datagrams that have been received
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">std</span><span class="o">::</span><span class="n">queue</span><span class="o">&lt;</span><span class="n">InternetDatagram</span><span class="o">&gt;</span> <span class="n">datagrams_received_</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">std</span><span class="o">::</span><span class="n">map</span><span class="o">&lt;</span><span class="kt">uint32_t</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">tuple</span><span class="o">&lt;</span><span class="n">EthernetAddress</span><span class="p">,</span> <span class="n">size_t</span><span class="p">,</span> <span class="kt">bool</span><span class="o">&gt;&gt;</span> <span class="n">arp_table_</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">std</span><span class="o">::</span><span class="n">queue</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">pair</span><span class="o">&lt;</span><span class="n">InternetDatagram</span><span class="p">,</span> <span class="n">Address</span><span class="o">&gt;&gt;</span> <span class="n">pending_datagrams_</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">uint64_t</span> <span class="n">current_time_</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>network_interface.cc:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span><span class="lnt">106
+</span><span class="lnt">107
+</span><span class="lnt">108
+</span><span class="lnt">109
+</span><span class="lnt">110
+</span><span class="lnt">111
+</span><span class="lnt">112
+</span><span class="lnt">113
+</span><span class="lnt">114
+</span><span class="lnt">115
+</span><span class="lnt">116
+</span><span class="lnt">117
+</span><span class="lnt">118
+</span><span class="lnt">119
+</span><span class="lnt">120
+</span><span class="lnt">121
+</span><span class="lnt">122
+</span><span class="lnt">123
+</span><span class="lnt">124
+</span><span class="lnt">125
+</span><span class="lnt">126
+</span><span class="lnt">127
+</span><span class="lnt">128
+</span><span class="lnt">129
+</span><span class="lnt">130
+</span><span class="lnt">131
+</span><span class="lnt">132
+</span><span class="lnt">133
+</span><span class="lnt">134
+</span><span class="lnt">135
+</span><span class="lnt">136
+</span><span class="lnt">137
+</span><span class="lnt">138
+</span><span class="lnt">139
+</span><span class="lnt">140
+</span><span class="lnt">141
+</span><span class="lnt">142
+</span><span class="lnt">143
+</span><span class="lnt">144
+</span><span class="lnt">145
+</span><span class="lnt">146
+</span><span class="lnt">147
+</span><span class="lnt">148
+</span><span class="lnt">149
+</span><span class="lnt">150
+</span><span class="lnt">151
+</span><span class="lnt">152
+</span><span class="lnt">153
+</span><span class="lnt">154
+</span><span class="lnt">155
+</span><span class="lnt">156
+</span><span class="lnt">157
+</span><span class="lnt">158
+</span><span class="lnt">159
+</span><span class="lnt">160
+</span><span class="lnt">161
+</span><span class="lnt">162
+</span><span class="lnt">163
+</span><span class="lnt">164
+</span><span class="lnt">165
+</span><span class="lnt">166
+</span><span class="lnt">167
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="c1">// network_interface.cc
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;arp_message.hh&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;exception.hh&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;network_interface.hh&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">//! \param[in] ethernet_address Ethernet (what ARP calls &#34;hardware&#34;) address of the interface
+</span></span></span><span class="line"><span class="cl"><span class="c1">//! \param[in] ip_address IP (what ARP calls &#34;protocol&#34;) address of the interface
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">NetworkInterface</span><span class="o">::</span><span class="n">NetworkInterface</span><span class="p">(</span> <span class="n">string_view</span> <span class="n">name</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                                    <span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">OutputPort</span><span class="o">&gt;</span> <span class="n">port</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                                    <span class="k">const</span> <span class="n">EthernetAddress</span><span class="o">&amp;</span> <span class="n">ethernet_address</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                                    <span class="k">const</span> <span class="n">Address</span><span class="o">&amp;</span> <span class="n">ip_address</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="o">:</span> <span class="n">name_</span><span class="p">(</span> <span class="n">name</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="p">,</span> <span class="n">port_</span><span class="p">(</span> <span class="n">notnull</span><span class="p">(</span> <span class="s">&#34;OutputPort&#34;</span><span class="p">,</span> <span class="n">move</span><span class="p">(</span> <span class="n">port</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="p">,</span> <span class="n">ethernet_address_</span><span class="p">(</span> <span class="n">ethernet_address</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="p">,</span> <span class="n">ip_address_</span><span class="p">(</span> <span class="n">ip_address</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="p">,</span> <span class="n">datagrams_received_</span><span class="p">()</span> 
+</span></span><span class="line"><span class="cl">  <span class="p">,</span> <span class="n">arp_table_</span><span class="p">()</span>          
+</span></span><span class="line"><span class="cl">  <span class="p">,</span> <span class="n">pending_datagrams_</span><span class="p">()</span>  
+</span></span><span class="line"><span class="cl">  <span class="p">,</span> <span class="n">current_time_</span><span class="p">(</span> <span class="mi">0</span> <span class="p">)</span>    
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;DEBUG: Network interface has Ethernet address &#34;</span> <span class="o">&lt;&lt;</span> <span class="n">to_string</span><span class="p">(</span> <span class="n">ethernet_address</span> <span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&#34; and IP address &#34;</span>
+</span></span><span class="line"><span class="cl">       <span class="o">&lt;&lt;</span> <span class="n">ip_address</span><span class="p">.</span><span class="n">ip</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">//! \param[in] dgram the IPv4 datagram to be sent
+</span></span></span><span class="line"><span class="cl"><span class="c1">//! \param[in] next_hop the IP address of the interface to send it to (typically a router or default gateway, but
+</span></span></span><span class="line"><span class="cl"><span class="c1">//! may also be another host if directly connected to the same network as the destination) Note: the Address type
+</span></span></span><span class="line"><span class="cl"><span class="c1">//! can be converted to a uint32_t (raw 32-bit IP address) by using the Address::ipv4_numeric() method.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="n">NetworkInterface</span><span class="o">::</span><span class="n">send_datagram</span><span class="p">(</span> <span class="k">const</span> <span class="n">InternetDatagram</span><span class="o">&amp;</span> <span class="n">dgram</span><span class="p">,</span> <span class="k">const</span> <span class="n">Address</span><span class="o">&amp;</span> <span class="n">next_hop</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">uint32_t</span> <span class="n">next_hop_ip</span> <span class="o">=</span> <span class="n">next_hop</span><span class="p">.</span><span class="n">ipv4_numeric</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">auto</span> <span class="n">it</span> <span class="o">=</span> <span class="n">arp_table_</span><span class="p">.</span><span class="n">find</span><span class="p">(</span> <span class="n">next_hop_ip</span> <span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span> <span class="n">it</span> <span class="o">!=</span> <span class="n">arp_table_</span><span class="p">.</span><span class="n">end</span><span class="p">()</span> <span class="o">&amp;&amp;</span> <span class="n">std</span><span class="o">::</span><span class="n">get</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span><span class="p">(</span> <span class="n">it</span><span class="o">-&gt;</span><span class="n">second</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="n">current_time_</span> <span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 有有效的ARP映射，可以发送数据报
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">EthernetFrame</span> <span class="n">frame</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">frame</span><span class="p">.</span><span class="n">header</span><span class="p">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">EthernetHeader</span><span class="o">::</span><span class="n">TYPE_IPv4</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">frame</span><span class="p">.</span><span class="n">header</span><span class="p">.</span><span class="n">src</span> <span class="o">=</span> <span class="n">ethernet_address_</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">frame</span><span class="p">.</span><span class="n">header</span><span class="p">.</span><span class="n">dst</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">get</span><span class="o">&lt;</span><span class="mi">0</span><span class="o">&gt;</span><span class="p">(</span> <span class="n">it</span><span class="o">-&gt;</span><span class="n">second</span> <span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">Serializer</span> <span class="n">serializer</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dgram</span><span class="p">.</span><span class="n">serialize</span><span class="p">(</span> <span class="n">serializer</span> <span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">frame</span><span class="p">.</span><span class="n">payload</span> <span class="o">=</span> <span class="n">serializer</span><span class="p">.</span><span class="n">output</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">transmit</span><span class="p">(</span> <span class="n">frame</span> <span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 没有有效的ARP映射，发送ARP请求
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span> <span class="n">it</span> <span class="o">==</span> <span class="n">arp_table_</span><span class="p">.</span><span class="n">end</span><span class="p">()</span> <span class="o">||</span> <span class="n">current_time_</span> <span class="o">-</span> <span class="n">std</span><span class="o">::</span><span class="n">get</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span><span class="p">(</span> <span class="n">it</span><span class="o">-&gt;</span><span class="n">second</span> <span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">5000</span> <span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="n">ARPMessage</span> <span class="n">arp_request</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="n">arp_request</span><span class="p">.</span><span class="n">opcode</span> <span class="o">=</span> <span class="n">ARPMessage</span><span class="o">::</span><span class="n">OPCODE_REQUEST</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="n">arp_request</span><span class="p">.</span><span class="n">sender_ethernet_address</span> <span class="o">=</span> <span class="n">ethernet_address_</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="n">arp_request</span><span class="p">.</span><span class="n">sender_ip_address</span> <span class="o">=</span> <span class="n">ip_address_</span><span class="p">.</span><span class="n">ipv4_numeric</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">      <span class="n">arp_request</span><span class="p">.</span><span class="n">target_ethernet_address</span> <span class="o">=</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl">      <span class="n">arp_request</span><span class="p">.</span><span class="n">target_ip_address</span> <span class="o">=</span> <span class="n">next_hop_ip</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">      <span class="n">EthernetFrame</span> <span class="n">arp_frame</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="n">arp_frame</span><span class="p">.</span><span class="n">header</span><span class="p">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">EthernetHeader</span><span class="o">::</span><span class="n">TYPE_ARP</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="n">arp_frame</span><span class="p">.</span><span class="n">header</span><span class="p">.</span><span class="n">src</span> <span class="o">=</span> <span class="n">ethernet_address_</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="n">arp_frame</span><span class="p">.</span><span class="n">header</span><span class="p">.</span><span class="n">dst</span> <span class="o">=</span> <span class="n">ETHERNET_BROADCAST</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">      <span class="n">Serializer</span> <span class="n">arp_serializer</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="n">arp_request</span><span class="p">.</span><span class="n">serialize</span><span class="p">(</span> <span class="n">arp_serializer</span> <span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="n">arp_frame</span><span class="p">.</span><span class="n">payload</span> <span class="o">=</span> <span class="n">arp_serializer</span><span class="p">.</span><span class="n">output</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">      <span class="n">transmit</span><span class="p">(</span> <span class="n">arp_frame</span> <span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="n">arp_table_</span><span class="p">[</span><span class="n">next_hop_ip</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span> <span class="n">EthernetAddress</span><span class="p">(),</span> <span class="n">current_time_</span><span class="p">,</span> <span class="nb">false</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 将数据报保存到待处理队列
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">pending_datagrams_</span><span class="p">.</span><span class="n">emplace</span><span class="p">(</span> <span class="n">dgram</span><span class="p">,</span> <span class="n">next_hop</span> <span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">//! \param[in] frame the incoming Ethernet frame
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="n">NetworkInterface</span><span class="o">::</span><span class="n">recv_frame</span><span class="p">(</span> <span class="k">const</span> <span class="n">EthernetFrame</span><span class="o">&amp;</span> <span class="n">frame</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span> <span class="n">frame</span><span class="p">.</span><span class="n">header</span><span class="p">.</span><span class="n">dst</span> <span class="o">!=</span> <span class="n">ethernet_address_</span> <span class="o">&amp;&amp;</span> <span class="n">frame</span><span class="p">.</span><span class="n">header</span><span class="p">.</span><span class="n">dst</span> <span class="o">!=</span> <span class="n">ETHERNET_BROADCAST</span> <span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span> <span class="n">frame</span><span class="p">.</span><span class="n">header</span><span class="p">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">EthernetHeader</span><span class="o">::</span><span class="n">TYPE_IPv4</span> <span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">InternetDatagram</span> <span class="n">dgram</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Parser</span> <span class="nf">parser</span><span class="p">(</span> <span class="n">frame</span><span class="p">.</span><span class="n">payload</span> <span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">try</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="n">dgram</span><span class="p">.</span><span class="n">parse</span><span class="p">(</span> <span class="n">parser</span> <span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="n">datagrams_received_</span><span class="p">.</span><span class="n">push</span><span class="p">(</span> <span class="n">dgram</span> <span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span> <span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">exception</span><span class="o">&amp;</span> <span class="n">e</span> <span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="c1">// 解析失败，忽略这个数据报
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span> <span class="k">else</span> <span class="nf">if</span> <span class="p">(</span> <span class="n">frame</span><span class="p">.</span><span class="n">header</span><span class="p">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">EthernetHeader</span><span class="o">::</span><span class="n">TYPE_ARP</span> <span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">ARPMessage</span> <span class="n">arp_msg</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Parser</span> <span class="n">parser</span><span class="p">(</span> <span class="n">frame</span><span class="p">.</span><span class="n">payload</span> <span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">try</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="n">arp_msg</span><span class="p">.</span><span class="n">parse</span><span class="p">(</span> <span class="n">parser</span> <span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="n">arp_table_</span><span class="p">[</span><span class="n">arp_msg</span><span class="p">.</span><span class="n">sender_ip_address</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span> <span class="n">arp_msg</span><span class="p">.</span><span class="n">sender_ethernet_address</span><span class="p">,</span> <span class="n">current_time_</span> <span class="o">+</span> <span class="mi">30000</span><span class="p">,</span> <span class="nb">true</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">      <span class="k">if</span> <span class="p">(</span> <span class="n">arp_msg</span><span class="p">.</span><span class="n">opcode</span> <span class="o">==</span> <span class="n">ARPMessage</span><span class="o">::</span><span class="n">OPCODE_REQUEST</span>
+</span></span><span class="line"><span class="cl">           <span class="o">&amp;&amp;</span> <span class="n">arp_msg</span><span class="p">.</span><span class="n">target_ip_address</span> <span class="o">==</span> <span class="n">ip_address_</span><span class="p">.</span><span class="n">ipv4_numeric</span><span class="p">()</span> <span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">ARPMessage</span> <span class="n">arp_reply</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">arp_reply</span><span class="p">.</span><span class="n">opcode</span> <span class="o">=</span> <span class="n">ARPMessage</span><span class="o">::</span><span class="n">OPCODE_REPLY</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">arp_reply</span><span class="p">.</span><span class="n">sender_ethernet_address</span> <span class="o">=</span> <span class="n">ethernet_address_</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">arp_reply</span><span class="p">.</span><span class="n">sender_ip_address</span> <span class="o">=</span> <span class="n">ip_address_</span><span class="p">.</span><span class="n">ipv4_numeric</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">        <span class="n">arp_reply</span><span class="p">.</span><span class="n">target_ethernet_address</span> <span class="o">=</span> <span class="n">arp_msg</span><span class="p">.</span><span class="n">sender_ethernet_address</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">arp_reply</span><span class="p">.</span><span class="n">target_ip_address</span> <span class="o">=</span> <span class="n">arp_msg</span><span class="p">.</span><span class="n">sender_ip_address</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">EthernetFrame</span> <span class="n">reply_frame</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">reply_frame</span><span class="p">.</span><span class="n">header</span><span class="p">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">EthernetHeader</span><span class="o">::</span><span class="n">TYPE_ARP</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">reply_frame</span><span class="p">.</span><span class="n">header</span><span class="p">.</span><span class="n">src</span> <span class="o">=</span> <span class="n">ethernet_address_</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">reply_frame</span><span class="p">.</span><span class="n">header</span><span class="p">.</span><span class="n">dst</span> <span class="o">=</span> <span class="n">arp_msg</span><span class="p">.</span><span class="n">sender_ethernet_address</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">Serializer</span> <span class="n">serializer</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">arp_reply</span><span class="p">.</span><span class="n">serialize</span><span class="p">(</span> <span class="n">serializer</span> <span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">reply_frame</span><span class="p">.</span><span class="n">payload</span> <span class="o">=</span> <span class="n">serializer</span><span class="p">.</span><span class="n">output</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">transmit</span><span class="p">(</span> <span class="n">reply_frame</span> <span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">      <span class="n">size_t</span> <span class="n">queue_size</span> <span class="o">=</span> <span class="n">pending_datagrams_</span><span class="p">.</span><span class="n">size</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">      <span class="k">for</span> <span class="p">(</span> <span class="n">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">queue_size</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span> <span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">auto</span> <span class="p">[</span><span class="n">dgram</span><span class="p">,</span> <span class="n">next_hop</span><span class="p">]</span> <span class="o">=</span> <span class="n">pending_datagrams_</span><span class="p">.</span><span class="n">front</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">        <span class="n">pending_datagrams_</span><span class="p">.</span><span class="n">pop</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span> <span class="n">next_hop</span><span class="p">.</span><span class="n">ipv4_numeric</span><span class="p">()</span> <span class="o">==</span> <span class="n">arp_msg</span><span class="p">.</span><span class="n">sender_ip_address</span> <span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">          <span class="n">EthernetFrame</span> <span class="n">datagram_frame</span><span class="p">;</span> <span class="c1">// 重命名局部变量
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>          <span class="n">datagram_frame</span><span class="p">.</span><span class="n">header</span><span class="p">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">EthernetHeader</span><span class="o">::</span><span class="n">TYPE_IPv4</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">          <span class="n">datagram_frame</span><span class="p">.</span><span class="n">header</span><span class="p">.</span><span class="n">src</span> <span class="o">=</span> <span class="n">ethernet_address_</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">          <span class="n">datagram_frame</span><span class="p">.</span><span class="n">header</span><span class="p">.</span><span class="n">dst</span> <span class="o">=</span> <span class="n">arp_msg</span><span class="p">.</span><span class="n">sender_ethernet_address</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">          <span class="n">Serializer</span> <span class="n">serializer</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">          <span class="n">dgram</span><span class="p">.</span><span class="n">serialize</span><span class="p">(</span> <span class="n">serializer</span> <span class="p">);</span>
+</span></span><span class="line"><span class="cl">          <span class="n">datagram_frame</span><span class="p">.</span><span class="n">payload</span> <span class="o">=</span> <span class="n">serializer</span><span class="p">.</span><span class="n">output</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">          <span class="n">transmit</span><span class="p">(</span> <span class="n">datagram_frame</span> <span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">          <span class="n">pending_datagrams_</span><span class="p">.</span><span class="n">push</span><span class="p">(</span> <span class="p">{</span> <span class="n">dgram</span><span class="p">,</span> <span class="n">next_hop</span> <span class="p">}</span> <span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">      <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span> <span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">exception</span><span class="o">&amp;</span> <span class="n">e</span> <span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="c1">// 解析失败，忽略这个ARP消息
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">//! \param[in] ms_since_last_tick the number of milliseconds since the last call to this method
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="n">NetworkInterface</span><span class="o">::</span><span class="n">tick</span><span class="p">(</span> <span class="k">const</span> <span class="n">size_t</span> <span class="n">ms_since_last_tick</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// 处理越界问题
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">if</span> <span class="p">(</span> <span class="n">current_time_</span> <span class="o">+</span> <span class="n">ms_since_last_tick</span> <span class="o">&lt;</span> <span class="n">current_time_</span> <span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 如果发生越界，重置 current_time_
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">current_time_</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="c1">// 或者设置为某个合理的起始值
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">current_time_</span> <span class="o">+=</span> <span class="n">ms_since_last_tick</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// 清除过期的 ARP 表项
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">for</span> <span class="p">(</span> <span class="k">auto</span> <span class="n">it</span> <span class="o">=</span> <span class="n">arp_table_</span><span class="p">.</span><span class="n">begin</span><span class="p">();</span> <span class="n">it</span> <span class="o">!=</span> <span class="n">arp_table_</span><span class="p">.</span><span class="n">end</span><span class="p">();</span> <span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span> <span class="n">std</span><span class="o">::</span><span class="n">get</span><span class="o">&lt;</span><span class="mi">2</span><span class="o">&gt;</span><span class="p">(</span> <span class="n">it</span><span class="o">-&gt;</span><span class="n">second</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">true</span> <span class="o">&amp;&amp;</span> <span class="n">std</span><span class="o">::</span><span class="n">get</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span><span class="p">(</span> <span class="n">it</span><span class="o">-&gt;</span><span class="n">second</span> <span class="p">)</span> <span class="o">&lt;=</span> <span class="n">current_time_</span> <span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="n">it</span> <span class="o">=</span> <span class="n">arp_table_</span><span class="p">.</span><span class="n">erase</span><span class="p">(</span> <span class="n">it</span> <span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="o">++</span><span class="n">it</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>check5 测试<code>cmake --build build --target check5</code>：</p>
+<p><img src="/p/cs144-lab-5/img/image-20241111164515322.png"
+	width="994"
+	height="241"
+	srcset="/p/cs144-lab-5/img/image-20241111164515322_hu4459072397907213339.png 480w, /p/cs144-lab-5/img/image-20241111164515322_hu1218208754400512204.png 1024w"
+	loading="lazy"
+	
+		alt="image-20241111164515322"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="412"
+		data-flex-basis="989px"
+	
+></p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    </footer>
+
+
+    
+        <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI&#43;WdtXRGWt2kTvGFasHpSy3SV"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG&#43;vnGctmUb0ZY0l8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"integrity="sha384-&#43;VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4&#43;/RRE05"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+        renderMathInElement(document.body, {
+            delimiters: [
+                { left: "$$", right: "$$", display: true },
+                { left: "$", right: "$", display: false },
+                { left: "\\(", right: "\\)", display: false },
+                { left: "\\[", right: "\\]", display: true }
+            ],
+            ignoredClasses: ["gist"]
+        });})
+</script>
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2024 SilentThink
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.29.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.99ce1801c4bad426a42fc436add4721e149159dbb598636e9578fd59cf778c83.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css">
+<div id="aplayer"></div>
+<script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script>
+
+<script>
+    const musicDir = "https://SilentThink.github.io/" + 'music/';
+    const songs = [
+        'Amani-BEYOND',
+        'Shall we talk-陈奕迅',
+        '暧昧-王菲',
+        '暗号-周杰伦',
+        '不浪漫罪名-王杰',
+        '超跑女神-周杰伦',
+        '城府-许嵩',
+        '大笨钟-周杰伦',
+        '单车-陈奕迅',
+        '东京不太热-洛天依',
+        '断桥残雪-许嵩',
+        '发如雪-周杰伦',
+        '枫-周杰伦',
+        '富士山下-陈奕迅',
+        '给我一首歌的时间-周杰伦',
+        '勾指起誓-洛天依Official;ilem',
+        '红玫瑰-陈奕迅',
+        '就是现在-王力宏',
+        '菊花台-周杰伦',
+        '庐州月-许嵩',
+        '你若成风-许嵩',
+        '陪你度过漫长岁月-陈奕迅',
+        '清明雨上-许嵩',
+        '晴天-周杰伦',
+        '如果当时-许嵩',
+        '谁明浪子心-王杰',
+        '霜雪千年-洛天依;乐正绫',
+        '素颜-许嵩',
+        '特别的人-方大同',
+        '听妈妈的话-周杰伦',
+        '烟花易冷-周杰伦',
+        '一场游戏一场梦-王杰',
+        '有何不可-许嵩',
+        '月光-胡彦斌',
+        '最伟大的作品-周杰伦',
+        '奏（かなで） (想唱的叙事诗)-高橋李依',
+        '言わないけどね。 (虽然不会说出口。)-高橋李依',
+        '小小虫-方大同',
+        '小さな恋のうた (小小恋歌)-高橋李依',
+        '小さなてのひら (小手手掌)-安野希世乃',
+        '麦恩莉-方大同',
+        '君色シグナル-春奈るな',
+        '季節を抱きしめて (拥抱季节)-安野希世乃',
+        '勾指起誓-洛天依Official;ilem',
+        '粉雪-高橋李依',
+        '春风吹-方大同',
+        '暗号-周杰伦',
+        '愛唄-高橋李依',
+        '爱爱爱-方大同',
+        'ダ・カーポ ～第2ボタンの誓い～ (达·卡波～第2颗扣子的誓言～)-安野希世乃',
+        'サインはB-高橋李依',
+        'キセキ (奇迹)-高橋李依',
+        'カラフル。 (色彩缤纷。)-沢井美空',
+        'ありがとう (谢谢)-高橋李依',
+        'ULTIMATE-安野希世乃',
+        'M♭-安野希世乃',
+        'Love Song-方大同',
+        'GLISTENING♭-安野希世乃',
+        'ETERNAL♭-安野希世乃',
+        'Cherish you-矢作紗友里'
+    ];
+    let audios = [];
+    songs.forEach((item) => {
+        const songInfo = item.split('-');
+        audios.push({
+            name: songInfo[0],
+            artist: songInfo[1],
+            url: musicDir + item + '/song.mp3',
+            cover: musicDir + item + '/cover.jpg',   
+            lrc: musicDir + item + '/lyric.lrc'       
+        });
+    });
+    
+    const ap = new APlayer({ 
+        container: document.getElementById('aplayer'),
+        lrcType: 3,
+        audio: audios,
+        
+        fixed: true,
+        listMaxHeight: '300px',
+    });
+
+    
+
+    window.onbeforeunload = () => {
+        
+        const playInfo = {
+            index: ap.list.index,
+            currentTime: ap.audio.currentTime,
+            paused: ap.paused
+        };
+        localStorage.setItem("playInfo", JSON.stringify(playInfo));
+    };
+
+    
+
+    window.onload = () => {
+        
+        const playInfo = JSON.parse(localStorage.getItem("playInfo"));
+        if (!playInfo) {
+            return;
+        }
+        
+        ap.list.switch(playInfo.index);
+        
+        setTimeout(() => {
+            
+            ap.seek(playInfo.currentTime);
+            
+            if (!playInfo.paused) {
+                ap.play()
+            }
+        }, 500);
+    };
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/pjax/pjax.min.js"></script>
+
+<script>
+    var pjax = new Pjax({
+        selectors: [".main-container"]
+    })
+
+    pjax._handleResponse = pjax.handleResponse;
+    pjax.handleResponse = function(responseText, request, href, options) {
+        if (request.responseText.match("<html")) {
+            
+            let newDom = new DOMParser().parseFromString(responseText, 'text/html');
+            
+            let bodyClass = newDom.body.className;
+            document.body.setAttribute("class", bodyClass)
+            
+            pjax._handleResponse(responseText, request, href, options);
+        } else {
+            
+        }
+    }
+
+    
+    document.addEventListener('pjax:complete', () => {
+        
+        window.Stack.init();
+    })
+</script>
+    </body>
+</html>

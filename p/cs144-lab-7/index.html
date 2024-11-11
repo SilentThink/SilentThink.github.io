@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Lab 7：putting it all together 1.概述 到目前为止，在课程学习过程中，已经逐步实现了互联网基础设施的重要部分。从检查点 0（可靠字节流），到检查点 1 - 3（传输控制协议），检查点 5（IP / 以太网网络接口）以及检查点 6（IP 路由器），已经完成了大量的编码工作。\n">
+<title>CS144 Lab 7</title>
+
+<link rel='canonical' href='https://SilentThink.github.io/p/cs144-lab-7/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="CS144 Lab 7">
+<meta property='og:description' content="Lab 7：putting it all together 1.概述 到目前为止，在课程学习过程中，已经逐步实现了互联网基础设施的重要部分。从检查点 0（可靠字节流），到检查点 1 - 3（传输控制协议），检查点 5（IP / 以太网网络接口）以及检查点 6（IP 路由器），已经完成了大量的编码工作。\n">
+<meta property='og:url' content='https://SilentThink.github.io/p/cs144-lab-7/'>
+<meta property='og:site_name' content='SilentThink 博客'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2024-11-11T15:50:40&#43;08:00'/><meta property='article:modified_time' content='2024-11-11T15:50:40&#43;08:00'/>
+<meta name="twitter:title" content="CS144 Lab 7">
+<meta name="twitter:description" content="Lab 7：putting it all together 1.概述 到目前为止，在课程学习过程中，已经逐步实现了互联网基础设施的重要部分。从检查点 0（可靠字节流），到检查点 1 - 3（传输控制协议），检查点 5（IP / 以太网网络接口）以及检查点 6（IP 路由器），已经完成了大量的编码工作。\n">
+    <link rel="shortcut icon" href="/favicon2.ico" />
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/%E5%8A%A0%E8%97%A4%E6%83%A0_hu8574714599784400491.png" width="300"
+                            height="301" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">😋</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">SilentThink 博客</a></h1>
+            <h2 class="site-description">欢迎</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/SilentThink'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E9%93%BE%E6%8E%A5/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>链接</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+                    
+                        <li id="i18n-switch">  
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M4 5h7" />
+  <path d="M9 3v2c0 4.418 -2.239 8 -5 8" />
+  <path d="M5 9c-.003 2.144 2.952 3.908 6.7 4" />
+  <path d="M12 20l4 -9l4 9" />
+  <path d="M19.1 18h-6.2" />
+</svg>
+
+
+
+                            <select name="language" title="language" onchange="window.location.href = this.selectedOptions[0].value">
+                                
+                                    <option value="https://SilentThink.github.io/en/" >English</option>
+                                
+                                    <option value="https://SilentThink.github.io/" selected>简体中文</option>
+                                
+                            </select>
+                        </li>
+                    
+                
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#lab-7putting-it-all-together">Lab 7：<strong>putting it all together</strong></a>
+      <ol>
+        <li><a href="#1概述">1.概述</a></li>
+        <li><a href="#2准备开始">2.准备开始</a></li>
+        <li><a href="#3-实现网络通信">3. 实现网络通信</a></li>
+        <li><a href="#实验步骤">实验步骤</a></li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/cs144-lab-7/">CS144 Lab 7</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">2024-11-11</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 2 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h2 id="lab-7putting-it-all-together">Lab 7：<strong>putting it all together</strong>
+</h2><h3 id="1概述">1.概述
+</h3><p>到目前为止，在课程学习过程中，已经逐步实现了互联网基础设施的重要部分。从检查点 0（可靠字节流），到检查点 1 - 3（传输控制协议），检查点 5（IP / 以太网网络接口）以及检查点 6（IP 路由器），已经完成了大量的编码工作。</p>
+<p>在本次检查点中，不一定需要进行新的编码（前提是之前的检查点工作状态良好）。相反，为了总结之前的成果，将利用之前所有的实验内容创建一个真实的网络，在这个网络中，自己实现的网络栈（主机和路由器）能够与其他同学实现的网络栈进行通信。</p>
+<h3 id="2准备开始">2.准备开始
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">git fetch --all
+</span></span><span class="line"><span class="cl">git merge origin/check7-startercode
+</span></span><span class="line"><span class="cl">git merge upstream/check7-startercode
+</span></span><span class="line"><span class="cl">cmake -S . -B build
+</span></span><span class="line"><span class="cl">cmake --build build
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="3-实现网络通信">3. 实现网络通信
+</h3><p>在本次实验中，将创建一个真实网络，整合自己的网络栈与班上其他同学实现的网络栈。双方各提供一个主机（包括可靠字节流、TCP 实现和网络接口）和一个路由器。由于可能位于网络地址转换（NAT）之后，双方网络连接将通过中继服务器（<a class="link" href="https://cs144.keithw.org/"  target="_blank" rel="noopener"
+    >cs144.keithw.org</a>）进行。</p>
+<h3 id="实验步骤">实验步骤
+</h3><ol>
+<li><strong>自行测试（可选）</strong></li>
+</ol>
+<ul>
+<li>可在虚拟机的两个不同窗口或终端中分别扮演客户端和服务器角色，使用自己的代码进行通信测试，便于调试。测试成功后再与伙伴合作。</li>
+</ul>
+<p>注意：如果使用WSL代理，发现无法通信可能需要打开clash的tun模式</p>
+<img src="img/image-20241111171703829.png" alt="image-20241111171703829" style="zoom: 67%;" />
+<p><img src="/p/cs144-lab-7/img/image-20241111170925277.png"
+	width="945"
+	height="212"
+	srcset="/p/cs144-lab-7/img/image-20241111170925277_hu5572931482094235686.png 480w, /p/cs144-lab-7/img/image-20241111170925277_hu16159298751386507265.png 1024w"
+	loading="lazy"
+	
+		alt="image-20241111170925277"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="445"
+		data-flex-basis="1069px"
+	
+></p>
+<p><img src="/p/cs144-lab-7/img/image-20241111171140080.png"
+	width="934"
+	height="221"
+	srcset="/p/cs144-lab-7/img/image-20241111171140080_hu15007680620597443726.png 480w, /p/cs144-lab-7/img/image-20241111171140080_hu5430421191259477231.png 1024w"
+	loading="lazy"
+	
+		alt="image-20241111171140080"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="422"
+		data-flex-basis="1014px"
+	
+></p>
+<p><img src="/p/cs144-lab-7/img/image-20241111171154920.png"
+	width="938"
+	height="201"
+	srcset="/p/cs144-lab-7/img/image-20241111171154920_hu973345543019486552.png 480w, /p/cs144-lab-7/img/image-20241111171154920_hu13387852865221841074.png 1024w"
+	loading="lazy"
+	
+		alt="image-20241111171154920"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="466"
+		data-flex-basis="1120px"
+	
+></p>
+<p><img src="/p/cs144-lab-7/img/image-20241111171512423.png"
+	width="951"
+	height="281"
+	srcset="/p/cs144-lab-7/img/image-20241111171512423_hu7091203653070579227.png 480w, /p/cs144-lab-7/img/image-20241111171512423_hu6673302069063986145.png 1024w"
+	loading="lazy"
+	
+		alt="image-20241111171512423"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="338"
+		data-flex-basis="812px"
+	
+></p>
+<p><img src="/p/cs144-lab-7/img/image-20241111171521384.png"
+	width="948"
+	height="300"
+	srcset="/p/cs144-lab-7/img/image-20241111171521384_hu8017905529905552879.png 480w, /p/cs144-lab-7/img/image-20241111171521384_hu3863573751885475586.png 1024w"
+	loading="lazy"
+	
+		alt="image-20241111171521384"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="316"
+		data-flex-basis="758px"
+	
+></p>
+<ol>
+<li><strong>选择中继标识</strong></li>
+</ol>
+<ul>
+<li>随机选择一个 1024 到 64000 之间的偶数作为实验室小组标识，需与其他同时工作的小组不同，假设选择 “3000”（实际应选其他数）。</li>
+</ul>
+<ol>
+<li><strong>服务器端操作</strong></li>
+</ol>
+<ul>
+<li>服务器端学生在 “build” 目录下运行<code>./apps/endtoend server cs144.keithw.org 3000</code>（3000 替换为实际所选数字），若成功，将打印网络接口信息、添加路由信息以及监听连接的相关输出。</li>
+</ul>
+<ol>
+<li><strong>客户端操作</strong></li>
+</ol>
+<ul>
+<li>客户端学生在 “build” 目录下运行<code>./apps/endtoend client cs144.keithw.org 3001</code>（3001 为所选数字加 1），若成功，将打印网络接口信息、添加路由信息、连接过程的输出，服务器端将打印新连接信息。</li>
+</ul>
+<ol>
+<li><strong>验证连接与数据交换</strong></li>
+</ol>
+<ul>
+<li>若双方看到预期输出，表明成功完成 TCP 握手，可进行数据交换，在一端输入内容，应在另一端显示，尝试双向输入。结束连接时，输入 Ctrl - D，验证字节流结束和程序正常退出情况。</li>
+</ul>
+<ol>
+<li><strong>调试模式（可选）</strong></li>
+</ol>
+<ul>
+<li>若未看到预期输出，可在运行 “endtoend” 程序时添加 “debug” 参数，打印交换的以太网帧，查看 ARP 和 TCP/IP 帧信息。</li>
+</ul>
+<ol>
+<li><strong>与伙伴合作测试</strong></li>
+</ol>
+<ul>
+<li>在自己计算机上两个窗口间测试成功后，与实验伙伴（及其实现）按照相同步骤进行测试。</li>
+</ul>
+<p>实测通信成功！</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    </footer>
+
+
+    
+        <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI&#43;WdtXRGWt2kTvGFasHpSy3SV"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG&#43;vnGctmUb0ZY0l8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"integrity="sha384-&#43;VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4&#43;/RRE05"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+        renderMathInElement(document.body, {
+            delimiters: [
+                { left: "$$", right: "$$", display: true },
+                { left: "$", right: "$", display: false },
+                { left: "\\(", right: "\\)", display: false },
+                { left: "\\[", right: "\\]", display: true }
+            ],
+            ignoredClasses: ["gist"]
+        });})
+</script>
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2024 SilentThink
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.29.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.99ce1801c4bad426a42fc436add4721e149159dbb598636e9578fd59cf778c83.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css">
+<div id="aplayer"></div>
+<script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script>
+
+<script>
+    const musicDir = "https://SilentThink.github.io/" + 'music/';
+    const songs = [
+        'Amani-BEYOND',
+        'Shall we talk-陈奕迅',
+        '暧昧-王菲',
+        '暗号-周杰伦',
+        '不浪漫罪名-王杰',
+        '超跑女神-周杰伦',
+        '城府-许嵩',
+        '大笨钟-周杰伦',
+        '单车-陈奕迅',
+        '东京不太热-洛天依',
+        '断桥残雪-许嵩',
+        '发如雪-周杰伦',
+        '枫-周杰伦',
+        '富士山下-陈奕迅',
+        '给我一首歌的时间-周杰伦',
+        '勾指起誓-洛天依Official;ilem',
+        '红玫瑰-陈奕迅',
+        '就是现在-王力宏',
+        '菊花台-周杰伦',
+        '庐州月-许嵩',
+        '你若成风-许嵩',
+        '陪你度过漫长岁月-陈奕迅',
+        '清明雨上-许嵩',
+        '晴天-周杰伦',
+        '如果当时-许嵩',
+        '谁明浪子心-王杰',
+        '霜雪千年-洛天依;乐正绫',
+        '素颜-许嵩',
+        '特别的人-方大同',
+        '听妈妈的话-周杰伦',
+        '烟花易冷-周杰伦',
+        '一场游戏一场梦-王杰',
+        '有何不可-许嵩',
+        '月光-胡彦斌',
+        '最伟大的作品-周杰伦',
+        '奏（かなで） (想唱的叙事诗)-高橋李依',
+        '言わないけどね。 (虽然不会说出口。)-高橋李依',
+        '小小虫-方大同',
+        '小さな恋のうた (小小恋歌)-高橋李依',
+        '小さなてのひら (小手手掌)-安野希世乃',
+        '麦恩莉-方大同',
+        '君色シグナル-春奈るな',
+        '季節を抱きしめて (拥抱季节)-安野希世乃',
+        '勾指起誓-洛天依Official;ilem',
+        '粉雪-高橋李依',
+        '春风吹-方大同',
+        '暗号-周杰伦',
+        '愛唄-高橋李依',
+        '爱爱爱-方大同',
+        'ダ・カーポ ～第2ボタンの誓い～ (达·卡波～第2颗扣子的誓言～)-安野希世乃',
+        'サインはB-高橋李依',
+        'キセキ (奇迹)-高橋李依',
+        'カラフル。 (色彩缤纷。)-沢井美空',
+        'ありがとう (谢谢)-高橋李依',
+        'ULTIMATE-安野希世乃',
+        'M♭-安野希世乃',
+        'Love Song-方大同',
+        'GLISTENING♭-安野希世乃',
+        'ETERNAL♭-安野希世乃',
+        'Cherish you-矢作紗友里'
+    ];
+    let audios = [];
+    songs.forEach((item) => {
+        const songInfo = item.split('-');
+        audios.push({
+            name: songInfo[0],
+            artist: songInfo[1],
+            url: musicDir + item + '/song.mp3',
+            cover: musicDir + item + '/cover.jpg',   
+            lrc: musicDir + item + '/lyric.lrc'       
+        });
+    });
+    
+    const ap = new APlayer({ 
+        container: document.getElementById('aplayer'),
+        lrcType: 3,
+        audio: audios,
+        
+        fixed: true,
+        listMaxHeight: '300px',
+    });
+
+    
+
+    window.onbeforeunload = () => {
+        
+        const playInfo = {
+            index: ap.list.index,
+            currentTime: ap.audio.currentTime,
+            paused: ap.paused
+        };
+        localStorage.setItem("playInfo", JSON.stringify(playInfo));
+    };
+
+    
+
+    window.onload = () => {
+        
+        const playInfo = JSON.parse(localStorage.getItem("playInfo"));
+        if (!playInfo) {
+            return;
+        }
+        
+        ap.list.switch(playInfo.index);
+        
+        setTimeout(() => {
+            
+            ap.seek(playInfo.currentTime);
+            
+            if (!playInfo.paused) {
+                ap.play()
+            }
+        }, 500);
+    };
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/pjax/pjax.min.js"></script>
+
+<script>
+    var pjax = new Pjax({
+        selectors: [".main-container"]
+    })
+
+    pjax._handleResponse = pjax.handleResponse;
+    pjax.handleResponse = function(responseText, request, href, options) {
+        if (request.responseText.match("<html")) {
+            
+            let newDom = new DOMParser().parseFromString(responseText, 'text/html');
+            
+            let bodyClass = newDom.body.className;
+            document.body.setAttribute("class", bodyClass)
+            
+            pjax._handleResponse(responseText, request, href, options);
+        } else {
+            
+        }
+    }
+
+    
+    document.addEventListener('pjax:complete', () => {
+        
+        window.Stack.init();
+    })
+</script>
+    </body>
+</html>
