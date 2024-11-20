@@ -1348,13 +1348,9 @@
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;联邦随机梯度下降算法（FedSGD）&lt;/strong&gt;&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;设定固定的学习率 $\eta$，对 $K$ 个客户端（client）的数据计算损失梯度：
-&lt;/p&gt;
 $$
 g_k = \bigtriangledown F_k(w_t)
-$$&lt;p&gt;服务器（server）将聚合每个客户端计算的梯度，以此来更新模型参数：
-&lt;/p&gt;
-$$
+$$$$
 w_{t+1} \leftarrow w_t - \eta \sum\limits_{k=1}^K \frac{n_k}{n} g_k = w_t - \eta \bigtriangledown f(w_t)
 $$&lt;p&gt;FedSGD 的不足之处：&lt;/p&gt;
 &lt;ol&gt;
@@ -1405,13 +1401,9 @@ $$&lt;p&gt;FedSGD 的不足之处：&lt;/p&gt;
 &lt;li&gt;各个客户端发送训练后的参数到中心服务器，中心服务器根据下式更新参数：
 其中$ n_k $为客户端$k$样本数，$n$为所有客户端的样本总数。&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;在客户端进行局部模型的更新：
-&lt;/p&gt;
 $$
 w_{t+1}^k \leftarrow w_t - \eta g_k
-$$&lt;p&gt;服务器对每个客户端更新后的权重进行加权平均：
-&lt;/p&gt;
-$$
+$$$$
 w_{t+1} \leftarrow \sum_{k=1}^K \frac{n_k}{n} w_{t+1}^k
 $$&lt;ul&gt;
 &lt;li&gt;$n_k$ 是 &lt;strong&gt;客户端 \( k \) 的数据样本数量&lt;/strong&gt;。&lt;/li&gt;
@@ -1548,8 +1540,11 @@ $$&lt;ul&gt;
 &lt;h3 id=&#34;43技术设计&#34;&gt;4.3技术设计
 &lt;/h3&gt;&lt;p&gt;GCFL利用GNN的强大表示能力，根据客户端传输的梯度动态聚类。通过引入超参数$\varepsilon_1$和$\varepsilon_2$作为聚类准则，当满足条件时，服务器基于余弦相似度矩阵和Stoer-Wagner最小割算法对集群进行二分。客户端在本地训练后传输梯度，服务器聚合梯度更新模型参数。&lt;/p&gt;
 &lt;ol&gt;
-&lt;li&gt;&lt;strong&gt;选择GNNs作为图挖掘模型&lt;/strong&gt;：GNNs在学习图表示方面能力强大且广泛应用于图挖掘，其模型参数和梯度能反映图结构与特征信息（详见4.4节），因此被用于GCFL框架。&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;动态聚类机制&lt;/strong&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;选择GNNs作为图挖掘模型&lt;/strong&gt;：GNNs在学习图表示方面能力强大且广泛应用于图挖掘，其模型参数和梯度能反映图结构与特征信息（详见4.4节），因此被用于GCFL框架。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;动态聚类机制&lt;/strong&gt;&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;聚类依据&lt;/strong&gt;：当客户端数据分布高度异构时，通用联邦学习（FL）接近平稳点时，客户端传输梯度范数不全趋于零。引入超参数 $\varepsilon_1$ 判断是否接近平稳点&lt;/li&gt;
 &lt;li&gt;$$\delta_{\text{mean}} = \left\|\sum_{i \in [n]} \frac{\left|\mathcal{G}_{i}\right|}{|\mathcal{G}|} \Delta \theta_{i}\right\| &lt; \varepsilon_{1}$$&lt;/li&gt;
@@ -1558,7 +1553,8 @@ $$&lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;聚类过程&lt;/strong&gt;：GCFL采用自上而下的二分机制。在通信轮次 $t$ 时，服务器接收不同簇客户端的梯度，若某簇 $C_k$ 满足分裂条件，计算簇内&lt;code&gt;余弦相似度矩阵&lt;/code&gt; $\alpha_k$ 构建全连接图，用Stoer-Wagner最小割算法将该簇二分为 $C_{k1}$ 和 $C_{k2}$。此机制可自动动态确定簇的数量，超参数可通过验证集实验进行设置。&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;客户端与服务器交互&lt;/strong&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;客户端与服务器交互&lt;/strong&gt;&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;簇 $C_k$ 中的客户端 $S_i$ 寻找接近真实解 $\theta_{k, i}^*$ 的 $\hat{\theta}&lt;em&gt;{k, i}$，在轮次 $t$ 将梯度 $\Delta \theta&lt;/em&gt;{k, i}^{t} = \hat{\theta}&lt;em&gt;{k, i}^{t} - \theta&lt;/em&gt;{k, i}^{t - 1}$ 传输给服务器。&lt;/li&gt;
 &lt;li&gt;服务器维护簇分配，并按簇聚合梯度：$\theta_{k}^{t + 1} = \theta_{k}^{t} + \sum_{i \in [n_{k}]} \Delta \theta_{k, i}^{t}$。&lt;/li&gt;
@@ -1656,6 +1652,9 @@ $$\beta_{k}(p, q) = \text{dist}(Q(p, :), Q(q, :))$$&lt;p&gt;（其中 $p, q \in 
 		data-flex-basis=&#34;916px&#34;
 	
 &gt;&lt;/p&gt;
+&lt;p&gt;从单个数据集中随机抽取约 100 个图分配给每个客户端，其中 10% 用于测试。使用了来自三个不同领域的数据集，分别为 NCI1（分配给 30 个客户端）、PROTEINS（分配给 10 个客户端）和 IMDB - BINARY（分配给 10 个客户端）&lt;/p&gt;
+&lt;p&gt;在所有三个数据集中，GCFL 和 GCFL + 框架相比自训练（self - train）均有显著性能提升，在 NCI1 数据集上平均性能增益分别为 13.27% 和 14.75%；在 PROTEINS 数据集上分别为 7.29% 和 7.81%；在 IMDB - BINARY 数据集上，GCFL 和 GCFL + 能够提升所有 10 个客户端的性能，而 FedAvg 和 FedProx 分别有 5/10 和 4/10 的客户端未能得到提升。这表明即使在单个数据集内，由于图数据的非独立同分布性（non - IIDness），FedAvg 等方法也可能失效，而 GCFL 和 GCFL + 框架能够有效提高图分类性能。&lt;/p&gt;
+&lt;p&gt;使用 GCFL 或 GCFL + 时，客户端相对于自训练的最小性能增益明显大于 FedAvg 和 FedProx，这意味着即使某些客户端使用 GCFL 或 GCFL + 未能从自训练中显著提升，其性能也能更接近自训练时的性能，说明 GCFL 和 GCFL + 框架能够使客户端性能更加稳定。&lt;/p&gt;
 &lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109170053080.png&#34;
 	width=&#34;2162&#34;
 	height=&#34;508&#34;
@@ -1670,8 +1669,10 @@ $$\beta_{k}(p, q) = \text{dist}(Q(p, :), Q(q, :))$$&lt;p&gt;（其中 $p, q \in 
 		data-flex-basis=&#34;1021px&#34;
 	
 &gt;&lt;/p&gt;
+&lt;p&gt;设计了两种多数据集设置，即单域（使用 MOLECULES 数据组，包含七个分子数据集分配给七个客户端）和跨域（使用 BIOCHEM 数据组，包含分子和蛋白质领域的数据集分配给 10 个客户端；使用 MIX 数据组，包含分子、蛋白质和社会领域的数据集分配给 13 个客户端）。每个客户端持有一个完整的图数据集，其中 10% 用于测试。&lt;/p&gt;
+&lt;p&gt;在多数据集设置下，尽管客户端之间的数据异构性更强，但 GCFL 和 GCFL + 框架仍然能够有效提高客户端的性能，相比自训练有 1.7% - 2.7% 的提升。这表明即使是来自不同数据集甚至不同领域的图数据，通过适当的联邦学习框架，也能够相互协作提升性能。&lt;/p&gt;
 &lt;h3 id=&#34;63集群内结构和特征分析&#34;&gt;6.3集群内结构和特征分析
-&lt;/h3&gt;&lt;p&gt;GCFL和GCFL+聚类后显著降低集群内图的结构和特征异质性，尤其在多数据集设置中。同一数据集内特征异质性降低较少，结构异质性显著降低；多数据集设置中两者均显著降低。聚类结果显示来自同一领域的数据集更易聚在一起，但不同领域数据集也能相互受益，表明框架能根据性能动态聚类的必要性。&lt;/p&gt;
+&lt;/h3&gt;&lt;p&gt;GCFL和GCFL+聚类后显著降低集群内图的结构和特征异质性，尤其在多数据集设置中。同一数据集内特征异质性降低较少，结构异质性显著降低；多数据集设置中两者均显著降低。聚类结果显示来自同一领域的数据集更易聚在一起，但不同领域数据集也能相互受益，表明框架能动态聚类的必要性。&lt;/p&gt;
 &lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109170128856.png&#34;
 	width=&#34;1930&#34;
 	height=&#34;678&#34;
@@ -1700,20 +1701,14 @@ $$\beta_{k}(p, q) = \text{dist}(Q(p, :), Q(q, :))$$&lt;p&gt;（其中 $p, q \in 
 		data-flex-basis=&#34;772px&#34;
 	
 &gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/%E9%9D%9E%E7%8B%AC%E7%AB%8B%E5%90%8C%E5%88%86%E5%B8%83%E5%9B%BE%E4%B8%8A%E7%9A%84%E8%81%94%E9%82%A6%E5%9B%BE%E5%88%86%E7%B1%BB/img/image-20241109170229862.png&#34;
-	width=&#34;2128&#34;
-	height=&#34;662&#34;
-	
-	loading=&#34;lazy&#34;
-	
-		alt=&#34;image-20241109170229862&#34;
-	
-	
-		class=&#34;gallery-image&#34; 
-		data-flex-grow=&#34;321&#34;
-		data-flex-basis=&#34;771px&#34;
-	
-&gt;&lt;/p&gt;
+&lt;p&gt;结果表明，GCFL 和 GCFL + 框架在聚类方面具有显著效果，能够有效降低集群内的结构和特征异构性，无论是在单数据集还是多数据集场景下均表现出色，并且能够跨越领域进行合理聚类，使不同数据集之间相互协作，提高整体数据的同质性，为联邦图分类任务提供了更有利的训练条件。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Think&lt;/strong&gt;：&lt;/p&gt;
+&lt;p&gt;这种通过客户端向服务器传递训练梯度来实现联邦学习的方法能否真正确保客户端的隐私性？&lt;/p&gt;
+&lt;p&gt;试想如果客户端使用其用户的隐私数据训练图神经网络，而训练得到模型准确度很高。因而使用该模型可以通过输入客户相关信息得出关于该用户隐私特征的输出。&lt;/p&gt;
+&lt;p&gt;若其他客户端能够通过对该客户端每轮上传的模型梯度进行分析，从而还原出效果相近的模型，就会造成严重的隐私泄露问题。&lt;/p&gt;
+&lt;p&gt;尽管FedAvg算法采用随机取样的方法在一定程度上能够保护客户端的隐私信息。但这种安全不是绝对可靠的。而且所有结点上传的梯度信息都存储在一个服务器中，有崩溃遗失的风险。&lt;/p&gt;
+&lt;/blockquote&gt;
 </description>
         </item>
         <item>
@@ -1751,7 +1746,7 @@ $$\beta_{k}(p, q) = \text{dist}(Q(p, :), Q(q, :))$$&lt;p&gt;（其中 $p, q \in 
 &lt;/h3&gt;&lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;构造过程&lt;/strong&gt;
 &lt;ul&gt;
-&lt;li&gt;步骤 1：对于给定的邻接矩阵，判断是否为的幂。若是，进入步骤 2；若不是，增加行和列使（为正整数），新增元素用 “0” 填充，再进入步骤 2 递归划分。&lt;/li&gt;
+&lt;li&gt;步骤 1：对于给定的邻接矩阵，判断是否为k的幂。若是，进入步骤 2；若不是，增加行和列使（为正整数），新增元素用 “0” 填充，再进入步骤 2 递归划分。&lt;/li&gt;
 &lt;li&gt;步骤 2：依据 MXQuntree 规则把矩阵划分为个大小一致的子矩阵。若子矩阵至少有一个 “1” 元素，标记为 1，否则标记为 0，自上而下、自左而右排列这些值作为根节点的 4 个儿子节点，完成树的第 1 层节点构造。对标记为 1 的矩阵递归处理，其值作为树的第 2 层节点，重复直至划分后的矩阵全为 0 或已划分到原始矩阵元素，递归停止。&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/li&gt;
@@ -1795,7 +1790,7 @@ $$\beta_{k}(p, q) = \text{dist}(Q(p, :), Q(q, :))$$&lt;p&gt;（其中 $p, q \in 
 &lt;/ul&gt;
 &lt;h3 id=&#34;2k-partition-技术&#34;&gt;（2）k²-partition 技术
 &lt;/h3&gt;&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;改进思路&lt;/strong&gt;：Claude 等人利用网页图中域的规律，提出k²-partition，沿对角线划分图为不同域，对不同域用传统-tree 表示，实现较好时间 / 空间均衡。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;改进思路&lt;/strong&gt;：Claude 等人利用网页图中域的规律，提出k²-partition，沿对角线划分图为不同域，对不同域用传统k²-tree 表示，实现较好时间 / 空间均衡。&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;效果对比&lt;/strong&gt;：如对图 2 中的矩阵，传统k²-tree 表示需 72bit 存储空间，k²-partition 表示只需 64bit，且随图节点增加效果更明显，同时能获得更好查询时间。&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;&lt;img src=&#34;https://SilentThink.github.io/p/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF%E7%BB%BC%E8%BF%B0/img/image-20241109145943577.png&#34;
@@ -1952,8 +1947,6 @@ $$\beta_{k}(p, q) = \text{dist}(Q(p, :), Q(q, :))$$&lt;p&gt;（其中 $p, q \in 
 &lt;/h2&gt;&lt;h3 id=&#34;1空隙编码&#34;&gt;（1）空隙编码
 &lt;/h3&gt;&lt;ul&gt;
 &lt;li&gt;
-&lt;p&gt;&lt;strong&gt;编码依据及思想&lt;/strong&gt;：研究表明多数网页图具有局部性，即页面直接邻居集合挨得很近。Boldi 等人据此提出空隙编码，其思想是用连续节点标签值替代原始值以压缩节点标签，减少存储空间。设 $A(x)=(a_1, a_2, a_3, \cdots, a_n)$ 为第 $x$ 个节点的直接邻居标签值序列，$x$ 对应的空隙编码 $B(x)=(c(a_1 - x), a_2 - a_1 - 1, a_3 - a_2 - 1, \cdots, a_n - a_{n - 1} - 1)$，其中
-&lt;/p&gt;
 $$
   c(x)=\begin{cases}2x, &amp; x \geq 0 \\ 2|x| - 1, &amp; x &lt; 0\end{cases}
   $$&lt;p&gt;
@@ -4186,6 +4179,109 @@ $$
 &lt;/h3&gt;</description>
         </item>
         <item>
+        <title>Git</title>
+        <link>https://SilentThink.github.io/p/git/</link>
+        <pubDate>Thu, 07 Nov 2024 13:59:07 +0800</pubDate>
+        
+        <guid>https://SilentThink.github.io/p/git/</guid>
+        <description>&lt;h3 id=&#34;titlegit-常用命令&#34;&gt;Title:Git 常用命令
+&lt;/h3&gt;&lt;h3 id=&#34;1-全局配置-git-信息&#34;&gt;&lt;strong&gt;1. 全局配置 Git 信息&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;在全局范围内配置 Git 用户名、邮箱等基本信息：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git config --global user.name &lt;span class=&#34;s2&#34;&gt;&amp;#34;你的名字&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git config --global user.email &lt;span class=&#34;s2&#34;&gt;&amp;#34;你的邮箱&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;查看当前配置：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git config --list --global
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;2-清理并重新初始化当前项目的-git-配置&#34;&gt;&lt;strong&gt;2. 清理并重新初始化当前项目的 Git 配置&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;如果当前仓库配置有问题，可以清理现有的 &lt;code&gt;.git&lt;/code&gt; 并重新初始化：&lt;/p&gt;
+&lt;p&gt;（1）删除现有的 &lt;code&gt;.git&lt;/code&gt; 文件夹：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;rm -rf .git
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;（2）重新初始化 Git 仓库：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git init
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git remote add origin &amp;lt;仓库URL&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;（3）重新下载代码：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git fetch --all
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git reset --hard origin/&amp;lt;分支名&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;3配置-ssh&#34;&gt;3.配置 SSH
+&lt;/h3&gt;&lt;p&gt;（1）生成 SSH 密钥：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;ssh-keygen -t rsa -b &lt;span class=&#34;m&#34;&gt;4096&lt;/span&gt; -C &lt;span class=&#34;s2&#34;&gt;&amp;#34;你的邮箱&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;（2）添加到 SSH-Agent：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nb&#34;&gt;eval&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;$(&lt;/span&gt;ssh-agent -s&lt;span class=&#34;k&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;ssh-add ~/.ssh/id_rsa
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;（3）将公钥添加到远程仓库：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;cat ~/.ssh/id_rsa.pub
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;将输出内容添加到远程仓库的 SSH 配置中（例如 GitHub 或 GitLab）。&lt;/p&gt;
+&lt;p&gt;（4）测试连接：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;ssh -T git@github.com
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description>
+        </item>
+        <item>
         <title>MyFirstBlog</title>
         <link>https://SilentThink.github.io/p/myfirstblog/</link>
         <pubDate>Thu, 07 Nov 2024 13:59:07 +0800</pubDate>
@@ -4604,8 +4700,6 @@ $$
 
 &lt;h3 id=&#34;examples&#34;&gt;Examples
 &lt;/h3&gt;&lt;p&gt;Inline math: $\varphi = \dfrac{1+\sqrt5}{2}= 1.6180339887…$&lt;/p&gt;
-&lt;p&gt;Block math:
-&lt;/p&gt;
 $$
  \varphi = 1+\frac{1} {1+\frac{1} {1+\frac{1} {1+\cdots} } } 
 $$</description>
