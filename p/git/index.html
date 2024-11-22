@@ -276,6 +276,8 @@
         <li><a href="#1-全局配置-git-信息"><strong>1. 全局配置 Git 信息</strong></a></li>
         <li><a href="#2-清理并重新初始化当前项目的-git-配置"><strong>2. 清理并重新初始化当前项目的 Git 配置</strong></a></li>
         <li><a href="#3配置-ssh">3.配置 SSH</a></li>
+        <li><a href="#创建并切换到新分支">创建并切换到新分支</a></li>
+        <li><a href="#直接推送到远程分支不推荐">直接推送到远程分支（不推荐）</a></li>
       </ol>
     </li>
   </ol>
@@ -404,6 +406,15 @@
 </span></span><span class="line"><span class="cl">git reset --hard origin/&lt;分支名&gt;
 </span></span></code></pre></td></tr></table>
 </div>
+</div><p>（4）push：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">git push --set-upstream origin master
+</span></span></code></pre></td></tr></table>
+</div>
 </div><h3 id="3配置-ssh">3.配置 SSH
 </h3><p>（1）生成 SSH 密钥：</p>
 <div class="highlight"><div class="chroma">
@@ -442,6 +453,62 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">ssh -T git@github.com
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="创建并切换到新分支">创建并切换到新分支
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">git branch new-branch-name
+</span></span><span class="line"><span class="cl">git switch new-branch-name
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="直接推送到远程分支不推荐">直接推送到远程分支（不推荐）
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">git push origin HEAD:remote-branch-name
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>创建并切换到新分支：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">git checkout -b 分支名
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>仅创建新分支：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">git branch 分支名
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>切换到已创建的分支：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">git checkout 分支名
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>查看所有分支：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">git branch
 </span></span></code></pre></td></tr></table>
 </div>
 </div>
