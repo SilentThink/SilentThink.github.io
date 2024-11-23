@@ -3,7 +3,7 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://SilentThink.github.io/</loc>
-    <lastmod>2024-11-11T15:50:40+08:00</lastmod>
+    <lastmod>2024-11-24T13:59:07+08:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
@@ -15,11 +15,8 @@
                 href="https://SilentThink.github.io/"
                 />
   </url><url>
-    <loc>https://SilentThink.github.io/p/cs144-lab-7/</loc>
-    <lastmod>2024-11-11T15:50:40+08:00</lastmod>
-  </url><url>
     <loc>https://SilentThink.github.io/post/</loc>
-    <lastmod>2024-11-11T15:50:40+08:00</lastmod>
+    <lastmod>2024-11-24T13:59:07+08:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
@@ -30,6 +27,9 @@
                 hreflang="zh-cn"
                 href="https://SilentThink.github.io/post/"
                 />
+  </url><url>
+    <loc>https://SilentThink.github.io/p/cs144-lab-7/</loc>
+    <lastmod>2024-11-11T15:50:40+08:00</lastmod>
   </url><url>
     <loc>https://SilentThink.github.io/p/cs144-lab-6/</loc>
     <lastmod>2024-11-11T15:50:21+08:00</lastmod>
